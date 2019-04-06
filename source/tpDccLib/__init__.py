@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 Initialization module for tpDccLib
@@ -45,7 +45,7 @@ class tpDccLib(object):
         import tpDccLib
 
         cls.create_logger()
-        cls.init_dcc()
+        cls.init_dcc(do_reload=do_reload)
         cls.import_modules(os.path.join(tpDccLib.__path__[0], 'core'), only_packages=True, order=['tpDccLib.widgets'])
 
         if do_reload:
@@ -63,17 +63,17 @@ class tpDccLib(object):
         return logger
 
     @classmethod
-    def init_dcc(cls):
+    def init_dcc(cls, do_reload=False):
         """
         Checks DCC we are working on an initializes proper variables
         """
 
         if 'cmds' in main.__dict__:
             import tpMayaLib
-            tpMayaLib.init()
+            tpMayaLib.init(do_reload=do_reload)
         elif 'MaxPlus' in main.__dict__:
             import tpMaxLib
-            tpMaxLib.init()
+            tpMaxLib.init(do_reload=do_reload)
         elif 'hou' in main.__dict__:
             raise NotImplementedError('Houdini is not a supported DCC yet!')
         elif 'nuke' in main.__dict__:
@@ -123,7 +123,7 @@ class tpDccLib(object):
                 return mod
             return None
         except (ImportError, AttributeError) as e:
-            tpDccLib.logger.debug('FAILED IMPORT: {} -> {}'.format(package_name, str(e)))
+            tpDccLib.logger.error('FAILED IMPORT: {} -> {}'.format(package_name, str(e)))
             pass
 
     @classmethod
@@ -207,7 +207,7 @@ def is_nuke():
     :return: bool
     """
 
-    return dcc == Dccs.Nuke
+    return Dcc.get_name() == Dccs.Nuke
 
 
 def is_maya():
@@ -216,7 +216,7 @@ def is_maya():
     :return: bool
     """
 
-    return dcc == Dccs.Maya
+    return Dcc.get_name() == Dccs.Maya
 
 
 def is_max():
@@ -225,7 +225,7 @@ def is_max():
     :return: bool
     """
 
-    return dcc == Dccs.Max
+    return Dcc.get_name() == Dccs.Max
 
 
 def is_houdini():
@@ -234,4 +234,4 @@ def is_houdini():
     :return: bool
     """
 
-    return dcc == Dccs.Houdini
+    return Dcc.get_name() == Dccs.Houdini
