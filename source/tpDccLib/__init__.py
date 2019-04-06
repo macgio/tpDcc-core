@@ -15,7 +15,7 @@ import pkgutil
 import importlib
 from collections import OrderedDict
 
-from tpPyUtils import logger as logger_utils
+from tpPyUtils import dcc, logger as logger_utils
 
 # =================================================================================
 
@@ -40,14 +40,16 @@ class tpDccLib(object):
     reload_modules = list()
 
     @classmethod
-    def initialize(cls):
+    def initialize(cls, do_reload=False):
 
         import tpDccLib
 
         cls.create_logger()
         cls.init_dcc()
         cls.import_modules(os.path.join(tpDccLib.__path__[0], 'core'), only_packages=True, order=['tpDccLib.widgets'])
-        cls.reload_all()
+
+        if do_reload:
+            cls.reload_all()
 
     @staticmethod
     def create_logger():
@@ -195,5 +197,41 @@ class tpDccLib(object):
         tpDccLib.logger.debug(' =========> tpDccLib reloaded successfully!')
 
 
-def init():
-    tpDccLib.initialize()
+def init(do_reload=False):
+    tpDccLib.initialize(do_reload=do_reload)
+
+
+def is_nuke():
+    """
+    Checks if Nuke is available or not
+    :return: bool
+    """
+
+    return dcc == Dccs.Nuke
+
+
+def is_maya():
+    """
+    Checks if Maya is available or not
+    :return: bool
+    """
+
+    return dcc == Dccs.Maya
+
+
+def is_max():
+    """
+    Checks if Max is available or not
+    :return: bool
+    """
+
+    return dcc == Dccs.Max
+
+
+def is_houdini():
+    """
+    Checks if Houdini is available or not
+    :return: bool
+    """
+
+    return dcc == Dccs.Houdini
