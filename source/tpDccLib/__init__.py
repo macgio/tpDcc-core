@@ -58,7 +58,7 @@ class tpDccLib(object):
         """
 
         global logger
-        logger = logger_utils.Logger(name='tpDccLib', level=logger_utils.LoggerLevel.WARNING)
+        logger = logger_utils.Logger(name='tpDccLib', level=logger_utils.LoggerLevel.WARNING).logger
         logger.debug('Initializing tpDccLib logger ...')
         return logger
 
