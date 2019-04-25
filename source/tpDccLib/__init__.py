@@ -15,7 +15,7 @@ import pkgutil
 import importlib
 from collections import OrderedDict
 
-from tpPyUtils import dcc, logger as logger_utils
+from tpPyUtils import logger as logger_utils
 
 # =================================================================================
 
