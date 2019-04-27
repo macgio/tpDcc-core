@@ -463,6 +463,17 @@ class Project(QWidget, ProjectData):
 
         return True
 
+    def load_project_data(self):
+        """
+        Return dictionary data contained in the project
+        :return: dict
+        """
+
+        if not self.settings:
+            return
+
+        return self.settings.data()
+
     def get_project_nodes(self):
         """
         Returns path where nodes should be stored
