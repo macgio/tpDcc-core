@@ -7,18 +7,16 @@ Initialization module for tpDccLib
 
 from __future__ import print_function, division, absolute_import
 
-main = __import__('__main__')
-
 import os
 import inspect
 
 from tpPyUtils import importer
-from tpQtLib.core import resource as resource_utils
+
+main = __import__('__main__')
 
 # =================================================================================
 
 logger = None
-resource = None
 Dcc = None
 
 # =================================================================================
@@ -31,10 +29,6 @@ class Dccs(object):
     Nuke = 'nuke'
 
 # =================================================================================
-
-
-class tpDccLibResource(resource_utils.Resource, object):
-    RESOURCES_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources')
 
 
 class tpDccLib(importer.Importer, object):
@@ -72,9 +66,7 @@ def init(do_reload=False):
     init_dcc(do_reload=do_reload)
 
     global logger
-    global resource
     logger = dcclib_importer.logger
-    resource = tpDccLibResource
 
     dcclib_importer.import_modules()
     dcclib_importer.import_packages(only_packages=True)

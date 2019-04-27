@@ -14,8 +14,9 @@ from tpQtLib.Qt.QtWidgets import *
 from tpQtLib.Qt.QtGui import *
 
 import tpDccLib as tp
-from tpPyUtils import path, folder, image, fileio, settings
-from tpQtLib.core import qtutils
+import tpQtLib
+from tpPyUtils import path, folder, fileio, settings
+from tpQtLib.core import qtutils, image
 from tpQtLib.widgets import search, directory, splitters, grid
 from tpDccLib.core import consts
 
@@ -353,7 +354,7 @@ class ProjectData(object):
         self._settings.set('name', self.name)
         self._settings.set('path', self.project_path)
         self._settings.set('full_path', self.full_path)
-        self._settings.set('image', image.image_to_base64(tp.resource.get('icons', 'rignode_icon') + '.png'))
+        self._settings.set('image', image.image_to_base64(tpQtLib.resource.get('icons', 'rignode_icon') + '.png'))
 
     def _setup_options(self):
 
@@ -404,19 +405,19 @@ class Project(QWidget, ProjectData):
     # region Override Functions
     def contextMenuEvent(self, event):
         menu = QMenu(self)
-        remove_icon = tp.resource.icon(name='delete', extension='png')
+        remove_icon = tpQtLib.resource.icon(name='delete', extension='png')
         remove_action = QAction(remove_icon, 'Remove', menu)
         remove_action.setStatusTip(consts.DELETE_PROJECT_TOOLTIP)
         remove_action.setToolTip(consts.DELETE_PROJECT_TOOLTIP)
         remove_action.triggered.connect(self._on_remove_project)
 
-        folder_icon = tp.resource.icon(name='open_folder', extension='png')
+        folder_icon = tpQtLib.resource.icon(name='open_folder', extension='png')
         folder_action = QAction(folder_icon, 'Open in Browser', menu)
         folder_action.setStatusTip(consts.OPEN_PROJECT_IN_EXPLORER_TOOLTIP)
         folder_action.setToolTip(consts.OPEN_PROJECT_IN_EXPLORER_TOOLTIP)
         folder_action.triggered.connect(self._on_open_in_browser)
 
-        image_icon = tp.resource.icon(name='picture', extension='png')
+        image_icon = tpQtLib.resource.icon(name='picture', extension='png')
         set_image_action = QAction(image_icon, 'Set Project Image', menu)
         set_image_action.setToolTip(consts.SET_PROJECT_IMAGE_TOOLTIP)
         set_image_action.setStatusTip(consts.SET_PROJECT_IMAGE_TOOLTIP)
@@ -898,7 +899,7 @@ class Template(QWidget):
         self.project_btn.toggled.connect(self._on_selected_template)
 
     def get_icon(self):
-        return tp.resource.icon(name='rignode_icon', extension='png')
+        return tpQtLib.resource.icon(name='rignode_icon', extension='png')
     # endregion
 
     # region Private Functions
