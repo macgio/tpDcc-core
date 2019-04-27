@@ -575,8 +575,8 @@ class ProjectViewer(grid.GridWidget, object):
                 tp.logger.warning('Projects Path {} is not valid!'.format(project_path))
                 return
             for root, dirs, files in os.walk(project_path):
-                if 'project.json' in files:
-                    new_project = Project.create_project_from_data(path.join_path(root, 'project.json'))
+                if consts.PROJECTS_NAME in files:
+                    new_project = Project.create_project_from_data(path.join_path(root, consts.PROJECTS_NAME))
                     if new_project is not None:
                         self.add_project(new_project)
 

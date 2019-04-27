@@ -11,13 +11,14 @@ import os
 import inspect
 
 from tpPyUtils import importer
+from tpDccLib.abstract import dcc as abstract_dcc
 
 main = __import__('__main__')
 
 # =================================================================================
 
 logger = None
-Dcc = None
+Dcc = abstract_dcc.AbstractDCC()
 
 # =================================================================================
 
@@ -63,13 +64,15 @@ def init(do_reload=False):
     """
 
     dcclib_importer = importer.init_importer(importer_class=tpDccLib, do_reload=do_reload)
-    init_dcc(do_reload=do_reload)
 
     global logger
     logger = dcclib_importer.logger
 
     dcclib_importer.import_modules()
     dcclib_importer.import_packages(only_packages=True)
+
+    init_dcc(do_reload=do_reload)
+
 
 def init_dcc(do_reload=False):
     """

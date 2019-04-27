@@ -8,6 +8,7 @@ Module that contains constant definitions for tpDccLib
 from __future__ import print_function, division, absolute_import
 
 # =================== PROJECTS
+PROJECTS_NAME = 'project.json'
 CODE_FOLDER = '__code__'
 DATA_FOLDER = '__data__'
 BACKUP_FOLDER = '__backup__'
