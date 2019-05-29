@@ -350,7 +350,6 @@ class ProjectData(object):
         self._settings = settings.JSONSettings()
         self._set_settings_path(project_path)
         self._settings.set('version', '0.0.0')
-        # self._settings.set('version', str(tpRigTask.get_rig_task_version()))
         self._settings.set('name', self.name)
         self._settings.set('path', self.project_path)
         self._settings.set('full_path', self.full_path)
@@ -626,6 +625,18 @@ class ProjectWidget(QWidget, object):
         self._open_project.set_settings(settings)
         self._new_project.set_settings(settings)
 
+    def get_project_by_name(self, project_name, force_update=True):
+        """
+        Returns project with given name, if exists
+        :param project_name: str
+        :return: Project or None
+        """
+
+        if force_update:
+            self._open_project.projects_list.update_projects()
+
+        return self._open_project.projects_list.get_project_by_name(project_name)
+
     def _on_project_opened(self, project):
         self.projectOpened.emit(project)
 
@@ -832,7 +843,7 @@ class NewProjectWidget(QWidget, object):
         project_path = self.project_line.text()
         project_name = self.name_line.text()
         if not project_path or not path.is_dir(project_path) or not project_name:
-            tp.logger.warning('Project Path: {0} or Project Name: {} are not valid!'.format(project_path, project_name))
+            tp.logger.warning('Project Path: {} or Project Name: {} are not valid!'.format(project_path, project_name))
             return
         if self._selected_template is None:
             tp.logger.warning('No Template selected, please select one first ...')
@@ -935,8 +946,8 @@ class BlankTemplateData(TemplateData, object):
     @staticmethod
     def create_project(project_name, project_path):
         new_project = TemplateData.create_project(project_name=project_name, project_path=project_path)
-        new_project.create_folder(consts.DATA_FOLDER)
-        new_project.create_folder(consts.CODE_FOLDER)
+        # new_project.create_folder(consts.DATA_FOLDER)
+        # new_project.create_folder(consts.CODE_FOLDER)
         return new_project
 
 

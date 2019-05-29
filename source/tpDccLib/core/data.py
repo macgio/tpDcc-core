@@ -26,13 +26,31 @@ class DataTypes(object):
     JSON = 'JSON'
 
 
+class DataExtensions(object):
+    """
+    Class that defines different data extensions supported by DCCs
+    """
+
+    FileDataExtension = 'data'
+
+
 class ScriptTypes(object):
     """
     Class that defines different script types supported by DCCs
     """
 
     Unknown = 'Unknown'
-    Python = 'PythonScript'
+    Python = 'script.python'
+    Manifest = 'script.manifest'
+
+
+class ScriptExtensions(object):
+    """
+    Class that defines different script extensions supported by DCCs
+    """
+
+    Python = 'py'
+    Manifest = 'data'
 
 
 class Data(object):
@@ -158,7 +176,7 @@ class FileData(Data, object):
         :return: str
         """
 
-        return 'data'
+        return DataExtensions.FileDataExtension
     # endregion
 
     # region Public Functions
@@ -316,8 +334,12 @@ class ScriptManifestData(ScriptData, object):
 
     @staticmethod
     def get_data_type():
-        return 'script.manifest'
+        return ScriptTypes.Manifest
         # return constants.ScriptLanguages.Manifest
+
+    @staticmethod
+    def get_data_extension():
+        return ScriptExtensions.Manifest
 
 
 class ScriptPythonData(ScriptData, object):
@@ -328,11 +350,11 @@ class ScriptPythonData(ScriptData, object):
     @staticmethod
     def get_data_type():
         # return constants.ScriptLanguages.Python
-        return 'script.python'
+        return ScriptTypes.Python
 
     @staticmethod
     def get_data_extension():
-        return 'py'
+        return ScriptExtensions.Python
 
     def open(self):
         lines = ''
