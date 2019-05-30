@@ -34,6 +34,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def is_batch():
+        """
+        Returns whether DCC is being executed in batch mode or not
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function is_batch() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_main_window():
         """
         Returns Qt object that references to the main DCC window
@@ -892,6 +902,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function get_time_slider_range() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def fit_view(animation=True):
+        """
+        Fits current viewport to current selection
+        :param animation: bool, Animated fit is available
+        """
+
+        raise NotImplementedError('abstract DCC function fit_view() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
