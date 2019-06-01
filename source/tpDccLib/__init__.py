@@ -11,7 +11,7 @@ import os
 import inspect
 
 from tpPyUtils import importer
-from tpDccLib.abstract import dcc as abstract_dcc
+from tpDccLib.abstract import dcc as abstract_dcc, callback as abstract_callback
 
 main = __import__('__main__')
 
@@ -19,9 +19,16 @@ main = __import__('__main__')
 
 logger = None
 Dcc = abstract_dcc.AbstractDCC()
+Callback = abstract_callback.AbstractCallback
 
 # =================================================================================
 
+
+class Callbacks(object):
+    SelectionChanged = None
+
+
+# =================================================================================
 
 class Dccs(object):
     Houdini = 'houdini'

@@ -118,9 +118,10 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def select_object(node, **kwargs):
+    def select_object(node, replace_selection=False, **kwargs):
         """
         Selects given object in the current scene
+        :param replace_selection: bool
         :param node: str
         """
 
@@ -721,6 +722,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def is_component_mode():
+        """
+        Returns whether current DCC selection mode is component mode or not
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function is_component_mode() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def scene_name():
         """
         Returns the name of the current scene
@@ -1077,6 +1088,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function disable_undo() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def focus(object_to_focus):
+        """
+        Focus in given object
+        :param object_to_focus: str
+        """
+
+        raise NotImplementedError('abstract DCC function focus() not implemented!')
 
     # ================================================================================================================
 

@@ -436,6 +436,13 @@ class Project(QWidget, ProjectData):
     def setup_signals(self):
         self.project_btn.clicked.connect(self._on_open_project)
 
+    def open(self):
+        """
+        Opens project
+        """
+
+        self._on_open_project()
+
     def set_image(self, encoded_image):
         if not encoded_image:
             return
@@ -625,17 +632,35 @@ class ProjectWidget(QWidget, object):
         self._open_project.set_settings(settings)
         self._new_project.set_settings(settings)
 
-    def get_project_by_name(self, project_name, force_update=True):
+    def set_projects_path(self, projects_path):
         """
-        Returns project with given name, if exists
+        Sets the path where we want to search for projects
+        :param projects_path: str
+        """
+
+        self._open_project.set_projects_path(projects_path)
+
+    def get_project_by_name(self, project_name):
+        """
+        Returns project by its name
         :param project_name: str
-        :return: Project or None
+        :return: Project
         """
 
-        if force_update:
-            self._open_project.projects_list.update_projects()
+        projects_list = self._open_project.get_projects_list()
+        return projects_list.get_project_by_name(project_name)
 
-        return self._open_project.projects_list.get_project_by_name(project_name)
+    def open_project(self, project_name):
+        """
+        Opens project with given name
+        :param project_name: str
+        :return: Project
+        """
+
+        project_found = self.get_project_by_name(project_name)
+        if project_found:
+            project_found.open()
+            return project_found
 
     def _on_project_opened(self, project):
         self.projectOpened.emit(project)
@@ -664,8 +689,8 @@ class OpenProjectWidget(QWidget, object):
         self.search_widget = search.SearchFindWidget()
         self.search_widget.set_placeholder_text('Filter Projects ...')
 
-        self.projects_list = ProjectViewer()
-        self.projects_list.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._projects_list = ProjectViewer()
+        self._projects_list.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         buttons_layout = QHBoxLayout()
         buttons_layout.setContentsMargins(0, 0, 0, 0)
@@ -684,14 +709,31 @@ class OpenProjectWidget(QWidget, object):
         main_layout.addWidget(self.search_widget)
         main_layout.addLayout(splitters.SplitterLayout())
         main_layout.addWidget(splitters.Splitter('   PROJECTS   '))
-        main_layout.addWidget(self.projects_list)
+        main_layout.addWidget(self._projects_list)
         main_layout.addLayout(splitters.SplitterLayout())
         main_layout.addLayout(buttons_layout)
 
         self.browse_widget.directoryChanged.connect(self._on_directory_browsed)
-        self.projects_list.projectOpened.connect(self._on_project_opened)
+        self._projects_list.projectOpened.connect(self._on_project_opened)
 
         self._update_ui()
+
+    def get_projects_list(self):
+        """
+        Returns projects list widget
+        :return: ProjectViewer
+        """
+
+        return self._projects_list
+
+    def set_projects_path(self, projects_path):
+        """
+        Sets the path where we want to search for projects
+        :param projects_path: str
+        """
+
+        self._on_directory_browsed(projects_path)
+        self.update_projects(projects_path)
 
     def set_settings(self, settings):
         """
@@ -704,10 +746,10 @@ class OpenProjectWidget(QWidget, object):
         self._update_ui()
 
         # We set the settings of the projects list after updating UI
-        self.projects_list.set_settings(settings)
+        self._projects_list.set_settings(settings)
 
     def update_projects(self, project_path=None):
-        self.projects_list.update_projects(project_path=project_path)
+        self._projects_list.update_projects(project_path=project_path)
     # endregion
 
     # region Private Functions
