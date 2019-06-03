@@ -14,7 +14,6 @@ from collections import OrderedDict
 
 import tpDccLib as tp
 from tpPyUtils import decorators, path, fileio, folder, settings
-from tpQtLib.core import dialog
 
 
 class DataTypes(object):
@@ -188,7 +187,9 @@ class FileData(Data, object):
 
         self.directory = directory
         self.settings.set_directory(self.directory, 'data.json')
-        self.name = self.settings.get('name')
+
+        if not self.name:
+            self.name = self.settings.get('name')
 
         self.get_sub_folder()
 
@@ -397,6 +398,8 @@ class CustomData(FileData, object):
         :param force: bool, True to force save if the file already exists (overwrite)
         """
 
+        from tpQtLib.core import dialog
+
         file_path_dialog = dialog.SaveFileDialog(parent=self, use_app_browser=False)
         file_path_dialog.set_filters(self.file_filter)
         file_path = file_path_dialog.exec_()
@@ -413,6 +416,8 @@ class CustomData(FileData, object):
         Override for custom import functionality
         :param file_path: str, file path of file to load
         """
+
+        from tpQtLib.core import dialog
 
         if not file_path:
             file_path_dialog = dialog.OpenFileDialog(parent=self, use_app_browser=False)

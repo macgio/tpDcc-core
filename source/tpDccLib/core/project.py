@@ -640,12 +640,16 @@ class ProjectWidget(QWidget, object):
 
         self._open_project.set_projects_path(projects_path)
 
-    def get_project_by_name(self, project_name):
+    def get_project_by_name(self, project_name, force_update=True):
         """
         Returns project by its name
         :param project_name: str
+        :param force_update: bool
         :return: Project
         """
+
+        if force_update:
+            self._open_project.get_projects_list().update_projects()
 
         projects_list = self._open_project.get_projects_list()
         return projects_list.get_project_by_name(project_name)
