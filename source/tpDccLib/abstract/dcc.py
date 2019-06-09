@@ -203,6 +203,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_reference_path(node, without_copy_number=False):
+        """
+        Returns reference path of the referenced node
+        :param node: str
+        :param without_copy_number: bool
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function node_reference_path() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_is_loaded(node):
         """
         Returns whether given node is loaded or not
@@ -372,6 +384,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function list_materials() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def scene_namespaces():
+        """
+        Returns all the available namespaces in the current scene
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function scene_namespaces() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod

@@ -503,9 +503,9 @@ class Project(QWidget, ProjectData):
         fileio.open_browser(self.full_path)
 
     def _on_set_project_image(self):
-        image_file = tp.Dcc.select_file(
-            caption='Select Project Image File',
-            filters="PNG Files (*.png)")
+        image_file = tp.Dcc.select_file_dialog(
+            title='Select Project Image File',
+            pattern="PNG Files (*.png)")
 
         if image_file is None or not path.is_file(image_file):
             tp.logger.warning('Selected Image "{}" is not valid!'.format(image_file))
@@ -711,10 +711,8 @@ class OpenProjectWidget(QWidget, object):
         buttons_layout.addLayout(buttons_layout1)
 
         main_layout.addWidget(self.search_widget)
-        main_layout.addLayout(splitters.SplitterLayout())
         main_layout.addWidget(splitters.Splitter('   PROJECTS   '))
         main_layout.addWidget(self._projects_list)
-        main_layout.addLayout(splitters.SplitterLayout())
         main_layout.addLayout(buttons_layout)
 
         self.browse_widget.directoryChanged.connect(self._on_directory_browsed)
@@ -846,9 +844,7 @@ class NewProjectWidget(QWidget, object):
         main_layout.addLayout(splitters.SplitterLayout())
         main_layout.addWidget(splitters.Splitter('   TEMPLATES   '))
         main_layout.addWidget(self.templates_list)
-        main_layout.addLayout(splitters.SplitterLayout())
         main_layout.addLayout(project_layout)
-        main_layout.addLayout(splitters.SplitterLayout())
         main_layout.addLayout(buttons_layout)
 
         self.templates_list.selectedTemplate.connect(self._on_selected_template)

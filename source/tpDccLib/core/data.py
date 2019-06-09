@@ -157,11 +157,11 @@ class FileData(Data, object):
     Class used to define data stored in disk files
     """
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, path=None):
         super(FileData, self).__init__(name=name)
 
         self.extension = self.get_data_extension()
-        self.directory = None
+        self.directory = path
         self.settings = settings.JSONSettings()
         self.file = None
         self._sub_folder = None
