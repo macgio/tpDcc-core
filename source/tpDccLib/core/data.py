@@ -8,9 +8,11 @@ Module that contains base definitions to handle DCC data
 from __future__ import print_function, division, absolute_import
 
 import os
+import json
 import uuid
 from collections import OrderedDict
 
+import tpDccLib as tp
 from tpPyUtils import decorators, path, fileio, folder, settings
 
 
@@ -268,3 +270,78 @@ class FileData(Data, object):
             return '{0}.{1}'.format(self.name, self.extension)
         else:
             return name
+
+
+class CustomData(FileData, object):
+    """
+    Class used to define custom data stored in disk files
+    """
+
+    def export_data(self, file_path, force=False):
+        """
+        Save data object to file on disk
+        Override for custom export functionality
+        :param file_path: str, file path to store the data in disk
+        :param force: bool, True to force save if the file already exists (overwrite)
+        """
+
+        dir_path = os.path.dirname(file_path)
+        if not os.path.isdir(dir_path):
+            os.makedirs(dir_path)
+
+        if os.path.isfile(file_path) and not force:
+            raise Exception('File "{}" already exists! Enable force saving to override the file.'.format(file_path))
+
+        file_out = open(file_path, 'w')
+        json.dump(self, file_out)
+        file_out.close()
+
+        tp.logger.debug('Saved {0}: "{1}"'.format(self.__class__.__name__, file_path))
+
+        return file_path
+
+    def export_data_as(self):
+        """
+        Save data object to file on disk by opening a file dialog to allow the user to specify a file path
+        Override for custom export as functionality
+        :param file_path: str, file path to store the data in disk
+        :param force: bool, True to force save if the file already exists (overwrite)
+        """
+
+        from tpQtLib.core import dialog
+
+        file_path_dialog = dialog.SaveFileDialog(parent=self, use_app_browser=False)
+        file_path_dialog.set_filters(self.file_filter)
+        file_path = file_path_dialog.exec_()
+        if not file_path:
+            return None
+        file_path = file_path[0]
+        file_path = self.save(file_path, force=True)
+
+        return file_path
+
+    def import_data(self, file_path=''):
+        """
+        Loads data object from JSON files
+        Override for custom import functionality
+        :param file_path: str, file path of file to load
+        """
+
+        from tpQtLib.core import dialog
+
+        if not file_path:
+            file_path_dialog = dialog.OpenFileDialog(parent=self, use_app_browser=False)
+            file_path_dialog.set_filters(self.file_filter)
+            file_path = file_path_dialog.exec_()
+            if not file_path:
+                return None
+        else:
+            if not os.path.isfile(file_path):
+                raise Exception('File "{}" does not exists!'.format(file_path))
+
+        file_in = open(file_path, 'rb')
+        data_in = json.load(file_in)
+        data_type = data_in.__class__.__name__
+        tp.logger.debug('Loaded {0}: "{1}"'.format(data_type, file_path))
+
+        return data_in
