@@ -118,6 +118,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def rename_node(node, new_name):
+        """
+        Renames given node with new given name
+        :param node: str
+        :param new_name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function rename_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def select_object(node, replace_selection=False, **kwargs):
         """
         Selects given object in the current scene
@@ -126,6 +138,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function select_object() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def select_hierarchy(root=None, add=False):
+        """
+        Selects the hierarchy of the given node
+        If no object is given current selection will be used
+        :param root: str
+        :param add: bool, Whether new selected objects need to be added to current selection or not
+        """
+
+        raise NotImplementedError('abstract DCC function select_hierarchy() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -156,6 +180,28 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function selected_nodes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def all_shapes_nodes(full_path=True):
+        """
+        Returns all shapes nodes in current scene
+        :param full_path: bool
+        :return: list<str>
+        """
+
+        raise NotImplementedError('abstract DCC function all_shapes_nodes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def default_scene_nodes(full_path=True):
+        """
+        Returns a list of nodes that are created by default by the DCC when a new scene is created
+        :param full_path: bool
+        :return: list<str>
+        """
+
+        raise NotImplementedError('abstract DCC function default_scene_nodes() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -223,6 +269,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function node_is_loaded() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_is_locked(node):
+        """
+        Returns whether given node is locked or not
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_locked() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1120,6 +1177,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function focus() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def find_available_name(self, *args, **kwargs):
+        """
+        Returns an available object name in current DCC scene
+        :param args: list
+        :param kwargs: dict
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC find_available_name focus() not implemented!')
 
     # ================================================================================================================
 
