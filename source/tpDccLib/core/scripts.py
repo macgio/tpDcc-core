@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains core data widgets for tpRigTask
+Module that contains core data widgets for tpRigBuilder
 """
 
 from __future__ import print_function, division, absolute_import

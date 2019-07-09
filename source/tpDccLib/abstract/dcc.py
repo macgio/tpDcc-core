@@ -96,6 +96,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_handle(node):
+        """
+        Returns unique identifier of the given node
+        :param node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function node_handle() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_type(node):
         """
         Returns node type of given object
@@ -213,6 +224,38 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function node_short_name() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_object_color(node):
+        """
+        Returns the color of the given node
+        :param node: str
+        :return: list(int, int, int, int)
+        """
+
+        raise NotImplementedError('abstract DCC function node_object_color() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_override_enabled(node):
+        """
+        Returns whether the given node has its display override attribute enabled or not
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_object_color() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def namespace_separator():
+        """
+        Returns character used to separate namespace from the node name
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function namespace_separator() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -520,6 +563,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def add_string_array_attribute(node, attribute_name, keyable=False):
+        """
+        Adds a new string array attribute into the given node
+        :param node: str
+        :param attribute_name: str
+        :param keyable: bool
+        """
+
+        raise NotImplementedError('abstract DCC function add_string_array_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def attribute_query(node, attribute_name, **kwargs):
         """
         Returns attribute qyer
@@ -778,6 +833,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function load_plugin() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def unload_plugin(plugin_path):
+        """
+        Unloads the given plugin
+        :param plugin_path: str
+        """
+
+        raise NotImplementedError('abstract DCC function unload_plugin() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
