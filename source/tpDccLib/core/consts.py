@@ -14,6 +14,7 @@ DATA_FOLDER = '__data__'
 BACKUP_FOLDER = '__backup__'
 VERSIONS_FOLDER = '__versions__'
 MANIFEST_FILE = 'manifest.data'
+DATA_FILE = 'data.json'
 
 
 # =================== TOOLTIPS

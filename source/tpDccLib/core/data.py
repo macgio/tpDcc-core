@@ -132,6 +132,8 @@ class FileData(Data, object):
     Class used to define data stored in disk files
     """
 
+    SETTINGS_FILE = 'data.json'
+
     def __init__(self, name=None, path=None):
         super(FileData, self).__init__(name=name)
 
@@ -161,7 +163,8 @@ class FileData(Data, object):
         """
 
         self.directory = directory
-        self.settings.set_directory(self.directory, 'data.json')
+        if self.SETTINGS_FILE:
+            self.settings.set_directory(self.directory, self.SETTINGS_FILE)
 
         if not self.name:
             self.name = self.settings.get('name')
@@ -198,7 +201,7 @@ class FileData(Data, object):
 
     def get_file_direct(self, sub_folder=None):
         """
-        Returns the file path where file is stored and optionally the sub folder is a name is given
+        Returns the file path where file is stored and optionally the sub folder if a name is given
         :param sub_folder: str, name of subfolder (optional)
         :return:
         """
@@ -265,6 +268,11 @@ class FileData(Data, object):
             return self._get_file_name()
 
     def _get_file_name(self):
+        """
+        Internal function that returns the file name including its extension
+        :return: str
+        """
+
         name = self.name
         if self.extension:
             return '{0}.{1}'.format(self.name, self.extension)
