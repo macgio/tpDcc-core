@@ -1,5 +1,10 @@
 # tpDccLib
 
+<p align="left">
+    <a href="https://github.com/tpoveda/tpPyUtils/blob/master/LICENSE" alt="License">
+        <img src="https://img.shields.io/github/license/tpoveda/tpDccLib.svg" /></a>
+</p>
+
 Collection of Python modules to write DCC tools in a DCC agnostic way.
 
 When working with specific DCCs, tpDccLib will auto import proper modules and will use
