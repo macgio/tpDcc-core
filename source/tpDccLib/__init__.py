@@ -11,7 +11,7 @@ import os
 import inspect
 
 from tpPyUtils import importer
-from tpDccLib.abstract import dcc as abstract_dcc, callback as abstract_callback
+from tpDccLib.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu,  callback as abstract_callback
 
 main = __import__('__main__')
 
@@ -19,6 +19,8 @@ main = __import__('__main__')
 
 logger = None
 Dcc = abstract_dcc.AbstractDCC()
+Shelf = abstract_shelf.AbstractShelf()
+Menu = abstract_menu.AbstractMenu()
 Callback = abstract_callback.AbstractCallback
 
 # =================================================================================
@@ -31,6 +33,7 @@ class Callbacks(object):
 # =================================================================================
 
 class Dccs(object):
+    Unknown = 'unknown'
     Houdini = 'houdini'
     Maya = 'maya'
     Max = 'max'
@@ -97,7 +100,10 @@ def init_dcc(do_reload=False):
     elif 'nuke' in main.__dict__:
         raise NotImplementedError('Nuke is not a supported DCC yet!')
     else:
-        raise NotImplementedError('Current DCC is not supported yet!')
+        global Dcc
+        from tpDccLib.core import dcc
+        Dcc = dcc.UnknownDCC
+        logger.warning('No DCC found, using abstracto one!')
 
 
 def is_nuke():

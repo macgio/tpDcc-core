@@ -34,6 +34,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_version_name():
+        """
+        Returns version of the DCC
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC function get_version_name() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def is_batch():
         """
         Returns whether DCC is being executed in batch mode or not
@@ -50,7 +60,7 @@ class AbstractDCC(object):
         :return:
         """
 
-        raise NotImplementedError('abstract DCC function get_main_window() not implemented!')
+        return None
 
     @staticmethod
     @decorators.abstractmethod
@@ -930,6 +940,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function warning() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def error(message):
+        """
+        Prints a error message
+        :param message: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function error() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
