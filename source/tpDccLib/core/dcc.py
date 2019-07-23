@@ -57,3 +57,23 @@ class UnknownDCC(abstract_dcc.AbstractDCC, object):
         """
 
         return None
+
+    @staticmethod
+    def warning(message):
+        """
+        Prints a warning message
+        :param message: str
+        :return:
+        """
+
+        print('[WARNING]: {}'.format(message))
+
+    @staticmethod
+    def error(message):
+        """
+        Prints a error message
+        :param message: str
+        :return:
+        """
+
+        print('[ERROR]: {}'.format(message))

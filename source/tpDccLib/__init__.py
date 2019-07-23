@@ -103,7 +103,7 @@ def init_dcc(do_reload=False):
         global Dcc
         from tpDccLib.core import dcc
         Dcc = dcc.UnknownDCC
-        logger.warning('No DCC found, using abstracto one!')
+        logger.warning('No DCC found, using abstract one!')
 
 
 def is_nuke():
