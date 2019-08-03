@@ -24,6 +24,28 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_dpi(value=1):
+        """
+        Returns current DPI used by DCC
+        :param value: float
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC function get_dpi() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_dpi_scale(value):
+        """
+        Returns current DPI scale used by DCC
+        :param value: float
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC function get_dpi_scale() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_version():
         """
         Returns version of the DCC

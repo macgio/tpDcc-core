@@ -23,6 +23,26 @@ class UnknownDCC(abstract_dcc.AbstractDCC, object):
         return tpDccLib.Dccs.Unknown
 
     @staticmethod
+    def get_dpi(value=1):
+        """
+        Returns current DPI used by DCC
+        :param value: float
+        :return: float
+        """
+
+        return 1.0
+
+    @staticmethod
+    def get_dpi_scale(value):
+        """
+        Returns current DPI scale used by DCC
+        :param value: float
+        :return: float
+        """
+
+        return 1.0 * value
+
+    @staticmethod
     def get_version():
         """
         Returns version of the DCC
