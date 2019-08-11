@@ -24,6 +24,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_extensions():
+        """
+        Returns supported extensions of the DCC
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function get_extensions() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_dpi(value=1):
         """
         Returns current DPI used by DCC
@@ -125,6 +135,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function check_object_type() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_node(node_type, node_name):
+        """
+        Creates a new node of the given type and with the given name
+        :param node_type: str
+        :param node_name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function create_node() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -256,6 +278,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function node_short_name() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_long_name(node):
+        """
+        Returns long name of the given node
+        :param node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function node_long_name() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -607,6 +640,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def add_message_attribute(node, attribute_name, keyable=False):
+        """
+        Adds a new message attribute into the given node
+        :param node: str
+        :param attribute_name: str
+        :param keyable: bool
+        """
+
+        raise NotImplementedError('abstract DCC function add_message_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def attribute_query(node, attribute_name, **kwargs):
         """
         Returns attribute qyer
@@ -641,6 +686,50 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function is_attribute_locked() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def show_attribute(node, attribute_name):
+        """
+        Shows attribute in DCC UI
+        :param node: str
+        :param attribute_name: str
+        """
+
+        raise NotImplementedError('abstract DCC function show_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_attribute(node, attribute_name):
+        """
+        Hides attribute in DCC UI
+        :param node: str
+        :param attribute_name: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def keyable_attribute(node, attribute_name):
+        """
+        Makes given attribute keyable
+        :param node: str
+        :param attribute_name: str
+        """
+
+        raise NotImplementedError('abstract DCC function keyable_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def unkeyable_attribute(node, attribute_name):
+        """
+        Makes given attribute unkeyable
+        :param node: str
+        :param attribute_name: str
+        """
+
+        raise NotImplementedError('abstract DCC function unkeyable_attribute() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -765,6 +854,20 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function delete_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def connect_attribute(source_node, source_attribute, target_node, target_attribute, force=False):
+        """
+        Connects source attribute to given target attribute
+        :param source_node: str
+        :param source_attribute: str
+        :param target_node: str
+        :param target_attribute: str
+        :param force: bool
+        """
+
+        raise NotImplementedError('abstract DCC function connect_attribute() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
