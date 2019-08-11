@@ -88,13 +88,15 @@ def init(do_reload=False):
     :param do_reload: bool, Whether to reload modules or not
     """
 
-    dcclib_importer = importer.init_importer(importer_class=tpDccLib, do_reload=do_reload)
+    dcclib_importer = importer.init_importer(importer_class=tpDccLib, do_reload=False)
 
     global logger
     logger = dcclib_importer.logger
 
     dcclib_importer.import_modules()
-    dcclib_importer.import_packages(only_packages=True)
+    dcclib_importer.import_packages(only_packages=True, order=['tpDccLib.core'])
+    if do_reload:
+        dcclib_importer.reload_all()
 
     init_dcc(do_reload=do_reload)
 

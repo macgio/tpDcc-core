@@ -227,7 +227,7 @@ class AbstractCallback(object):
 
         pass
 
-    def unregister_owner_notifiers(self, owner):
+    def unregister_owner_callbacks(self, owner):
         """
         Removes all notifiers registered by a certain owner
         :param owner: class
@@ -353,7 +353,7 @@ class SimpleCallback(AbstractCallback):
             self._registry.remove(entry)
         tp.logger.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
 
-    def unregister_owner_notifiers(self, owner):
+    def unregister_owner_callbacks(self, owner):
         """
         Removes all notifiers registered by a certain owner
         :param owner: class
@@ -495,7 +495,7 @@ class FilterCallback(AbstractCallback, object):
             self._token = self._disconnect(self._token)
         tp.logger.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
 
-    def unregister_owner_notifiers(self, owner):
+    def unregister_owner_callbacks(self, owner):
         """
         Removes all notifiers registered by a certain owner
         :param owner: class

@@ -29,12 +29,12 @@ class CallbacksManager(object):
         if cls._initialized:
             return
 
-        default_notifiers = {
+        default_callbacks = {
             'Tick': callback.PythonTickCallback
         }
 
         try:
-            shutdown_type = getattr(tpDccLib.Callbacks, 'ShutdownNotifier')
+            shutdown_type = getattr(tpDccLib.Callbacks, 'ShutdownCallback')
         except AttributeError:
             shutdown_type = None
 
@@ -57,7 +57,7 @@ class CallbacksManager(object):
 
             callback_class = getattr(tpDccLib.Callbacks, '{}Callback'.format(callback_name), None)
             if not callback_class:
-                callback_class = default_notifiers.get(callback_name, callback.ICallback)
+                callback_class = default_callbacks.get(callback_name, callback.ICallback)
                 tpDccLib.logger.warning('Dcc {} does not provides an ICallback for {}Callback. Using {} instead'.format(tpDccLib.Dcc.get_name(), callback_name, callback_class.__name__))
 
             new_callback = getattr(tpDccLib, callback_name, None)
@@ -72,7 +72,7 @@ class CallbacksManager(object):
     @classmethod
     def register(cls, callback_type, fn, owner=None):
         """
-        Registers, is notifier exists, a new callback
+        Registers, is callback exists, a new callback
         :param callback_type: str, type of callback
         :param fn: Python function to be called when callback is emitted
         :param owner, class
@@ -87,7 +87,7 @@ class CallbacksManager(object):
     @classmethod
     def unregister(cls, callback_type, fn):
         """
-        Unregisters, is notifier exists, a new callback
+        Unregisters, is callback exists, a new callback
         :param callback_type: str, type of callback
         :param fn: Python function we want to unregister
         """
@@ -99,9 +99,9 @@ class CallbacksManager(object):
             sys.modules[tpDccLib.__name__].__dict__[callback_type].unregister(fn)
 
     @classmethod
-    def unregister_owner_notifiers(cls, owner):
+    def unregister_owner_callbacks(cls, owner):
         """
-        Unregister all the notifiers from all registered callbacks that belongs to a specific owner
+        Unregister all the callbacks from all registered callbacks that belongs to a specific owner
         :param owner: class
         """
 
@@ -110,7 +110,7 @@ class CallbacksManager(object):
 
         for k, v in sys.modules[tpDccLib.__name__].__dict__.items():
             if isinstance(v, callback.AbstractCallback):
-                v.unregister_owner_notifiers(owner=owner)
+                v.unregister_owner_callbacks(owner=owner)
 
     @classmethod
     def cleanup(cls):
