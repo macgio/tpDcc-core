@@ -126,15 +126,27 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def check_object_type(node, node_type):
+    def check_object_type(node, node_type, check_sub_types=False):
         """
         Returns whether give node is of the given type or not
         :param node: str
         :param node_type: str
+        :param check_sub_types: bool
         :return: bool
         """
 
         raise NotImplementedError('abstract DCC function check_object_type() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_empty_group(name, parent=None):
+        """
+        Creates a new empty group node
+        :param name: str
+        :param parent: str or None
+        """
+
+        raise NotImplementedError('abstract DCC function create_empty_group() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -147,6 +159,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function create_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_name(node):
+        """
+        Returns the name of the given node
+        :param node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function node_name() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod

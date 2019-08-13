@@ -20,8 +20,8 @@ main = __import__('__main__')
 
 logger = None
 Dcc = abstract_dcc.AbstractDCC()
-Shelf = abstract_shelf.AbstractShelf()
-Menu = abstract_menu.AbstractMenu()
+Menu = abstract_menu.AbstractMenu
+Shelf = abstract_shelf.AbstractShelf
 
 # =================================================================================
 
@@ -116,7 +116,8 @@ def init_dcc(do_reload=False):
         import tpMaxLib
         tpMaxLib.init(do_reload=do_reload)
     elif 'hou' in main.__dict__:
-        raise NotImplementedError('Houdini is not a supported DCC yet!')
+        import tpHoudiniLib
+        tpHoudiniLib.init(do_reload=do_reload)
     elif 'nuke' in main.__dict__:
         raise NotImplementedError('Nuke is not a supported DCC yet!')
     else:

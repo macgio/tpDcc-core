@@ -12,6 +12,8 @@ from tpPyUtils import decorators
 
 class AbstractShelf(object):
 
+    ICONS_PATHS = None
+
     def __init__(self, name='AbstractShelf', label_background=(0, 0, 0, 0), label_color=(0.9, 0.9, 0.9), category_icon=None):
         super(AbstractShelf, self).__init__()
 
@@ -57,3 +59,11 @@ class AbstractShelf(object):
         """
 
         raise NotImplementedError('abstract DCC shelf function create() not implemented!')
+
+    @decorators.abstractmethod
+    def set_as_active(self, delete_if_exists=True):
+        """
+        Sets this shelf as active shelf in current DCC session
+        """
+
+        raise NotImplementedError('abstract DCC shelf function set_as_active() not implemented!')
