@@ -1430,6 +1430,15 @@ class AbstractDCC(object):
 
         raise NotImplementedError('abstract DCC find_available_name focus() not implemented!')
 
+    @staticmethod
+    @decorators.abstractmethod
+    def clean_scene():
+        """
+        Cleans invalid nodes from current scene
+        """
+
+        raise NotImplementedError('abstract DCC clean_scene focus() not implemented!')
+
     # ================================================================================================================
 
     @staticmethod
