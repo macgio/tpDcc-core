@@ -12,6 +12,12 @@ from tpPyUtils import decorators
 
 class AbstractDCC(object):
 
+    class DialogResult(object):
+        Yes = 'Yes'
+        No = 'No'
+        Cancel = 'No'
+        Close = 'No'
+
     @staticmethod
     @decorators.abstractmethod
     def get_name():
