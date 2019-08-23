@@ -61,6 +61,17 @@ class AbstractShelf(object):
         raise NotImplementedError('abstract DCC shelf function create() not implemented!')
 
     @decorators.abstractmethod
+    def build(self, shelf_file):
+        """
+        Builds shelf from JSON file
+        :param shelf_file: str
+        :param args: list
+        :param kwargs: dict
+        """
+
+        raise NotImplementedError('abstract DCC shelf function build() not implemented!')
+
+    @decorators.abstractmethod
     def set_as_active(self, delete_if_exists=True):
         """
         Sets this shelf as active shelf in current DCC session
