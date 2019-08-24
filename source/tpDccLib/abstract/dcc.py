@@ -978,6 +978,30 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def import_file(file_path, force=True):
+        """
+        Imports given file into current DCC scene
+        :param file_path: str
+        :param force: bool
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function import_file() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def reference_file(file_path, force=True):
+        """
+        References given file into current DCC scene
+        :param file_path: str
+        :param force: bool
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function reference_file() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def is_plugin_loaded(plugin_name):
         """
         Return whether given plugin is loaded or not
