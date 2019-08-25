@@ -224,6 +224,27 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def show_object(node):
+        """
+        Shows given object
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function show_object() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_object(node):
+        """
+        Hides given object
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_object() not implemented!')
+
+
+    @staticmethod
+    @decorators.abstractmethod
     def select_object(node, replace_selection=False, **kwargs):
         """
         Selects given object in the current scene
@@ -244,6 +265,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function select_hierarchy() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def deselect_object(node):
+        """
+        Deselects given node from current selection
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function deselect_object() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -372,6 +403,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function node_parent_namespace() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_is_visible(node):
+        """
+        Returns whether given node is visible or not
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_visible() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1462,6 +1504,28 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC clean_scene focus() not implemented!')
+
+    # ================================================================================================================
+
+    @classmethod
+    def set_attribute_value(cls, node, attribute_name, attribute_value, **kwargs):
+        """
+        Sets attribute to given node
+        :param node:
+        :param attribute_name:
+        :param attribute_value:
+        :param kwargs:
+        :return:
+        """
+
+        if type(attribute_value) is int:
+            cls.set_integer_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value, **kwargs)
+        elif type(attribute_value) is float:
+            cls.set_float_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value, **kwargs)
+        elif type(attribute_value) in [str, unicode]:
+            cls.set_string_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value)
+        else:
+            raise NotImplementedError('Type {} is not supported yet: {}!'.format(type(attribute_value)))
 
     # ================================================================================================================
 
