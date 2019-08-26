@@ -440,6 +440,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_unreference(node):
+        """
+        Unreferences given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function node_unreference() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_is_loaded(node):
         """
         Returns whether given node is loaded or not
