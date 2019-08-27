@@ -14,13 +14,14 @@ class AbstractShelf(object):
 
     ICONS_PATHS = None
 
-    def __init__(self, name='AbstractShelf', label_background=(0, 0, 0, 0), label_color=(0.9, 0.9, 0.9), category_icon=None):
+    def __init__(self, name='AbstractShelf', label_background=(0, 0, 0, 0), label_color=(0.9, 0.9, 0.9), category_icon=None, enable_labels=True):
         super(AbstractShelf, self).__init__()
 
         self._name = name
         self._label_background = label_background
         self._label_color = label_color
         self._category_icon = category_icon
+        self._enable_labels = enable_labels
 
         self._category_btn = None
         self._category_menu = None
