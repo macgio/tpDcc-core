@@ -623,6 +623,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def shape_transform(shape_node):
+        """
+        Returns the transform parent of the given shape node
+        :param shape_node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function shape_transform() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def list_materials():
         """
         Returns a list of materials in the current scene
@@ -873,6 +884,19 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def set_boolean_attribute_value(node, attribute_name, attribute_value):
+        """
+        Sets the boolean value of the given attribute in the given node
+        :param node: str
+        :param attribute_name: str
+        :param attribute_value: int
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function set_boolean_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def set_numeric_attribute_value(node, attribute_name, attribute_value, clamp=False):
         """
         Sets the integer value of the given attribute in the given node
@@ -897,7 +921,7 @@ class AbstractDCC(object):
         :return:
         """
 
-        raise NotImplementedError('abstract DCC function set_string_attribute_value() not implemented!')
+        raise NotImplementedError('abstract DCC function set_integer_attribute_value() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -911,7 +935,7 @@ class AbstractDCC(object):
         :return:
         """
 
-        raise NotImplementedError('abstract DCC function set_string_attribute_value() not implemented!')
+        raise NotImplementedError('abstract DCC function set_float_attribute_value() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -924,6 +948,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function set_string_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_float_vector3_attribute_value(node, attribute_name, attribute_value):
+        """
+        Sets the float vector3 value of the given attribute in the given node
+        :param node: str
+        :param attribute_name: str
+        :param attribute_value: str
+        """
+
+        raise NotImplementedError('abstract DCC function set_vector3_attribute_name() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1291,6 +1327,26 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_start_frame():
+        """
+        Returns current start frame
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC function get_start_frame() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_end_frame():
+        """
+        Returns current end frame
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC function get_end_frame() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_current_frame():
         """
         Returns current frame set in time slider
@@ -1298,6 +1354,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function get_current_frame() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_current_frame(frame):
+        """
+        Sets the current frame in time slider
+        :param frame: int
+        """
+
+        raise NotImplementedError('abstract DCC function set_current_frame() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1492,7 +1558,7 @@ class AbstractDCC(object):
         :param object_to_focus: str
         """
 
-        raise NotImplementedError('abstract DCC function focus() not implemented!')
+        raise NotImplementedError('abstract DCC function() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1504,7 +1570,7 @@ class AbstractDCC(object):
         :return: str
         """
 
-        raise NotImplementedError('abstract DCC find_available_name focus() not implemented!')
+        raise NotImplementedError('abstract DCC find_available_name() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1513,7 +1579,102 @@ class AbstractDCC(object):
         Cleans invalid nodes from current scene
         """
 
-        raise NotImplementedError('abstract DCC clean_scene focus() not implemented!')
+        raise NotImplementedError('abstract DCC clean_scene() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_current_camera(full_path=True):
+        """
+        Returns camera currently being used in scene
+        :param full_path: bool
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_cameras() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_playblast_formats():
+        """
+        Returns a list of supported formats for DCC playblast
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_playblast_formats() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_playblast_compressions(playblast_format):
+        """
+        Returns a list of supported compressions for DCC playblast
+        :param playblast_format: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_playblast_compressions() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_viewport_resolution_width():
+        """
+        Returns the default width resolution of the current DCC viewport
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC get_viewport_resolution_width() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_viewport_resolution_height():
+        """
+        Returns the default height resolution of the current DCC viewport
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC get_viewport_resolution_height() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_renderers():
+        """
+        Returns dictionary with the different renderers supported by DCC
+        :return: dict(str, str)
+        """
+
+        raise NotImplementedError('abstract DCC get_renderers() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_default_render_resolution_width():
+        """
+        Returns the default width resolution of the current DCC render settings
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC get_default_render_resolution_width() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_default_render_resolution_height():
+        """
+        Returns the default height resolution of the current DCC render settings
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC get_default_render_resolution_height() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_default_render_resolution_aspect_ratio():
+        """
+        Returns the default resolution aspect ratio of the current DCC render settings
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC get_default_render_resolution_aspect_ratio() not implemented!')
+
+
+
 
     # ================================================================================================================
 
@@ -1528,14 +1689,21 @@ class AbstractDCC(object):
         :return:
         """
 
-        if type(attribute_value) is int:
+        if type(attribute_value) is bool:
+            cls.set_boolean_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value)
+        elif type(attribute_value) is int:
             cls.set_integer_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value, **kwargs)
         elif type(attribute_value) is float:
             cls.set_float_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value, **kwargs)
         elif type(attribute_value) in [str, unicode]:
             cls.set_string_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value)
+        elif type(attribute_value) in [list, tuple]:
+            if len(attribute_value) == 3:
+                cls.set_float_vector3_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value)
+            else:
+                raise NotImplementedError('Vector Type of length: {} is not supported yet!'.format(type(len(attribute_value))))
         else:
-            raise NotImplementedError('Type {} is not supported yet: {}!'.format(type(attribute_value)))
+            raise NotImplementedError('Type {} is not supported yet: {}!'.format(type(attribute_value), attribute_name))
 
     # ================================================================================================================
 
