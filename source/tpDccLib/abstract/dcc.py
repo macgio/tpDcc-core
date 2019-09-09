@@ -1220,6 +1220,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def show_message_in_viewport(msg, **kwargs):
+        """
+        Shows a message in DCC viewport
+        :param msg: str, Message to show
+        :param kwargs: dict, extra arguments
+        """
+
+        raise NotImplementedError('abstract DCC show_message_in_viewport error() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def add_shelf_menu_item(parent, label, command='', icon=''):
         """
         Adds a new menu item
