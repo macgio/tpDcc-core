@@ -543,6 +543,29 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_matrix(node):
+        """
+        Returns the world matrix of the given node
+        :param node: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function node_matrix() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_matrix(node, matrix):
+        """
+        Sets the world matrix of the given node
+        :param node: str
+        :param matrix: variant
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_matrix() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def list_node_types(type_string):
         """
         List all dependency node types satisfying given classification string
@@ -1078,11 +1101,12 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def reference_file(file_path, force=True):
+    def reference_file(file_path, force=True, **kwargs):
         """
         References given file into current DCC scene
         :param file_path: str
         :param force: bool
+        :param kwargs: keyword arguments
         :return:
         """
 
@@ -1594,6 +1618,28 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def is_camera(node_name):
+        """
+        Returns whether given node is a camera or not
+        :param node_name: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC is_camera() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_all_cameras(full_path=True):
+        """
+        Returns all cameras in the scene
+        :param full_path: bool
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_all_cameras() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_current_camera(full_path=True):
         """
         Returns camera currently being used in scene
@@ -1601,7 +1647,7 @@ class AbstractDCC(object):
         :return: list(str)
         """
 
-        raise NotImplementedError('abstract DCC get_cameras() not implemented!')
+        raise NotImplementedError('abstract DCC get_current_camera() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
