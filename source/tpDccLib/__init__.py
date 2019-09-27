@@ -111,13 +111,13 @@ def init_dcc(do_reload=False):
 
     if 'cmds' in main.__dict__:
         import tpMayaLib
-        tpMayaLib.init(do_reload=do_reload)
+        tpMayaLib.init_dcc(do_reload=do_reload)
     elif 'MaxPlus' in main.__dict__:
         import tpMaxLib
-        tpMaxLib.init(do_reload=do_reload)
+        tpMaxLib.init_dcc(do_reload=do_reload)
     elif 'hou' in main.__dict__:
         import tpHoudiniLib
-        tpHoudiniLib.init(do_reload=do_reload)
+        tpHoudiniLib.init_dcc(do_reload=do_reload)
     elif 'nuke' in main.__dict__:
         raise NotImplementedError('Nuke is not a supported DCC yet!')
     else:
