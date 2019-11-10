@@ -384,6 +384,28 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def namespace_exists(name):
+        """
+        Returns whether or not given namespace exists in current scene
+        :param name: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function namespace_exists() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def unique_namespace(name):
+        """
+        Returns a unique namespace from the given one
+        :param name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function unique_namespace() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_namespace(node):
         """
         Returns namespace of the given node
