@@ -52,7 +52,7 @@ class CallbacksManager(object):
 
             # We extract callback types from the specific registered callbacks module
             if not hasattr(tpDccLib, 'Callbacks'):
-                tpDccLib.logger.warning('DCC {} does not Callbacks registered!'.format(tpDccLib.Dcc.get_name()))
+                tpDccLib.logger.warning('DCC {} has no callbacks registered!'.format(tpDccLib.Dcc.get_name()))
                 return
 
             callback_class = getattr(tpDccLib.Callbacks, '{}Callback'.format(callback_name), None)
