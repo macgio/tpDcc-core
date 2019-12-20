@@ -406,10 +406,11 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def node_namespace(node):
+    def node_namespace(node, check_node=True):
         """
         Returns namespace of the given node
         :param node: str
+        :param check_node: bool
         :return: str
         """
 

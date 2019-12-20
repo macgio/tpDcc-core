@@ -58,8 +58,8 @@ class Dccs(object):
 
 
 class tpDccLib(importer.Importer, object):
-    def __init__(self):
-        super(tpDccLib, self).__init__(module_name='tpDccLib')
+    def __init__(self, *args, **kwargs):
+        super(tpDccLib, self).__init__(module_name='tpDccLib', *args, **kwargs)
 
     def get_module_path(self):
         """
