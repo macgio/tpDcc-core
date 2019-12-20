@@ -26,7 +26,6 @@ class ProjectData(object):
         self._settings = settings
         self._options = options
 
-    # region Properties
     def get_name(self):
         return self._name
 
@@ -47,43 +46,7 @@ class ProjectData(object):
     full_path = property(get_full_path)
     settings = property(get_settings)
     options = property(get_options)
-    # endregion
 
-    # region Static Functions
-    @staticmethod
-    def create_project_from_data(project_data_path):
-        """
-        Creates a new project using a project data JSON file
-        :param project_data_path: str, path where project JSON data file is located
-        :return: Project
-        """
-
-        if project_data_path is None or not path.is_file(project_data_path):
-            tp.logger.warning('Project Data Path {} is not valid!'.format(project_data_path))
-            return None
-
-        project_data = settings.JSONSettings()
-        project_options = settings.JSONSettings()
-        project_dir = path.get_dirname(project_data_path)
-        project_name = path.get_basename(project_data_path)
-        project_data.set_directory(project_dir, project_name)
-        project_options.set_directory(project_dir, 'options.json')
-        if not project_data or not project_data.has_settings():
-            tp.logger.warning('No valid project data found on Project Data File: {}'.format(project_data_path))
-
-        project_name = project_data.get('name')
-        project_path = path.get_dirname(path.get_dirname(project_data_path))
-        project_image = project_data.get('image')
-
-        tp.logger.debug('New Project found [{}]: {}'.format(project_name, project_path))
-        new_project = Project(name=project_name, project_path=project_path, settings=project_data, options=project_options)
-        if project_image:
-            new_project.set_image(project_image)
-
-        return new_project
-    # endregion
-
-    # region Public Functions
     def get_project_file(self):
         """
         Returns path where project file is located
@@ -252,9 +215,9 @@ class ProjectData(object):
         if self.options:
             self.options.clear()
 
-    def get_character_image(self):
+    def get_project_image(self):
         """
-        Returns the image used by the character
+        Returns the image used by the project
         :return: QPixmap
         """
 
@@ -406,7 +369,6 @@ class Project(QWidget, ProjectData):
 
         self.setup_signals()
 
-    # region Override Functions
     def contextMenuEvent(self, event):
         menu = QMenu(self)
         remove_icon = tpQtLib.resource.icon(name='delete', extension='png')
@@ -435,11 +397,41 @@ class Project(QWidget, ProjectData):
 
         menu.exec_(self.mapToGlobal(event.pos()))
 
-    # endregion
-
-    # region Public Functions
     def setup_signals(self):
         self.project_btn.clicked.connect(self._on_open_project)
+
+    @classmethod
+    def create_project_from_data(cls, project_data_path):
+        """
+        Creates a new project using a project data JSON file
+        :param project_data_path: str, path where project JSON data file is located
+        :return: Project
+        """
+
+        if project_data_path is None or not path.is_file(project_data_path):
+            tp.logger.warning('Project Data Path {} is not valid!'.format(project_data_path))
+            return None
+
+        project_data = settings.JSONSettings()
+        project_options = settings.JSONSettings()
+        project_dir = path.get_dirname(project_data_path)
+        project_name = path.get_basename(project_data_path)
+        project_data.set_directory(project_dir, project_name)
+        project_options.set_directory(project_dir, 'options.json')
+        if not project_data or not project_data.has_settings():
+            tp.logger.warning('No valid project data found on Project Data File: {}'.format(project_data_path))
+
+        project_name = project_data.get('name')
+        project_path = path.get_dirname(path.get_dirname(project_data_path))
+        project_image = project_data.get('image')
+
+        tp.logger.debug('New Project found [{}]: {}'.format(project_name, project_path))
+        new_project = cls(name=project_name, project_path=project_path, settings=project_data,
+                              options=project_options)
+        if project_image:
+            new_project.set_image(project_image)
+
+        return new_project
 
     def open(self):
         """
@@ -526,4 +518,3 @@ class Project(QWidget, ProjectData):
 
         if valid_change:
             self.projectImageChanged.emit(image_file)
-    # endregion
