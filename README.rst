@@ -18,6 +18,7 @@ Manual
 ~~~~~~~~~~~~~~~~~~~~~~
 1. Clone/Download tpDccLib anywhere in your PC (If you download the repo, you will need to extract
 the contents of the .zip file).
+
 2. Copy **tpDccLib** folder located inside **source** folder in a path added to **sys.path**
 
 Automatic
