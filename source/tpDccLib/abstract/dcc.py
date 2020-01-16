@@ -179,6 +179,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_name_without_namespace(node):
+        """
+        Returns the name of the given node without namespace
+        :param node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function node_name_without_namespace() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_handle(node):
         """
         Returns unique identifier of the given node
@@ -210,6 +221,72 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function node_is_empty() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_world_space_translation(node):
+        """
+        Returns world translation of given node
+        :param node: str
+        :return: list
+        """
+
+        raise NotImplementedError('abstract DCC function node_world_space_translation() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def translate_node_in_world_space(node, translation_list):
+        """
+        Translates given node with the given translation vector
+        :param node: str
+        :param translation_list:  list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC translate_node_in_world_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_world_space_rotation(node):
+        """
+        Returns world rotation of given node
+        :param node: str
+        :return: list
+        """
+
+        raise NotImplementedError('abstract DCC function node_world_space_rotation() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def rotate_node_in_world_space(node, rotation_list):
+        """
+        Translates given node with the given translation vector
+        :param node: str
+        :param rotation_list:  list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC rotate_node_in_world_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_world_space_scale(node):
+        """
+        Returns world scale of given node
+        :param node: str
+        :return: list
+        """
+
+        raise NotImplementedError('abstract DCC function node_world_space_scale() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def scale_node_in_world_space(node, scale_list):
+        """
+        Scales given node with the given vector list
+        :param node: str
+        :param scale_list: list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC scale_node_in_world_space() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -386,6 +463,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def list_namespaces():
+        """
+        Returns a list of all available namespaces
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function list_namespaces() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def namespace_separator():
         """
         Returns character used to separate namespace from the node name
@@ -418,15 +505,38 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def node_namespace(node, check_node=True):
+    def node_namespace(node, check_node=True, clean=False):
         """
         Returns namespace of the given node
         :param node: str
         :param check_node: bool
+        :param clean: bool
         :return: str
         """
 
         raise NotImplementedError('abstract DCC function node_namespace() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def all_nodes_in_namespace(namespace_name):
+        """
+        Returns all nodes in given namespace
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function node_namespace() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def rename_namespace(current_namespace, new_namespace):
+        """
+        Renames namespace of the given node
+        :param current_namespace: str
+        :param new_namespace: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function rename_namespace() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -693,10 +803,23 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def list_materials():
+    def default_shaders():
         """
-        Returns a list of materials in the current scene
-        :return: list<str>
+        Returns a list with all thte default shadres of the current DCC
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function default_shaders() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def list_materials(skip_default_materials=False, nodes=None):
+        """
+        Returns a list of materials in the current scene or given nodes
+        :param skip_default_materials: bool, Whether to return also standard materials or not
+        :param nodes: list(str), list of nodes we want to search materials into. If not given, all scene materials
+            will be retrieved
+        :return: list(str)
         """
 
         raise NotImplementedError('abstract DCC function list_materials() not implemented!')
@@ -742,6 +865,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function import_reference() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def attribute_default_value(node, attribute_name):
+        """
+        Returns default value of the attribute in the given node
+        :param node: str
+        :param attribute_name: str
+        :return: object
+        """
+
+        raise NotImplementedError('abstract DCC function attribute_default_value() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1094,6 +1229,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function list_connections_of_type() not implemented!')
+
+    @staticmethod
+    def list_node_connections(node):
+        """
+        Returns all connections of the given node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function list_node_connections() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1828,6 +1973,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def match_scale(source_node, target_node):
+        """
+        Match scale of the given node to the rotation of the target node
+        :param source_node: str
+        :param target_node: str
+        """
+
+        raise NotImplementedError('abstract DCC match_scale() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def match_translation_rotation(source_node, target_node):
         """
         Match translation and rotation of the given node to the translation and rotation of the target node
@@ -1836,6 +1992,36 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC match_translation_rotation() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def match_transform(source_node, target_node):
+        """
+        Match the transform (translation, rotation and scale) of the given node to the rotation of the target node
+        :param source_node: str
+        :param target_node: str
+        """
+
+        raise NotImplementedError('abstract DCC match_transform() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def open_render_settings():
+        """
+        Opens DCC render settings options
+        """
+
+        raise NotImplementedError('abstract DCC open_render_settings() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def scene_materials(skip_default_materials=False):
+        """
+        Returns all materials of the current DCC scene
+        :param skip_default_materials: bool, Whether default materials should be returned or not
+        """
+
+        raise NotImplementedError('abstract DCC open_render_settings() not implemented!')
 
     # ================================================================================================================
 
