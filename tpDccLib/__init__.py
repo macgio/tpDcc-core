@@ -10,8 +10,8 @@ from __future__ import print_function, division, absolute_import
 import os
 import sys
 import inspect
+import logging
 
-from tpPyUtils import importer
 from tpDccLib.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu,  callback as abstract_callback
 
 main = __import__('__main__')
@@ -57,36 +57,64 @@ class Dccs(object):
 # =================================================================================
 
 
-class tpDccLib(importer.Importer, object):
-    def __init__(self, *args, **kwargs):
-        super(tpDccLib, self).__init__(module_name='tpDccLib', *args, **kwargs)
-
-    def get_module_path(self):
-        """
-        Returns path where tpDccLib module is stored
-        :return: str
-        """
-
-        try:
-            mod_dir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)
-        except Exception:
-            try:
-                mod_dir = os.path.dirname(__file__)
-            except Exception:
-                try:
-                    import tpDccLib
-                    mod_dir = tpDccLib.__path__[0]
-                except Exception:
-                    return None
-
-        return mod_dir
-
-
-def init(do_reload=False):
+def init(do_reload=False, dev=False):
     """
     Initializes module
     :param do_reload: bool, Whether to reload modules or not
+    :param dev: bool, Whether artellapipe is initialized in dev mode or not
     """
+
+    # Load logger configuration
+    logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
+
+    from tpPyUtils import importer
+
+    class tpDccLib(importer.Importer, object):
+        def __init__(self, *args, **kwargs):
+            super(tpDccLib, self).__init__(module_name='tpDccLib', *args, **kwargs)
+
+        def get_module_path(self):
+            """
+            Returns path where tpDccLib module is stored
+            :return: str
+            """
+
+            try:
+                mod_dir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)
+            except Exception:
+                try:
+                    mod_dir = os.path.dirname(__file__)
+                except Exception:
+                    try:
+                        import tpDccLib
+                        mod_dir = tpDccLib.__path__[0]
+                    except Exception:
+                        return None
+
+            return mod_dir
+
+    def init_dcc(do_reload=False):
+        """
+        Checks DCC we are working on an initializes proper variables
+        """
+
+        if 'cmds' in main.__dict__:
+            import tpMayaLib
+            tpMayaLib.init_dcc(do_reload=do_reload)
+        elif 'MaxPlus' in main.__dict__:
+            import tpMaxLib
+            tpMaxLib.init_dcc(do_reload=do_reload)
+
+        elif 'hou' in main.__dict__:
+            import tpHoudiniLib
+            tpHoudiniLib.init_dcc(do_reload=do_reload)
+        elif 'nuke' in main.__dict__:
+            raise NotImplementedError('Nuke is not a supported DCC yet!')
+        else:
+            global Dcc
+            from tpDccLib.core import dcc
+            Dcc = dcc.UnknownDCC
+            logger.warning('No DCC found, using abstract one!')
 
     dcclib_importer = importer.init_importer(importer_class=tpDccLib, do_reload=False)
 
@@ -104,28 +132,25 @@ def init(do_reload=False):
     callbackmanager.CallbacksManager.initialize()
 
 
-def init_dcc(do_reload=False):
+def create_logger_directory():
     """
-    Checks DCC we are working on an initializes proper variables
+    Creates artellapipe logger directory
     """
 
-    if 'cmds' in main.__dict__:
-        import tpMayaLib
-        tpMayaLib.init_dcc(do_reload=do_reload)
-    elif 'MaxPlus' in main.__dict__:
-        import tpMaxLib
-        tpMaxLib.init_dcc(do_reload=do_reload)
+    tpdcclib_importer = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDccLib', 'logs'))
+    if not os.path.isdir(tpdcclib_importer):
+        os.makedirs(tpdcclib_importer)
 
-    elif 'hou' in main.__dict__:
-        import tpHoudiniLib
-        tpHoudiniLib.init_dcc(do_reload=do_reload)
-    elif 'nuke' in main.__dict__:
-        raise NotImplementedError('Nuke is not a supported DCC yet!')
-    else:
-        global Dcc
-        from tpDccLib.core import dcc
-        Dcc = dcc.UnknownDCC
-        logger.warning('No DCC found, using abstract one!')
+
+def get_logging_config():
+    """
+    Returns logging configuration file path
+    :return: str
+    """
+
+    create_logger_directory()
+
+    return os.path.normpath(os.path.join(os.path.dirname(__file__), '__logging__.ini'))
 
 
 def is_nuke():
