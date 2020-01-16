@@ -10,18 +10,16 @@ from __future__ import print_function, division, absolute_import
 import os
 import sys
 import inspect
-import logging
-
-from tpDccLib.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu,  callback as abstract_callback
+import logging.config
 
 main = __import__('__main__')
 
 # =================================================================================
 
 logger = None
-Dcc = abstract_dcc.AbstractDCC()
-Menu = abstract_menu.AbstractMenu
-Shelf = abstract_shelf.AbstractShelf
+Dcc = None
+Menu = None
+Shelf = None
 
 # =================================================================================
 
@@ -68,6 +66,12 @@ def init(do_reload=False, dev=False):
     logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
 
     from tpPyUtils import importer
+
+    from tpDccLib.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu, callback as abstract_callback
+
+    Dcc = abstract_dcc.AbstractDCC()
+    Menu = abstract_menu.AbstractMenu
+    Shelf = abstract_shelf.AbstractShelf
 
     class tpDccLib(importer.Importer, object):
         def __init__(self, *args, **kwargs):
