@@ -397,6 +397,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def selected_nodes_of_type(node_type, full_path=True):
+        """
+        Returns a list of selected nodes of given type
+        :param node_type: str
+        :param full_path: bool
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function select_nodes_of_type() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def all_shapes_nodes(full_path=True):
         """
         Returns all shapes nodes in current scene
@@ -662,6 +674,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function set_parent() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_parent_to_world(node):
+        """
+        Parent given node to the root world node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function set_parent_to_world() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1182,6 +1204,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def delete_multi_attribute(node, attribute_name, attribute_index):
+        """
+        Deletes given multi attribute of given node
+        :param node: str
+        :param attribute_name:str
+        :param attribute_index: int or str
+        """
+
+        raise NotImplementedError('abstract DCC function delete_multi_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def connect_attribute(source_node, source_attribute, target_node, target_attribute, force=False):
         """
         Connects source attribute to given target attribute
@@ -1296,7 +1330,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def import_file(file_path, force=True):
+    def import_file(file_path, force=True, **kwargs):
         """
         Imports given file into current DCC scene
         :param file_path: str
@@ -1870,6 +1904,28 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def look_through_camera(camera_name):
+        """
+        Updates DCC viewport to look through given camera
+        :param camera_name: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC look_through_camera() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_camera_focal_length(camera_name):
+        """
+        Returns focal length of the given camera
+        :param camera_name: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC get_camera_focal_length() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_playblast_formats():
         """
         Returns a list of supported formats for DCC playblast
@@ -2015,13 +2071,312 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def scene_materials(skip_default_materials=False):
+    def all_scene_shots():
         """
-        Returns all materials of the current DCC scene
-        :param skip_default_materials: bool, Whether default materials should be returned or not
+        Returns all shots in current scene
+        :return: list(str)
         """
 
-        raise NotImplementedError('abstract DCC open_render_settings() not implemented!')
+        raise NotImplementedError('abstract DCC all_scene_shots() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shot_is_muted(shot_node):
+        """
+        Returns whether or not given shot node is muted
+        :param shot_node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC shot_is_muted() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shot_track_number(shot_node):
+        """
+    Returns track where given shot node is located
+        :param shot_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC shot_track() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shot_start_frame_in_sequencer(shot_node):
+        """
+        Returns the start frame of the given shot in sequencer time
+        :param shot_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC shot_start_frame_in_sequencer() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shot_end_frame_in_sequencer(shot_node):
+        """
+        Returns the end frame of the given shot in sequencer time
+        :param shot_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC shot_end_frame_in_sequencer() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_pre_hold(shot_node):
+        """
+        Returns shot prehold value
+        :param shot_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC get_pre_hold() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_post_hold(shot_node):
+        """
+        Returns shot posthold value
+        :param shot_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC get_post_hold() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shot_scale(shot_node):
+        """
+        Returns the scale of the given shot
+        :param shot_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC shot_scale() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shot_start_frame(shot_node):
+        """
+        Returns the start frame of the given shot
+        :param shot_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC shot_start_frame() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_shot_start_frame(shot_node, start_frame):
+        """
+        Sets the start frame of the given shot
+        :param shot_node: str
+        :param start_frame: int
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC set_shot_start_frame() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shot_end_frame(shot_node):
+        """
+        Returns the end frame of the given shot
+        :param shot_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC shot_end_frame() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_shot_end_frame(shot_node, end_frame):
+        """
+        Sets the end frame of the given shot
+        :param shot_node: str
+        :param end_frame: int
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC set_shot_end_frame() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shot_camera(shot_node):
+        """
+        Returns camera associated given node
+        :param shot_node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC shot_camera() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def export_shot_animation_curves(anim_curves_to_export, export_file_path, start_frame, end_frame, **kwargs):
+        """
+        Exports given shot animation curves in the given path and in the given frame range
+        :param anim_curves_to_export: list(str), animation curves to export
+        :param export_file_path: str, file path to export animation curves information into
+        :param start_frame: int, start frame to export animation from
+        :param end_frame: int, end frame to export animation until
+        :param args:
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC export_animation_curves() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def import_shot_animation_curves(anim_curves_to_import, import_file_path, start_frame, end_frame):
+        """
+        Imports given shot animation curves in the given path and in the given frame range
+        :param anim_curves_to_import: list(str), animation curves to import
+        :param import_file_path: str, file path to import animation curves information fron
+        :param start_frame: int, start frame to import animation from
+        :param end_frame: int, end frame to import animation until
+        :param args:
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC import_shot_animation_curves() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_animation_curves(node):
+        """
+        Returns all animation curves of the given node
+        :param node: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC node_animation_curves() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def all_animation_curves():
+        """
+        Returns all animation located in current DCC scene
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC all_animation_curves() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def all_keyframes_in_anim_curves(anim_curves=None):
+        """
+        Retursn al keyframes in given anim curves
+        :param anim_curves: list(str)
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC all_keyframes_in_anim_curves() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def key_all_anim_curves_in_frames(frames, anim_curves=None):
+        """
+        Inserts keyframes on all animation curves on given frame
+        :param frames: list(int)
+        :param anim_curves: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC all_keyframes_in_anim_curves() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def remove_keys_from_animation_curves(range_to_delete, anim_curves=None):
+        """
+        Inserts keyframes on all animation curves on given frame
+        :param range_to_delete: list(int ,int)
+        :param anim_curves: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC remove_keys_from_animation_curves() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def check_anim_curves_has_fraction_keys(anim_curves, selected_range=None):
+        """
+        Returns whether or not given curves have or not fraction keys
+        :param anim_curves: list(str)
+        :param selected_range: list(str)
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC check_anim_curves_has_fraction_keys() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def convert_fraction_keys_to_whole_keys(animation_curves, consider_selected_range=False):
+        """
+        Find keys on fraction of a frame and insert a key on the nearest whole number frame
+        Useful to make sure that no keys are located on fraction of frames
+        :param animation_curves: list(str)
+        :param consider_selected_range: bool
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC convert_fraction_keys_to_whole_keys() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_active_frame_range(start_frame, end_frame):
+        """
+        Sets current animation frame range
+        :param start_frame: int
+        :param end_frame: int
+        """
+
+        raise NotImplementedError('abstract DCC set_active_frame_range() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_aim_constraint(source, point_to, **kwargs):
+        """
+        Sets current animation frame range
+        :param source: str
+        :param point_to: str
+        """
+
+        raise NotImplementedError('abstract DCC create_aim_constraint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def zero_scale_joint(jnt):
+        """
+        Sets the given scale to zero and compensate the change by modifying the joint translation and rotation
+        :param jnt: str
+        """
+
+        raise NotImplementedError('abstract DCC zero_scale_joint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def reset_node_transforms(node, **kwargs):
+        """
+        Reset the transformations of the given node and its children
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC reset_node_transforms() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_rotation_axis_in_object_space(node, x, y, z):
+        """
+        Sets the rotation axis of given node in object space
+        :param node: str
+        :param x: int
+        :param y: int
+        :param z: int
+        """
+
+        raise NotImplementedError('abstract DCC set_node_rotation_axis_in_object_space() not implemented!')
 
     # ================================================================================================================
 
@@ -2141,3 +2496,12 @@ class AbstractDCC(object):
         from tpDccLib.abstract import progressbar
 
         return progressbar.AbstractProgressBar
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_undo_decorator():
+        """
+        Returns undo decorator for current DCC
+        """
+
+        return decorators.empty_decorator

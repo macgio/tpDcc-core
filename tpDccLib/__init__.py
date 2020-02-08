@@ -21,6 +21,11 @@ Dcc = None
 Menu = None
 Shelf = None
 
+# We initialize with abstract instance to have auto completion in IDE
+if False:
+    from tpDccLib.abstract import dcc
+    Dcc = dcc.AbstractDCC()
+
 # =================================================================================
 
 
