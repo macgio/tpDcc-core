@@ -1,4 +1,4 @@
 order = [
-    'tpDccLib.core.consts',
-    'tpDccLib.core.scene'
+    'tpDcc.core.consts',
+    'tpDcc.core.scene'
 ]

@@ -14,7 +14,8 @@ class AbstractShelf(object):
 
     ICONS_PATHS = None
 
-    def __init__(self, name='AbstractShelf', label_background=(0, 0, 0, 0), label_color=(0.9, 0.9, 0.9), category_icon=None, enable_labels=True):
+    def __init__(self, name='AbstractShelf', label_background=(0, 0, 0, 0), label_color=(0.9, 0.9, 0.9),
+                 category_icon=None, enable_labels=True):
         super(AbstractShelf, self).__init__()
 
         self._name = name
