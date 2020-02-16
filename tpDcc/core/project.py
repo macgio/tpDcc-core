@@ -421,15 +421,14 @@ class Project(QWidget, ProjectData):
         project_data.set_directory(project_dir, project_name)
         project_options.set_directory(project_dir, 'options.json')
         if not project_data or not project_data.has_settings():
-            tp.logger.warning('No valid project data found on Project Data File: {}'.format(project_data_path))
+            LOGGER.warning('No valid project data found on Project Data File: {}'.format(project_data_path))
 
         project_name = project_data.get('name')
         project_path = path.get_dirname(path.get_dirname(project_data_path))
         project_image = project_data.get('image')
 
-        tp.logger.debug('New Project found [{}]: {}'.format(project_name, project_path))
-        new_project = cls(name=project_name, project_path=project_path, settings=project_data,
-                              options=project_options)
+        LOGGER.debug('New Project found [{}]: {}'.format(project_name, project_path))
+        new_project = cls(name=project_name, project_path=project_path, settings=project_data, options=project_options)
         if project_image:
             new_project.set_image(project_image)
 
@@ -444,7 +443,7 @@ class Project(QWidget, ProjectData):
 
     def set_image(self, encoded_image):
 
-        from tpQtLib.core import image
+        from tpDcc.libs.qt.core import image
 
         if not encoded_image:
             return
@@ -454,7 +453,7 @@ class Project(QWidget, ProjectData):
 
     def remove(self):
 
-        from tpQtLib.core import qtutils
+        from tpDcc.libs.qt.core import qtutils
 
         if not path.is_dir(self.full_path):
             LOGGER.warning('Impossible to remove Project Path: {}'.format(self.full_path))

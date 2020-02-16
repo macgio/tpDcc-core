@@ -61,7 +61,9 @@ class CallbacksManager(object):
             callback_class = getattr(tpDcc.Callbacks, '{}Callback'.format(callback_name), None)
             if not callback_class:
                 callback_class = default_callbacks.get(callback_name, callback.ICallback)
-                LOGGER.warning('Dcc {} does not provides an ICallback for {}Callback. Using {} instead'.format(tpDccLib.Dcc.get_name(), callback_name, callback_class.__name__))
+                LOGGER.warning(
+                    'Dcc {} does not provides an ICallback for {}Callback. Using {} instead'.format(
+                        tpDccLib.Dcc.get_name(), callback_name, callback_class.__name__))
 
             new_callback = getattr(tpDcc, callback_name, None)
             if new_callback:

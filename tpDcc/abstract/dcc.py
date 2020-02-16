@@ -331,7 +331,6 @@ class AbstractDCC(object):
 
         raise NotImplementedError('abstract DCC function hide_object() not implemented!')
 
-
     @staticmethod
     @decorators.abstractmethod
     def select_object(node, replace_selection=False, **kwargs):
@@ -2394,16 +2393,20 @@ class AbstractDCC(object):
         if type(attribute_value) is bool:
             cls.set_boolean_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value)
         elif type(attribute_value) is int:
-            cls.set_integer_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value, **kwargs)
+            cls.set_integer_attribute_value(
+                node=node, attribute_name=attribute_name, attribute_value=attribute_value, **kwargs)
         elif type(attribute_value) is float:
-            cls.set_float_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value, **kwargs)
+            cls.set_float_attribute_value(
+                node=node, attribute_name=attribute_name, attribute_value=attribute_value, **kwargs)
         elif type(attribute_value) in [str, unicode]:
             cls.set_string_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value)
         elif type(attribute_value) in [list, tuple]:
             if len(attribute_value) == 3:
-                cls.set_float_vector3_attribute_value(node=node, attribute_name=attribute_name, attribute_value=attribute_value)
+                cls.set_float_vector3_attribute_value(
+                    node=node, attribute_name=attribute_name, attribute_value=attribute_value)
             else:
-                raise NotImplementedError('Vector Type of length: {} is not supported yet!'.format(type(len(attribute_value))))
+                raise NotImplementedError(
+                    'Vector Type of length: {} is not supported yet!'.format(type(len(attribute_value))))
         else:
             raise NotImplementedError('Type {} is not supported yet: {}!'.format(type(attribute_value), attribute_name))
 

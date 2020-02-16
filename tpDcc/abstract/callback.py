@@ -99,9 +99,11 @@ class AbstractCallback(object):
 
     def _filter(self, *args):
         """
-        Internal function to evaluate if the callback from the notifier is valid.  Test the validity of the message with the custom function.
+        Internal function to evaluate if the callback from the notifier is valid.
+            Test the validity of the message with the custom function.
         @param *args A variable list of arguments receivied from the notifier.
-        @return      A tuple of indeterminant length (bool, object, ...) that is (True, Valid Data, ...) if callback should be passed to the listners; (False, None) otherwise.
+        @return      A tuple of indeterminant length (bool, object, ...) that is (True, Valid Data, ...) if callback
+            should be passed to the listners; (False, None) otherwise.
         """
 
         return self._notifier.filter(*args)
@@ -188,7 +190,8 @@ class AbstractCallback(object):
     @enabled.setter
     def enabled(self, value):
         """
-        Convenience property to set the 'enable' state of the callback.  Modifying the enable state either toggles the 'connected' state of the callback but maintains the list of listeners.
+        Convenience property to set the 'enable' state of the callback.  Modifying the enable state either toggles
+            the 'connected' state of the callback but maintains the list of listeners.
         @param value The enable state of the callback.
         @warning This method must be overriden by subclasses.
         """
@@ -267,7 +270,8 @@ class SimpleCallback(AbstractCallback):
 
         LOGGER.debug('Started: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
         for entry in self._registry:
-            LOGGER.debug('{}._shutdown - Disconnecting ({})'.format(str(self._notifier), self.__class__.__name__, str(entry)))
+            LOGGER.debug(
+                '{}._shutdown - Disconnecting ({})'.format(str(self._notifier), self.__class__.__name__, str(entry)))
             entry.token = self._disconnect(entry.token)
         del self._registry[:]
 
@@ -316,7 +320,8 @@ class SimpleCallback(AbstractCallback):
     @enabled.setter
     def enabled(self, value):
         """!
-        Convenience property to set the 'enable' state of the callback.  Modifying the enable state either toggles the 'connected' state of the callback but maintains the list of listeners.
+        Convenience property to set the 'enable' state of the callback.  Modifying the enable state either toggles
+            the 'connected' state of the callback but maintains the list of listeners.
 
         @param value The enable state of the callback.
         """
@@ -335,10 +340,13 @@ class SimpleCallback(AbstractCallback):
         """
 
         entry = next((e for e in self._registry if e.callback == fn), None)
-        LOGGER.debug('Started: ({}) {} Register - fn:"{}", owner:"{}", entry:"{}"'.format(str(self._notifier), self.__class__.__name__, str(fn), owner, str(entry)))
+        LOGGER.debug(
+            'Started: ({}) {} Register - fn:"{}", owner:"{}", entry:"{}"'.format(
+                str(self._notifier), self.__class__.__name__, str(fn), owner, str(entry)))
         if not entry:
             token = self._connect(fn) if self.connected else None
-            LOGGER.debug('({}) {} Register - token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(token)))
+            LOGGER.debug(
+                '({}) {} Register - token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(token)))
             self._registry.append(SimpleCallback.RegistryEntry(fn, token, owner=owner))
         LOGGER.debug('Completed: ({}) {} Register'.format(str(self._notifier), self.__class__.__name__))
 
@@ -349,7 +357,9 @@ class SimpleCallback(AbstractCallback):
         """
 
         entry = next((e for e in self._registry if e.callback == fn), None)
-        LOGGER.debug('Started: ({}) {} Unregister - fn:"{}", entry:"{}"'.format(str(self._notifier), self.__class__.__name__, str(fn), str(entry)))
+        LOGGER.debug(
+            'Started: ({}) {} Unregister - fn:"{}", entry:"{}"'.format(
+                str(self._notifier), self.__class__.__name__, str(fn), str(entry)))
         if entry:
             self._disconnect(entry.token)
             self._registry.remove(entry)
@@ -362,7 +372,9 @@ class SimpleCallback(AbstractCallback):
         """
 
         entry = next((e for e in self._registry if e.owner == owner), None)
-        LOGGER.debug('Started: ({}) {} Unregister - owner:"{}", entry:"{}"'.format(str(self._notifier), self.__class__.__name__, str(owner), str(entry)))
+        LOGGER.debug(
+            'Started: ({}) {} Unregister - owner:"{}", entry:"{}"'.format(
+                str(self._notifier), self.__class__.__name__, str(owner), str(entry)))
         if entry:
             self._disconnect(entry.token)
             self._registry.remove(entry)
@@ -454,7 +466,8 @@ class FilterCallback(AbstractCallback, object):
     @enabled.setter
     def enabled(self, value):
         """!
-        Convenience property to set the 'enable' state of the callback.  Modifying the enable state either toggles the 'connected' state of the callback but maintains the list of listeners.
+        Convenience property to set the 'enable' state of the callback.  Modifying the enable state either toggles
+            the 'connected' state of the callback but maintains the list of listeners.
 
         @param value The enable state of the callback.
         """
@@ -467,14 +480,17 @@ class FilterCallback(AbstractCallback, object):
     def register(self, fn, owner=None):
         """
         Adds a listener to this instance
-        @param fn: a valid Python function with a varaible number of arguments (exp. *args)
+        @param fn: a valid Python function with a variable number of arguments (exp. *args)
         @param owner: class, owner of the callback
         """
 
-        LOGGER.debug('Started: ({}) {} Register - fn:"{}", owner:"{}", IsEmpty:"{}"'.format(str(self._notifier), self.__class__.__name__, str(fn), owner, bool(self.empty)))
+        LOGGER.debug(
+            'Started: ({}) {} Register - fn:"{}", owner:"{}", IsEmpty:"{}"'.format(
+                str(self._notifier), self.__class__.__name__, str(fn), owner, bool(self.empty)))
         if self.empty:
             self._token = self._connect(self._notify)
-            LOGGER.debug('({}) {} Register - token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
+            LOGGER.debug(
+                '({}) {} Register - token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
         self._registry.append(FilterCallback.RegistryEntry(fn, owner=owner))
         LOGGER.debug('Completed: ({}) {} Register'.format(str(self._notifier), self.__class__.__name__))
 
@@ -485,15 +501,19 @@ class FilterCallback(AbstractCallback, object):
         """
 
         entry = next((e for e in self._registry if e.callback == fn), None)
-        LOGGER.debug('Started: ({}) {} Unregister - fn:"{}", IsEmpty:"{}"'.format(str(self._notifier), self.__class__.__name__, str(fn), bool(self.empty)))
+        LOGGER.debug(
+            'Started: ({}) {} Unregister - fn:"{}", IsEmpty:"{}"'.format(
+                str(self._notifier), self.__class__.__name__, str(fn), bool(self.empty)))
 
         if entry:
             self._registry.remove(entry)
         # else:
-        #     dcclib.logger.warning('({}) {} Unregister - fn:"{}" not in list - perhaps already removed?'.format(str(self._notifier), self.__class__.__name__, str(fn)))
+        #     dcclib.logger.warning('({}) {} Unregister - fn:"{}" not in list - perhaps already removed?'.format(
+        #     str(self._notifier), self.__class__.__name__, str(fn)))
 
         if self.empty and self.connected:
-            LOGGER.debug('({}) {} Unregister token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
+            LOGGER.debug(
+                '({}) {} Unregister token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
             self._token = self._disconnect(self._token)
         LOGGER.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
 
@@ -504,14 +524,18 @@ class FilterCallback(AbstractCallback, object):
         """
 
         entry = next((e for e in self._registry if e.owner == owner), None)
-        LOGGER.debug('Started: ({}) {} Unregister - owner:"{}", entry:"{}"'.format(str(self._notifier), self.__class__.__name__, str(owner), str(entry)))
+        LOGGER.debug(
+            'Started: ({}) {} Unregister - owner:"{}", entry:"{}"'.format(
+                str(self._notifier), self.__class__.__name__, str(owner), str(entry)))
         if entry:
             self._registry.remove(entry)
         # else:
-        #     dcclib.logger.warning('({}) {} Unregister - fn:"{}" not in list - perhaps already removed?'.format(str(self._notifier), self.__class__.__name__, str(owner)))
+        #     dcclib.logger.warning('({}) {} Unregister - fn:"{}" not in list - perhaps already removed?'.format(
+        #     str(self._notifier), self.__class__.__name__, str(owner)))
 
         if self.empty and self.connected:
-            LOGGER.debug('({}) {} Unregister token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
+            LOGGER.debug(
+                '({}) {} Unregister token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
             self._token = self._disconnect(self._token)
         LOGGER.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
 
