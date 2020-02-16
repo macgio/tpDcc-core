@@ -1,0 +1,7 @@
+tpDcc.managers.callbackmanager module
+=====================================
+
+.. automodule:: tpDcc.managers.callbackmanager
+   :members:
+   :undoc-members:
+   :show-inheritance:

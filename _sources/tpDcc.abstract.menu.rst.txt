@@ -1,0 +1,7 @@
+tpDcc.abstract.menu module
+==========================
+
+.. automodule:: tpDcc.abstract.menu
+   :members:
+   :undoc-members:
+   :show-inheritance:

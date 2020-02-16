@@ -1,0 +1,7 @@
+tpDcc.abstract.shelf module
+===========================
+
+.. automodule:: tpDcc.abstract.shelf
+   :members:
+   :undoc-members:
+   :show-inheritance:

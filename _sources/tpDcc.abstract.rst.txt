@@ -1,0 +1,21 @@
+tpDcc.abstract package
+======================
+
+Submodules
+----------
+
+.. toctree::
+
+   tpDcc.abstract.callback
+   tpDcc.abstract.dcc
+   tpDcc.abstract.menu
+   tpDcc.abstract.progressbar
+   tpDcc.abstract.shelf
+
+Module contents
+---------------
+
+.. automodule:: tpDcc.abstract
+   :members:
+   :undoc-members:
+   :show-inheritance:

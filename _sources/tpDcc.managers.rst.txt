@@ -1,0 +1,17 @@
+tpDcc.managers package
+======================
+
+Submodules
+----------
+
+.. toctree::
+
+   tpDcc.managers.callbackmanager
+
+Module contents
+---------------
+
+.. automodule:: tpDcc.managers
+   :members:
+   :undoc-members:
+   :show-inheritance:

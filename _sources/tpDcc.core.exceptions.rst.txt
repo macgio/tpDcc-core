@@ -1,0 +1,7 @@
+tpDcc.core.exceptions module
+============================
+
+.. automodule:: tpDcc.core.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,27 @@
+tpDcc package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+
+   tpDcc.abstract
+   tpDcc.core
+   tpDcc.managers
+
+Submodules
+----------
+
+.. toctree::
+
+   tpDcc.loader
+   tpDcc.register
+
+Module contents
+---------------
+
+.. automodule:: tpDcc
+   :members:
+   :undoc-members:
+   :show-inheritance:

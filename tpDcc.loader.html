@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tpDcc.loader module &mdash; tpDcc-core 0.0.l documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tpDcc.register module" href="tpDcc.register.html" />
+    <link rel="prev" title="tpDcc.managers.callbackmanager module" href="tpDcc.managers.callbackmanager.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> tpDcc-core
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">tpDcc</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tpDcc.html">tpDcc package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tpDcc.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="tpDcc.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">tpDcc.loader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.register.html">tpDcc.register module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tpDcc.html#module-tpDcc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tpDcc-core</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">tpDcc</a> &raquo;</li>
+        
+          <li><a href="tpDcc.html">tpDcc package</a> &raquo;</li>
+        
+      <li>tpDcc.loader module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tpDcc.loader.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-tpDcc.loader">
+<span id="tpdcc-loader-module"></span><h1>tpDcc.loader module<a class="headerlink" href="#module-tpDcc.loader" title="Permalink to this headline">¶</a></h1>
+<p>Initialization module for tpDccLib</p>
+<dl class="class">
+<dt id="tpDcc.loader.DccCallbacks">
+<em class="property">class </em><code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">DccCallbacks</code><a class="headerlink" href="#tpDcc.loader.DccCallbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.NodeAdded">
+<code class="sig-name descname">NodeAdded</code><em class="property"> = ('NodeAdded', {'type': 'filter'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.NodeAdded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.NodeDeleted">
+<code class="sig-name descname">NodeDeleted</code><em class="property"> = ('NodeDeleted', {'type': 'filter'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.NodeDeleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.NodeSelect">
+<code class="sig-name descname">NodeSelect</code><em class="property"> = ('NodeSelect', {'type': 'filter'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.NodeSelect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.SceneNewFinished">
+<code class="sig-name descname">SceneNewFinished</code><em class="property"> = ('SceneNewFinished', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.SceneNewFinished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.SceneNewRequested">
+<code class="sig-name descname">SceneNewRequested</code><em class="property"> = ('SceneNewRequested', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.SceneNewRequested" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.SceneOpenFinished">
+<code class="sig-name descname">SceneOpenFinished</code><em class="property"> = ('SceneOpenFinished', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.SceneOpenFinished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.SceneOpenRequested">
+<code class="sig-name descname">SceneOpenRequested</code><em class="property"> = ('SceneOpenRequested', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.SceneOpenRequested" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.ScenePostCreated">
+<code class="sig-name descname">ScenePostCreated</code><em class="property"> = ('ScenePreCreated', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.ScenePostCreated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.ScenePreCreated">
+<code class="sig-name descname">ScenePreCreated</code><em class="property"> = ('ScenePreCreated', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.ScenePreCreated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.SceneSaveFinished">
+<code class="sig-name descname">SceneSaveFinished</code><em class="property"> = ('SceneSaveFinished', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.SceneSaveFinished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.SceneSaveRequested">
+<code class="sig-name descname">SceneSaveRequested</code><em class="property"> = ('SceneSaveRequested', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.SceneSaveRequested" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.Shutdown">
+<code class="sig-name descname">Shutdown</code><em class="property"> = ('Shutdown', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.Shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.Tick">
+<code class="sig-name descname">Tick</code><em class="property"> = ('Tick', {'type': 'simple'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.Tick" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.UserPropertyPostChanged">
+<code class="sig-name descname">UserPropertyPostChanged</code><em class="property"> = ('UserPropertyPostChanged', {'type': 'filter'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.UserPropertyPostChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.DccCallbacks.UserPropertyPreChanged">
+<code class="sig-name descname">UserPropertyPreChanged</code><em class="property"> = ('UserPropertyPreChanged', {'type': 'filter'})</em><a class="headerlink" href="#tpDcc.loader.DccCallbacks.UserPropertyPreChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tpDcc.loader.Dccs">
+<em class="property">class </em><code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">Dccs</code><a class="headerlink" href="#tpDcc.loader.Dccs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="tpDcc.loader.Dccs.Houdini">
+<code class="sig-name descname">Houdini</code><em class="property"> = 'houdini'</em><a class="headerlink" href="#tpDcc.loader.Dccs.Houdini" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.Dccs.Max">
+<code class="sig-name descname">Max</code><em class="property"> = 'max'</em><a class="headerlink" href="#tpDcc.loader.Dccs.Max" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.Dccs.Maya">
+<code class="sig-name descname">Maya</code><em class="property"> = 'maya'</em><a class="headerlink" href="#tpDcc.loader.Dccs.Maya" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.Dccs.Nuke">
+<code class="sig-name descname">Nuke</code><em class="property"> = 'nuke'</em><a class="headerlink" href="#tpDcc.loader.Dccs.Nuke" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tpDcc.loader.Dccs.Unknown">
+<code class="sig-name descname">Unknown</code><em class="property"> = 'unknown'</em><a class="headerlink" href="#tpDcc.loader.Dccs.Unknown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.callbacks">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a full list of callbacks based on DccCallbacks dictionary
+:return: list&lt;str&gt;</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.create_logger_directory">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">create_logger_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.create_logger_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates artellapipe logger directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.get_logging_config">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">get_logging_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.get_logging_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns logging configuration file path
+:return: str</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.init">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param">do_reload=False</em>, <em class="sig-param">dev=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes module
+:param do_reload: bool, Whether to reload modules or not
+:param dev: bool, Whether artellapipe is initialized in dev mode or not</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.is_houdini">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">is_houdini</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.is_houdini" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if Houdini is available or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.is_max">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">is_max</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.is_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if Max is available or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.is_maya">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">is_maya</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.is_maya" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if Maya is available or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.is_nuke">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">is_nuke</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.is_nuke" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if Nuke is available or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tpDcc.loader.register_class">
+<code class="sig-prename descclassname">tpDcc.loader.</code><code class="sig-name descname">register_class</code><span class="sig-paren">(</span><em class="sig-param">cls_name</em>, <em class="sig-param">cls</em>, <em class="sig-param">is_unique=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.loader.register_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function registers given class
+:param cls_name: str, name of the class we want to register
+:param cls: class, class we want to register
+:param is_unique: bool, Whether if the class should be updated if new class is registered with the same name</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/tpDcc/tpDcc-libs-python" target="_blank">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tpDcc.register.html" class="btn btn-neutral float-right" title="tpDcc.register module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tpDcc.managers.callbackmanager.html" class="btn btn-neutral float-left" title="tpDcc.managers.callbackmanager module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Tomas Poveda
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

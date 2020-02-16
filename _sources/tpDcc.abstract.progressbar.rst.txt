@@ -1,0 +1,7 @@
+tpDcc.abstract.progressbar module
+=================================
+
+.. automodule:: tpDcc.abstract.progressbar
+   :members:
+   :undoc-members:
+   :show-inheritance:

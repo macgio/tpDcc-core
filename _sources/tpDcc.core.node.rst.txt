@@ -1,0 +1,7 @@
+tpDcc.core.node module
+======================
+
+.. automodule:: tpDcc.core.node
+   :members:
+   :undoc-members:
+   :show-inheritance:

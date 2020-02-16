@@ -1,0 +1,24 @@
+tpDcc.core package
+==================
+
+Submodules
+----------
+
+.. toctree::
+
+   tpDcc.core.consts
+   tpDcc.core.data
+   tpDcc.core.dcc
+   tpDcc.core.exceptions
+   tpDcc.core.node
+   tpDcc.core.project
+   tpDcc.core.scene
+   tpDcc.core.scripts
+
+Module contents
+---------------
+
+.. automodule:: tpDcc.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
