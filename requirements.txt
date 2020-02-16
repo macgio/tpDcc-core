@@ -1,4 +1,5 @@
 # ===================================================================
-# tpDccLib requirements file
+# tpDcc-core requirements file
 # ===================================================================
-tpPyUtils
+
+tpDcc-libs-python

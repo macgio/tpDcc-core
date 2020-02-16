@@ -7,7 +7,7 @@ Module that contains tests for tpDccLib
 
 import pytest
 
-from tpDccLib import __version__
+from tpDcc import __version__
 
 
 def test_version():
