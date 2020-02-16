@@ -171,8 +171,174 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="tpdcc-core-project-module">
-<h1>tpDcc.core.project module<a class="headerlink" href="#tpdcc-core-project-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-tpDcc.core.project">
+<span id="tpdcc-core-project-module"></span><h1>tpDcc.core.project module<a class="headerlink" href="#module-tpDcc.core.project" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains generic functionality when dealing with projects</p>
+<dl class="class">
+<dt id="tpDcc.core.project.ProjectData">
+<em class="property">class </em><code class="sig-prename descclassname">tpDcc.core.project.</code><code class="sig-name descname">ProjectData</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">project_path</em>, <em class="sig-param">settings</em>, <em class="sig-param">options</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.add_option">
+<code class="sig-name descname">add_option</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em>, <em class="sig-param">group=None</em>, <em class="sig-param">option_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.add_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new option to the project options file
+:param name: str, name of the option
+:param value: variant, value of the option
+:param group: variant, str || None, group of the option (optional)
+:param option_type: variant, str || None, option type (optional)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.clear_options">
+<code class="sig-name descname">clear_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.clear_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears all the options of the task</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.create_folder">
+<code class="sig-name descname">create_folder</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">relative_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.create_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.create_project">
+<code class="sig-name descname">create_project</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.create_project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.full_path">
+<em class="property">property </em><code class="sig-name descname">full_path</code><a class="headerlink" href="#tpDcc.core.project.ProjectData.full_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_full_path">
+<code class="sig-name descname">get_full_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_full_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_name">
+<code class="sig-name descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_option">
+<code class="sig-name descname">get_option</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns option value with proper format (to force string use get_unformatted_option function)
+:param name: str, name of the option we want to retrieve
+:param group: variant, str || None, group of the option (optional)
+:return: variante</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_option_match">
+<code class="sig-name descname">get_option_match</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">return_first=True</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_option_match" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all optiosn contained in the settings file
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_options_file">
+<code class="sig-name descname">get_options_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_options_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns path where project options file is located
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_path">
+<code class="sig-name descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_project_file">
+<code class="sig-name descname">get_project_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_project_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns path where project file is located
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_project_image">
+<code class="sig-name descname">get_project_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_project_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the image used by the project
+:return: QPixmap</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_settings">
+<code class="sig-name descname">get_settings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.get_unformatted_option">
+<code class="sig-name descname">get_unformatted_option</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.get_unformatted_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns option without format (string format)
+:param name: str, name of the option we want to retrieve
+:param group: variant, str || None, group of the option (optional)
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.has_option">
+<code class="sig-name descname">has_option</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.has_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the project has given option or not
+:param name: str, name of the option
+:param group: variant, str || None, group of the option (optional)
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.has_options">
+<code class="sig-name descname">has_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.has_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the project has options or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#tpDcc.core.project.ProjectData.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.options">
+<em class="property">property </em><code class="sig-name descname">options</code><a class="headerlink" href="#tpDcc.core.project.ProjectData.options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.project_path">
+<em class="property">property </em><code class="sig-name descname">project_path</code><a class="headerlink" href="#tpDcc.core.project.ProjectData.project_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.set_option">
+<code class="sig-name descname">set_option</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em>, <em class="sig-param">group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.set_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set an option of the option settings file. If the option does not exist, it will be created
+:param name: str, name of the option we want to set
+:param value: variant, value of the option
+:param group: variant, str || None, group of the option (optional)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.set_project_image">
+<code class="sig-name descname">set_project_image</code><span class="sig-paren">(</span><em class="sig-param">image_path</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.set_project_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates project image icon
+:param image_path: str, path that points to the image of the new project icon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.settings">
+<em class="property">property </em><code class="sig-name descname">settings</code><a class="headerlink" href="#tpDcc.core.project.ProjectData.settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tpDcc.core.project.ProjectData.update_project">
+<code class="sig-name descname">update_project</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.project.ProjectData.update_project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
