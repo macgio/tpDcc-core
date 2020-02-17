@@ -66,20 +66,18 @@ def init(do_reload=False, dev=False):
     :param dev: bool, Whether artellapipe is initialized in dev mode or not
     """
 
-    # Load logger configuration
-    logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
-
     from tpDcc.libs.python import importer
-
     from tpDcc.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu
 
     Dcc = abstract_dcc.AbstractDCC()
     Menu = abstract_menu.AbstractMenu
     Shelf = abstract_shelf.AbstractShelf
 
+    create_logger()
+
     class tpDccLib(importer.Importer, object):
         def __init__(self, *args, **kwargs):
-            super(tpDccLib, self).__init__(module_name='tpDccLib', *args, **kwargs)
+            super(tpDccLib, self).__init__(module_name='tpDcc', *args, **kwargs)
 
         def get_module_path(self):
             """
@@ -120,14 +118,10 @@ def init(do_reload=False, dev=False):
             loader.init_dcc(do_reload=do_reload)
         else:
             global Dcc
-            from tpDccLib.core import dcc
+            from tpDcc.core import dcc
             Dcc = dcc.UnknownDCC
 
     dcclib_importer = importer.init_importer(importer_class=tpDccLib, do_reload=False)
-
-    global logger
-    logger = dcclib_importer.logger
-
     dcclib_importer.import_modules()
     dcclib_importer.import_packages(only_packages=True, order=['tpDcc.core'])
     if do_reload:
@@ -135,8 +129,19 @@ def init(do_reload=False, dev=False):
 
     init_dcc(do_reload=do_reload)
 
-    from tpDccLib.core import callbackmanager
+    from tpDcc.managers import callbackmanager
     callbackmanager.CallbacksManager.initialize()
+
+
+def create_logger():
+    """
+    Returns logger of current module
+    """
+
+    logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
+    logger = logging.getLogger('tpDcc-core')
+
+    return logger
 
 
 def create_logger_directory():
@@ -144,9 +149,9 @@ def create_logger_directory():
     Creates artellapipe logger directory
     """
 
-    tpdcclib_importer = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs'))
-    if not os.path.isdir(tpdcclib_importer):
-        os.makedirs(tpdcclib_importer)
+    logger_directory = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs'))
+    if not os.path.isdir(logger_directory):
+        os.makedirs(logger_directory)
 
 
 def get_logging_config():
