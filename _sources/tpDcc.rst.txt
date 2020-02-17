@@ -8,7 +8,7 @@ Subpackages
 
    tpDcc.abstract
    tpDcc.core
-   tpDcc.dcc
+   tpDcc.dccs
    tpDcc.libs
    tpDcc.managers
 

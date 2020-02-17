@@ -1,10 +1,10 @@
-tpDcc.dcc package
-=================
+tpDcc.dccs package
+==================
 
 Module contents
 ---------------
 
-.. automodule:: tpDcc.dcc
+.. automodule:: tpDcc.dccs
    :members:
    :undoc-members:
    :show-inheritance:
