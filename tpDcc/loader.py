@@ -94,16 +94,16 @@ def init(do_reload=False, dev=False):
         """
 
         if 'cmds' in main.__dict__:
-            from tpDcc.dcc.maya import loader
+            from tpDcc.dccs.maya import loader
             loader.init_dcc(do_reload=do_reload)
         elif 'MaxPlus' in main.__dict__:
-            from tpDcc.dcc.maya import loader
+            from tpDcc.dccs.max import loader
             loader.init_dcc(do_reload=do_reload)
         elif 'hou' in main.__dict__:
-            from tpDcc.dcc.houdini import loader
+            from tpDcc.dccs.houdini import loader
             loader.init_dcc(do_reload=do_reload)
         elif 'nuke' in main.__dict__:
-            from tpDcc.dcc.nuke import loader
+            from tpDcc.dccs.nuke import loader
             loader.init_dcc(do_reload=do_reload)
         else:
             global Dcc
