@@ -1,0 +1,10 @@
+tpDcc.dcc package
+=================
+
+Module contents
+---------------
+
+.. automodule:: tpDcc.dcc
+   :members:
+   :undoc-members:
+   :show-inheritance:
