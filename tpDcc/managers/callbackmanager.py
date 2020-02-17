@@ -11,6 +11,7 @@ import sys
 import logging
 
 import tpDcc
+from tpDcc import register
 from tpDcc.abstract import callback
 
 LOGGER = logging.getLogger()
@@ -43,7 +44,7 @@ class CallbacksManager(object):
 
         for callback_name in tpDcc.callbacks():
 
-            # Get callback type from tpDccLib.DccCallbacks
+            # Get callback type from tpDcc.DccCallbacks
             n_type = getattr(tpDcc.DccCallbacks, callback_name)[1]['type']
             if n_type == 'simple':
                 callback_type = callback.SimpleCallback
@@ -63,12 +64,12 @@ class CallbacksManager(object):
                 callback_class = default_callbacks.get(callback_name, callback.ICallback)
                 LOGGER.warning(
                     'Dcc {} does not provides an ICallback for {}Callback. Using {} instead'.format(
-                        tpDccLib.Dcc.get_name(), callback_name, callback_class.__name__))
+                        tpDcc.Dcc.get_name(), callback_name, callback_class.__name__))
 
             new_callback = getattr(tpDcc, callback_name, None)
             if new_callback:
                 new_callback.cleanup()
-            tpDcc.register_class(callback_name, callback_type(callback_class, shutdown_type))
+            register.register_class(callback_name, callback_type(callback_class, shutdown_type))
 
             LOGGER.debug('Creating Callback "{}" of type "{}" ...'.format(callback_name, callback_class))
 

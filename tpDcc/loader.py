@@ -11,10 +11,11 @@ import os
 import inspect
 import logging.config
 
+from tpDcc import register
+from tpDcc.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu
+
 main = __import__('__main__')
 
-
-# =================================================================================
 
 class DccCallbacks(object):
     Shutdown = ('Shutdown', {'type': 'simple'})
@@ -55,12 +56,6 @@ def init(do_reload=False, dev=False):
     """
 
     from tpDcc.libs.python import importer
-    from tpDcc import register
-    from tpDcc.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu
-
-    register.register_class('Dcc', abstract_dcc.AbstractDCC())
-    register.register_class('Menu', abstract_menu.AbstractMenu)
-    register.register_class('Shelf', abstract_shelf.AbstractShelf)
 
     create_logger()
 
@@ -124,7 +119,7 @@ def init(do_reload=False, dev=False):
 
 def create_logger():
     """
-    Returns logger of current module
+    Returns logger of current modue
     """
 
     logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
@@ -160,7 +155,9 @@ def is_nuke():
     :return: bool
     """
 
-    return Dcc.get_name() == Dccs.Nuke
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.Nuke
 
 
 def is_maya():
@@ -169,7 +166,9 @@ def is_maya():
     :return: bool
     """
 
-    return Dcc.get_name() == Dccs.Maya
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.Maya
 
 
 def is_max():
@@ -178,7 +177,9 @@ def is_max():
     :return: bool
     """
 
-    return Dcc.get_name() == Dccs.Max
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.Max
 
 
 def is_houdini():
@@ -187,7 +188,9 @@ def is_houdini():
     :return: bool
     """
 
-    return Dcc.get_name() == Dccs.Houdini
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.Houdini
 
 
 def callbacks():
@@ -203,3 +206,15 @@ def callbacks():
         new_list.append(v[0])
 
     return new_list
+
+
+register.register_class('Dcc', abstract_dcc.AbstractDCC())
+register.register_class('Menu', abstract_menu.AbstractMenu)
+register.register_class('Shelf', abstract_shelf.AbstractShelf)
+register.register_class('Dccs', Dccs)
+register.register_class('DccCallbacks', DccCallbacks)
+register.register_class('callbacks', callbacks)
+register.register_class('is_maya', is_maya)
+register.register_class('is_max', is_max)
+register.register_class('is_houdini', is_houdini)
+register.register_class('is_nuke', is_nuke)
