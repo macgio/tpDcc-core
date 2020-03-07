@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Initialization module for tpDccLib
+Initialization module for tpDcc
 """
 
 from __future__ import print_function, division, absolute_import
@@ -12,7 +12,13 @@ import inspect
 import logging.config
 
 from tpDcc import register
+from tpDcc.libs.python import python
 from tpDcc.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu
+
+if python.is_python2():
+    import pkgutil as loader
+else:
+    import importlib as loader
 
 main = __import__('__main__')
 
@@ -45,6 +51,10 @@ class Dccs(object):
     Max = 'max'
     Nuke = 'nuke'
 
+    @staticmethod
+    def get_available_dccs():
+        return {k: v for k, v in Dccs.__class__.__dict__.items() if not k.startswith('__')}
+
 # =================================================================================
 
 
@@ -56,16 +66,18 @@ def init(do_reload=False, dev=False):
     """
 
     from tpDcc.libs.python import importer
+    from tpDcc import register
 
-    create_logger()
+    logger = create_logger()
+    register.register_class('logger', logger)
 
-    class tpDccLib(importer.Importer, object):
+    class tpDcc(importer.Importer, object):
         def __init__(self, *args, **kwargs):
-            super(tpDccLib, self).__init__(module_name='tpDcc', *args, **kwargs)
+            super(tpDcc, self).__init__(module_name='tpDcc', *args, **kwargs)
 
         def get_module_path(self):
             """
-            Returns path where tpDccLib module is stored
+            Returns path where tpDcc module is stored
             :return: str
             """
 
@@ -76,50 +88,90 @@ def init(do_reload=False, dev=False):
                     mod_dir = os.path.dirname(__file__)
                 except Exception:
                     try:
-                        import tpDccLib
-                        mod_dir = tpDccLib.__path__[0]
+                        import tpDcc
+                        mod_dir = tpDcc.__path__[0]
                     except Exception:
                         return None
 
             return mod_dir
 
-    def init_dcc(do_reload=False):
-        """
-        Checks DCC we are working on an initializes proper variables
-        """
+    # We initialize first Python library
+    from tpDcc.libs import python
+    python.init(do_reload=do_reload)
 
-        if 'cmds' in main.__dict__:
-            from tpDcc.dccs.maya import loader
-            loader.init_dcc(do_reload=do_reload)
-        elif 'MaxPlus' in main.__dict__:
-            from tpDcc.dccs.max import loader
-            loader.init_dcc(do_reload=do_reload)
-        elif 'hou' in main.__dict__:
-            from tpDcc.dccs.houdini import loader
-            loader.init_dcc(do_reload=do_reload)
-        elif 'nuke' in main.__dict__:
-            from tpDcc.dccs.nuke import loader
-            loader.init_dcc(do_reload=do_reload)
-        else:
-            global Dcc
-            from tpDcc.core import dcc
-            Dcc = dcc.UnknownDCC
-
-    dcclib_importer = importer.init_importer(importer_class=tpDccLib, do_reload=False)
+    # We initialize then tpDcc-core library and DCC specific library
+    dcclib_importer = importer.init_importer(importer_class=tpDcc, do_reload=False)
     dcclib_importer.import_modules()
-    dcclib_importer.import_packages(only_packages=True, order=['tpDcc.core'])
+    dcclib_importer.import_packages(only_packages=True, order=['tpDcc.widgets', 'tpDcc.core'])
     if do_reload:
         dcclib_importer.reload_all()
-
     init_dcc(do_reload=do_reload)
 
-    from tpDcc.managers import callbackmanager
-    callbackmanager.CallbacksManager.initialize()
+    # After that we initialize Qt library (we must do it after tpDcc one because tpDcc-libs-qt depends on tpDcc-core)
+    from tpDcc.libs.qt import loader
+    loader.init(do_reload=do_reload)
+
+    init_managers(dev=dev, do_reload=do_reload)
+
+    from tpDcc.managers import callbacks
+    callbacks.CallbacksManager.initialize()
+
+
+def init_dcc(do_reload=False):
+    """
+    Checks DCC we are working on an initializes proper variables
+    """
+
+    if 'cmds' in main.__dict__:
+        from tpDcc.dccs.maya import loader
+        loader.init_dcc(do_reload=do_reload)
+    elif 'MaxPlus' in main.__dict__:
+        from tpDcc.dccs.max import loader
+        loader.init_dcc(do_reload=do_reload)
+    elif 'hou' in main.__dict__:
+        from tpDcc.dccs.houdini import loader
+        loader.init_dcc(do_reload=do_reload)
+    elif 'nuke' in main.__dict__:
+        from tpDcc.dccs.nuke import loader
+        loader.init_dcc(do_reload=do_reload)
+    else:
+        global Dcc
+        from tpDcc.core import dcc
+        Dcc = dcc.UnknownDCC
+
+
+def init_managers(dev=True, do_reload=False):
+    """
+    Initializes all tpDcc managers
+    """
+
+    import tpDcc
+    from tpDcc import config
+    from tpDcc import toolsets
+
+    tpDcc.ConfigsMgr().register_package_configs('tpDcc', os.path.dirname(config.__file__))
+
+    core_config = tpDcc.ConfigsMgr().get_config('tpDcc-core')
+    if not core_config:
+        tpDcc.logger.warning(
+            'tpDcc-core configuration file not found! Make sure that you have tpDcc-config package installed!')
+        return None
+
+    tools_to_load = core_config.get('tools', list())
+
+    # Tools
+    tpDcc.ToolsMgr().load_package_tools('tpDcc', tools_to_load=tools_to_load, dev=dev)
+    if do_reload:
+        tpDcc.ToolsMgr().reload_tools()
+
+    # Toolsets
+    tpDcc.ToolsetsMgr().register_path('tpDcc', os.path.dirname(toolsets.__file__))
+    tpDcc.ToolsetsMgr().load_registered_toolsets('tpDcc', tools_to_load=tools_to_load, dev=dev, do_reload=do_reload)
 
 
 def create_logger():
     """
-    Returns logger of current modue
+    Returns logger of current module
     """
 
     logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)

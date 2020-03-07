@@ -10,7 +10,9 @@ from __future__ import print_function, division, absolute_import
 import os
 import logging
 
-from tpDcc.libs import qt
+from Qt.QtGui import *
+
+import tpDcc
 from tpDcc.libs.python import path, folder, settings
 from tpDcc.core import consts
 
@@ -319,7 +321,7 @@ class ProjectData(object):
         self._settings.set('name', self.name)
         self._settings.set('path', self.project_path)
         self._settings.set('full_path', self.full_path)
-        self._settings.set('image', image.image_to_base64(qt.resource.get('icons', 'rignode_icon') + '.png'))
+        self._settings.set('image', image.image_to_base64(tpDcc.ResourcesMgr().get('icons', 'rignode_icon') + '.png'))
 
     def _setup_options(self):
 
