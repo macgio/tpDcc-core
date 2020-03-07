@@ -20,7 +20,7 @@ class UnknownDCC(abstract_dcc.AbstractDCC, object):
         :return: str
         """
 
-        return tpDccLib.Dccs.Unknown
+        return tpDcc.Dccs.Unknown
 
     @staticmethod
     def get_dpi(value=1):

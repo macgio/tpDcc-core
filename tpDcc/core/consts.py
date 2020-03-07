@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains constant definitions for tpDccLib
+Module that contains constant definitions for tpDcc
 """
 
 from __future__ import print_function, division, absolute_import

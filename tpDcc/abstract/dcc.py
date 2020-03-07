@@ -7,6 +7,8 @@ Module that contains abstract definition of basic DCC functions
 
 from __future__ import print_function, division, absolute_import
 
+from collections import OrderedDict
+
 from tpDcc.libs.python import decorators
 
 
@@ -17,6 +19,8 @@ class AbstractDCC(object):
         No = 'No'
         Cancel = 'No'
         Close = 'No'
+        
+    TYPE_FILTERS = OrderedDict()
 
     @staticmethod
     @decorators.abstractmethod
@@ -98,7 +102,18 @@ class AbstractDCC(object):
         :return:
         """
 
-        return None
+        raise NotImplementedError('abstract DCC function get_main_window() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def is_window_floating(window_name):
+        """
+        Returns whether or not DCC window is floating
+        :param window_name: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function is_window_floating() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -301,7 +316,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def rename_node(node, new_name):
+    def rename_node(node, new_name, **kwargs):
         """
         Renames given node with new given name
         :param node: str
@@ -1837,11 +1852,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def find_unique_name(node_name, include_last_number=True):
+    def find_unique_name(
+            obj_names=None, filter_type=None, include_last_number=True, do_rename=False, 
+            search_hierarchy=False, selection_only=True, **kwargs):
         """
         Returns a unique node name by adding a number to the end of the node name
-        :param node_name: str, name fo find unique name from
+        :param obj_names: str, name or list of names to find unique name from
+        :param filter_type: str, find unique name on nodes that matches given filter criteria
         :param include_last_number: bool
+        :param do_rename: bool
+       :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene object
         :return: str
         """
 
@@ -2356,6 +2377,25 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def delete_history(node):
+        """
+        Removes the history of the given node
+        """
+
+        raise NotImplementedError('abstract DCC delete_history() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def freeze_transforms(node, **kwargs):
+        """
+        Freezes the transformations of the given node and its children
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC freeze_transforms() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def reset_node_transforms(node, **kwargs):
         """
         Reset the transformations of the given node and its children
@@ -2376,6 +2416,182 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC set_node_rotation_axis_in_object_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def filter_nodes_by_type(filter_type, search_hierarchy=False, selection_only=True, **kwargs):
+        """
+        Returns list of nodes in current scene filtered by given filter
+        :param filter_type: str, filter used to filter nodes to edit index of
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search all scene objects or only selected ones
+        :param kwargs:
+        :return: list(str), list of filtered nodes
+        """
+
+        raise NotImplementedError('abstract DCC filter_nodes_by_type() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def add_name_prefix(
+            prefix, obj_names=None, filter_type=None, search_hierarchy=False, selection_only=True, **kwargs):
+        """
+        Add prefix to node name
+        :param prefix: str, string to add to the start of the current node name
+        :param obj_names: str or list(str), name of list of node names to rename
+        :param filter_type: str, name of object type to filter the objects to apply changes ('Group, 'Joint', etc)
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene objects
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC add_name_prefix() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def add_name_suffix(
+            suffix, obj_names=None, filter_type=None, search_hierarchy=False, selection_only=True, **kwargs):
+        """
+        Add suffix to node name
+        :param suffix: str, string to add to the end of the current node name
+        :param obj_names: str or list(str), name of list of node names to rename
+        :param filter_type: str, name of object type to filter the objects to apply changes ('Group, 'Joint', etc)
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene objects
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC add_name_suffix() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def remove_name_prefix(
+            obj_names=None, filter_type=None, separator='_', search_hierarchy=False, selection_only=True, **kwargs):
+        """
+        Removes prefix from node name
+        :param obj_names: str or list(str), name of list of node names to rename
+        :param filter_type: str, name of object type to filter the objects to apply changes ('Group, 'Joint', etc)
+        :param separator: str, separator character for the prefix
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene objects
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC remove_name_prefix() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def remove_name_suffix(
+            obj_names=None, filter_type=None, separator='_', search_hierarchy=False, selection_only=True, **kwargs):
+        """
+        Removes suffix from node name
+        :param obj_names: str or list(str), name of list of node names to rename
+        :param filter_type: str, name of object type to filter the objects to apply changes ('Group, 'Joint', etc)
+        :param separator: str, separator character for the suffix
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene objects
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC remove_name_suffix() not implemented!')
+    
+    @staticmethod
+    @decorators.abstractmethod
+    def auto_name_suffix(obj_names=None, filter_type=None, search_hierarchy=False, selection_only=True, **kwargs):
+        """
+        Automatically add a sufix to node names
+        :param obj_names: str or list(str), name of list of node names to rename
+        :param filter_type: str, name of object type to filter the objects to apply changes ('Group, 'Joint', etc)
+        :param separator: str, separator character for the suffix
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene objects
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC auto_name_suffix() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def remove_name_numbers(
+            obj_names=None, filter_type=None, search_hierarchy=False, selection_only=True, remove_underscores=True,
+            trailing_only=False, **kwargs):
+        """
+        Removes numbers from node names
+        :param obj_names: str or list(str), name of list of node names to rename
+        :param filter_type: str, name of object type to filter the objects to apply changes ('Group, 'Joint', etc)
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene objects
+        :param remove_underscores: bool, Whether or not to remove unwanted underscores
+        :param trailing_only: bool, Whether or not to remove only numbers at the ned of the name
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC remove_name_numbers() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def renumber_objects(
+            obj_names=None, filter_type=None, remove_trailing_numbers=True, add_underscore=True, padding=2,
+            search_hierarchy=False, selection_only=True, **kwargs):
+        """
+        Removes numbers from node names
+        :param obj_names: str or list(str), name of list of node names to rename
+        :param filter_type: str, name of object type to filter the objects to apply changes ('Group, 'Joint', etc)
+        :param remove_trailing_numbers: bool, Whether to remove trailing numbers before doing the renumber
+        :param add_underscore: bool, Whether or not to remove underscore between name and new number
+        :param padding: int, amount of numerical padding (2=01, 3=001, etc). Only used if given names has no numbers.
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene objects
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC renumber_objects() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def change_suffix_padding(
+            obj_names=None, filter_type=None, add_underscore=True, padding=2,
+            search_hierarchy=False, selection_only=True, **kwargs):
+        """
+        Removes numbers from node names
+        :param obj_names: str or list(str), name of list of node names to rename
+        :param filter_type: str, name of object type to filter the objects to apply changes ('Group, 'Joint', etc)
+        :param add_underscore: bool, Whether or not to remove underscore between name and new number
+        :param padding: int, amount of numerical padding (2=01, 3=001, etc). Only used if given names has no numbers.
+        :param search_hierarchy: bool, Whether to search objects in hierarchies
+        :param selection_only: bool, Whether to search only selected objects or all scene objects
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC change_suffix_padding() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def dock_widget(widget, *args, **kwargs):
+        """
+        Docks given widget into current DCC UI
+        :param widget: QWidget
+        :param args:
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC dock_widget() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def deferred_function(fn, *args, **kwargs):
+        """
+        Calls given function with given arguments in a deferred way
+        :param fn:
+        :param args: list
+        :param kwargs: dict
+        """
+
+        return fn(*args, **kwargs)
 
     # ================================================================================================================
 
@@ -2485,7 +2701,7 @@ class AbstractDCC(object):
         :return: AbstractProgressBar
         """
 
-        from tpDccLib.abstract import progressbar
+        from tpDcc.abstract import progressbar
 
         return progressbar.AbstractProgressBar(**kwargs)
 
@@ -2496,7 +2712,7 @@ class AbstractDCC(object):
         :return: class
         """
 
-        from tpDccLib.abstract import progressbar
+        from tpDcc.abstract import progressbar
 
         return progressbar.AbstractProgressBar
 
