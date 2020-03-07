@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="tpDcc.loader module" href="tpDcc.loader.html" />
+    <link rel="next" title="tpDcc.tools package" href="tpDcc.tools.html" />
     <link rel="prev" title="tpDcc.managers package" href="tpDcc.managers.html" /> 
 </head>
 
@@ -94,6 +94,8 @@
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.dccs.html">tpDcc.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.libs.html">tpDcc.libs package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="tpDcc.managers.html">tpDcc.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.tools.html">tpDcc.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.toolsets.html">tpDcc.toolsets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tpDcc.html#submodules">Submodules</a></li>
@@ -175,52 +177,6 @@
             
   <div class="section" id="module-tpDcc.managers.callbackmanager">
 <span id="tpdcc-managers-callbackmanager-module"></span><h1>tpDcc.managers.callbackmanager module<a class="headerlink" href="#module-tpDcc.managers.callbackmanager" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains base callbackManager class</p>
-<dl class="class">
-<dt id="tpDcc.managers.callbackmanager.CallbacksManager">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.managers.callbackmanager.</code><code class="sig-name descname">CallbacksManager</code><a class="headerlink" href="#tpDcc.managers.callbackmanager.CallbacksManager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Static class used to manage all callbacks instances</p>
-<dl class="method">
-<dt id="tpDcc.managers.callbackmanager.CallbacksManager.cleanup">
-<em class="property">classmethod </em><code class="sig-name descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.managers.callbackmanager.CallbacksManager.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cleanup all module callbacks
-:param owner: class, If given, only
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.managers.callbackmanager.CallbacksManager.initialize">
-<em class="property">classmethod </em><code class="sig-name descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.managers.callbackmanager.CallbacksManager.initialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes all module callbacks</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.managers.callbackmanager.CallbacksManager.register">
-<em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">callback_type</em>, <em class="sig-param">fn</em>, <em class="sig-param">owner=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.managers.callbackmanager.CallbacksManager.register" title="Permalink to this definition">¶</a></dt>
-<dd><p>Registers, is callback exists, a new callback
-:param callback_type: str, type of callback
-:param fn: Python function to be called when callback is emitted
-:param owner, class</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.managers.callbackmanager.CallbacksManager.unregister">
-<em class="property">classmethod </em><code class="sig-name descname">unregister</code><span class="sig-paren">(</span><em class="sig-param">callback_type</em>, <em class="sig-param">fn</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.managers.callbackmanager.CallbacksManager.unregister" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unregisters, is callback exists, a new callback
-:param callback_type: str, type of callback
-:param fn: Python function we want to unregister</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.managers.callbackmanager.CallbacksManager.unregister_owner_callbacks">
-<em class="property">classmethod </em><code class="sig-name descname">unregister_owner_callbacks</code><span class="sig-paren">(</span><em class="sig-param">owner</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.managers.callbackmanager.CallbacksManager.unregister_owner_callbacks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unregister all the callbacks from all registered callbacks that belongs to a specific owner
-:param owner: class</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 
 
@@ -235,7 +191,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tpDcc.loader.html" class="btn btn-neutral float-right" title="tpDcc.loader module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tpDcc.tools.html" class="btn btn-neutral float-right" title="tpDcc.tools package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="tpDcc.managers.html" class="btn btn-neutral float-left" title="tpDcc.managers package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

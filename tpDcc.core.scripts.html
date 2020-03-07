@@ -94,6 +94,8 @@
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.dccs.html">tpDcc.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.libs.html">tpDcc.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.managers.html">tpDcc.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.tools.html">tpDcc.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.toolsets.html">tpDcc.toolsets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tpDcc.html#submodules">Submodules</a></li>
@@ -175,136 +177,6 @@
             
   <div class="section" id="module-tpDcc.core.scripts">
 <span id="tpdcc-core-scripts-module"></span><h1>tpDcc.core.scripts module<a class="headerlink" href="#module-tpDcc.core.scripts" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains script data definitions for DCCs</p>
-<dl class="class">
-<dt id="tpDcc.core.scripts.ScriptData">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.core.scripts.</code><code class="sig-name descname">ScriptData</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="tpDcc.core.data.html#tpDcc.core.data.FileData" title="tpDcc.core.data.FileData"><code class="xref py py-class docutils literal notranslate"><span class="pre">tpDcc.core.data.FileData</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class used to define scripts stored in disk files</p>
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptData.create">
-<code class="sig-name descname">create</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptData.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates file</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptData.save">
-<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">lines</em>, <em class="sig-param">comment=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptData.save" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptData.set_lines">
-<code class="sig-name descname">set_lines</code><span class="sig-paren">(</span><em class="sig-param">lines</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptData.set_lines" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="tpDcc.core.scripts.ScriptExtensions">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.core.scripts.</code><code class="sig-name descname">ScriptExtensions</code><a class="headerlink" href="#tpDcc.core.scripts.ScriptExtensions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that defines different script extensions supported by DCCs</p>
-<dl class="attribute">
-<dt id="tpDcc.core.scripts.ScriptExtensions.Manifest">
-<code class="sig-name descname">Manifest</code><em class="property"> = 'json'</em><a class="headerlink" href="#tpDcc.core.scripts.ScriptExtensions.Manifest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="tpDcc.core.scripts.ScriptExtensions.Python">
-<code class="sig-name descname">Python</code><em class="property"> = 'py'</em><a class="headerlink" href="#tpDcc.core.scripts.ScriptExtensions.Python" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="tpDcc.core.scripts.ScriptManifestData">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.core.scripts.</code><code class="sig-name descname">ScriptManifestData</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptManifestData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#tpDcc.core.scripts.ScriptData" title="tpDcc.core.scripts.ScriptData"><code class="xref py py-class docutils literal notranslate"><span class="pre">tpDcc.core.scripts.ScriptData</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class used to define manifest scripts stored in disk files</p>
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptManifestData.get_data_extension">
-<em class="property">static </em><code class="sig-name descname">get_data_extension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptManifestData.get_data_extension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns extension of the file
-Should be override on derived classes
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptManifestData.get_data_title">
-<em class="property">static </em><code class="sig-name descname">get_data_title</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptManifestData.get_data_title" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function should be override in each derived data class
-Returns the title used by the data
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptManifestData.get_data_type">
-<em class="property">static </em><code class="sig-name descname">get_data_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptManifestData.get_data_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function should be override in each derived data class
-Returns the data of type
-:return: str</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="tpDcc.core.scripts.ScriptPythonData">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.core.scripts.</code><code class="sig-name descname">ScriptPythonData</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptPythonData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#tpDcc.core.scripts.ScriptData" title="tpDcc.core.scripts.ScriptData"><code class="xref py py-class docutils literal notranslate"><span class="pre">tpDcc.core.scripts.ScriptData</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class used to define Python scripts stored in disk files</p>
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptPythonData.get_data_extension">
-<em class="property">static </em><code class="sig-name descname">get_data_extension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptPythonData.get_data_extension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns extension of the file
-Should be override on derived classes
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptPythonData.get_data_title">
-<em class="property">static </em><code class="sig-name descname">get_data_title</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptPythonData.get_data_title" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function should be override in each derived data class
-Returns the title used by the data
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptPythonData.get_data_type">
-<em class="property">static </em><code class="sig-name descname">get_data_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptPythonData.get_data_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function should be override in each derived data class
-Returns the data of type
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.scripts.ScriptPythonData.open">
-<code class="sig-name descname">open</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.scripts.ScriptPythonData.open" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="tpDcc.core.scripts.ScriptTypes">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.core.scripts.</code><code class="sig-name descname">ScriptTypes</code><a class="headerlink" href="#tpDcc.core.scripts.ScriptTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that defines different script types supported by DCCs</p>
-<dl class="attribute">
-<dt id="tpDcc.core.scripts.ScriptTypes.Manifest">
-<code class="sig-name descname">Manifest</code><em class="property"> = 'script.manifest'</em><a class="headerlink" href="#tpDcc.core.scripts.ScriptTypes.Manifest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="tpDcc.core.scripts.ScriptTypes.Python">
-<code class="sig-name descname">Python</code><em class="property"> = 'script.python'</em><a class="headerlink" href="#tpDcc.core.scripts.ScriptTypes.Python" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="tpDcc.core.scripts.ScriptTypes.Unknown">
-<code class="sig-name descname">Unknown</code><em class="property"> = 'Unknown'</em><a class="headerlink" href="#tpDcc.core.scripts.ScriptTypes.Unknown" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </div>
 
 

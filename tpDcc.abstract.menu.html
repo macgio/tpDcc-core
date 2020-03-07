@@ -94,6 +94,8 @@
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.dccs.html">tpDcc.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.libs.html">tpDcc.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.managers.html">tpDcc.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.tools.html">tpDcc.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.toolsets.html">tpDcc.toolsets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tpDcc.html#submodules">Submodules</a></li>
@@ -175,33 +177,6 @@
             
   <div class="section" id="module-tpDcc.abstract.menu">
 <span id="tpdcc-abstract-menu-module"></span><h1>tpDcc.abstract.menu module<a class="headerlink" href="#module-tpDcc.abstract.menu" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains abstract implementation for DCC menus</p>
-<dl class="class">
-<dt id="tpDcc.abstract.menu.AbstractMenu">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.abstract.menu.</code><code class="sig-name descname">AbstractMenu</code><span class="sig-paren">(</span><em class="sig-param">name='AbstractMenu'</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.menu.AbstractMenu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="tpDcc.abstract.menu.AbstractMenu.create_category">
-<em class="property">static </em><code class="sig-name descname">create_category</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.menu.AbstractMenu.create_category" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new category on the given menu. If not menu given this menu is used
-:param category_name: str, name of the category to add
-:param category_items: list(str), list of items to add to this category
-:param parent_menu: str
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.abstract.menu.AbstractMenu.create_menu">
-<code class="sig-name descname">create_menu</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.menu.AbstractMenu.create_menu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new DCC menu
-If file path is not given, menu is created without items
-:param file_path: str, path where JSON menu file is located
-:param parent_menu: str, name of the menu to append this menu into
-:return:</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 
 

@@ -94,6 +94,8 @@
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.dccs.html">tpDcc.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.libs.html">tpDcc.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.managers.html">tpDcc.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.tools.html">tpDcc.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.toolsets.html">tpDcc.toolsets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tpDcc.html#submodules">Submodules</a></li>
@@ -175,80 +177,6 @@
             
   <div class="section" id="module-tpDcc.core.dcc">
 <span id="tpdcc-core-dcc-module"></span><h1>tpDcc.core.dcc module<a class="headerlink" href="#module-tpDcc.core.dcc" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains DCC functionality for non DCC based environemnts</p>
-<dl class="class">
-<dt id="tpDcc.core.dcc.UnknownDCC">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.core.dcc.</code><code class="sig-name descname">UnknownDCC</code><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="tpDcc.abstract.dcc.html#tpDcc.abstract.dcc.AbstractDCC" title="tpDcc.abstract.dcc.AbstractDCC"><code class="xref py py-class docutils literal notranslate"><span class="pre">tpDcc.abstract.dcc.AbstractDCC</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.error">
-<em class="property">static </em><code class="sig-name descname">error</code><span class="sig-paren">(</span><em class="sig-param">message</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints a error message
-:param message: str
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.get_dpi">
-<em class="property">static </em><code class="sig-name descname">get_dpi</code><span class="sig-paren">(</span><em class="sig-param">value=1</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.get_dpi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns current DPI used by DCC
-:param value: float
-:return: float</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.get_dpi_scale">
-<em class="property">static </em><code class="sig-name descname">get_dpi_scale</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.get_dpi_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns current DPI scale used by DCC
-:param value: float
-:return: float</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.get_main_window">
-<em class="property">static </em><code class="sig-name descname">get_main_window</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.get_main_window" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns Qt object that references to the main DCC window
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.get_name">
-<em class="property">static </em><code class="sig-name descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.get_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the name of the DCC
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.get_version">
-<em class="property">static </em><code class="sig-name descname">get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.get_version" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns version of the DCC
-:return: int</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.get_version_name">
-<em class="property">static </em><code class="sig-name descname">get_version_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.get_version_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns version of the DCC
-:return: int</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.is_batch">
-<em class="property">static </em><code class="sig-name descname">is_batch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.is_batch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns whether DCC is being executed in batch mode or not
-:return: bool</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.core.dcc.UnknownDCC.warning">
-<em class="property">static </em><code class="sig-name descname">warning</code><span class="sig-paren">(</span><em class="sig-param">message</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.core.dcc.UnknownDCC.warning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints a warning message
-:param message: str
-:return:</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 
 

@@ -94,6 +94,8 @@
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.dccs.html">tpDcc.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.libs.html">tpDcc.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tpDcc.managers.html">tpDcc.managers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.tools.html">tpDcc.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tpDcc.toolsets.html">tpDcc.toolsets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tpDcc.html#submodules">Submodules</a></li>
@@ -175,60 +177,6 @@
             
   <div class="section" id="module-tpDcc.abstract.shelf">
 <span id="tpdcc-abstract-shelf-module"></span><h1>tpDcc.abstract.shelf module<a class="headerlink" href="#module-tpDcc.abstract.shelf" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains abstract implementation for DCC shelves</p>
-<dl class="class">
-<dt id="tpDcc.abstract.shelf.AbstractShelf">
-<em class="property">class </em><code class="sig-prename descclassname">tpDcc.abstract.shelf.</code><code class="sig-name descname">AbstractShelf</code><span class="sig-paren">(</span><em class="sig-param">name='AbstractShelf'</em>, <em class="sig-param">label_background=(0</em>, <em class="sig-param">0</em>, <em class="sig-param">0</em>, <em class="sig-param">0)</em>, <em class="sig-param">label_color=(0.9</em>, <em class="sig-param">0.9</em>, <em class="sig-param">0.9)</em>, <em class="sig-param">category_icon=None</em>, <em class="sig-param">enable_labels=True</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.shelf.AbstractShelf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="attribute">
-<dt id="tpDcc.abstract.shelf.AbstractShelf.ICONS_PATHS">
-<code class="sig-name descname">ICONS_PATHS</code><em class="property"> = None</em><a class="headerlink" href="#tpDcc.abstract.shelf.AbstractShelf.ICONS_PATHS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.abstract.shelf.AbstractShelf.add_menu_item">
-<em class="property">static </em><code class="sig-name descname">add_menu_item</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.shelf.AbstractShelf.add_menu_item" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a new item with the given attributes to the shelf
-:param parent:
-:param label: str
-:param command: str
-:param icon: str
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.abstract.shelf.AbstractShelf.add_sub_menu">
-<em class="property">static </em><code class="sig-name descname">add_sub_menu</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.shelf.AbstractShelf.add_sub_menu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a sub menu item with the given label and icon to the given parent popup menu
-:param parent:
-:param label:
-:param icon:
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.abstract.shelf.AbstractShelf.build">
-<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.shelf.AbstractShelf.build" title="Permalink to this definition">¶</a></dt>
-<dd><p>Builds shelf from JSON file
-:param shelf_file: str
-:param args: list
-:param kwargs: dict</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.abstract.shelf.AbstractShelf.create">
-<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.shelf.AbstractShelf.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new shelf</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tpDcc.abstract.shelf.AbstractShelf.set_as_active">
-<code class="sig-name descname">set_as_active</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#tpDcc.abstract.shelf.AbstractShelf.set_as_active" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets this shelf as active shelf in current DCC session</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 
 

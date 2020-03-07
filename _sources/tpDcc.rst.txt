@@ -11,6 +11,8 @@ Subpackages
    tpDcc.dccs
    tpDcc.libs
    tpDcc.managers
+   tpDcc.tools
+   tpDcc.toolsets
 
 Submodules
 ----------

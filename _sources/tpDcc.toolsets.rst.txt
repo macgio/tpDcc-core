@@ -1,0 +1,10 @@
+tpDcc.toolsets package
+======================
+
+Module contents
+---------------
+
+.. automodule:: tpDcc.toolsets
+   :members:
+   :undoc-members:
+   :show-inheritance:
