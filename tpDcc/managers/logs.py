@@ -35,7 +35,7 @@ class LogsManager(object):
         if not logging_file:
             return logging.getLogger('tpDcc')
 
-        logging.config.fileConfig(logging_file,  disable_existing_loggers=False)
+        logging.config.fileConfig(logging_file, disable_existing_loggers=False)
         # tool_logger_level_env = '{}_LOG_LEVEL'.format(pkg_loader.fullname.replace('.', '_').upper())
         return logging.getLogger(tool_id)
 

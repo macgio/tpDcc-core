@@ -275,17 +275,15 @@ class MenusManager(object):
         """
 
         if language == 'python':
-            exec (command)
+            exec(command)
         else:
             raise NotImplementedError('Commands of of language "{}" are not supported!'.format(language))
-
 
 
 @decorators.Singleton
 class MenusManagerSingleton(MenusManager, object):
     def __init__(self):
         MenusManager.__init__(self)
-
 
 
 tpDcc.register.register_class('MenusMgr', MenusManagerSingleton)

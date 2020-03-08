@@ -19,7 +19,7 @@ class AbstractDCC(object):
         No = 'No'
         Cancel = 'No'
         Close = 'No'
-        
+
     TYPE_FILTERS = OrderedDict()
 
     @staticmethod
@@ -1853,7 +1853,7 @@ class AbstractDCC(object):
     @staticmethod
     @decorators.abstractmethod
     def find_unique_name(
-            obj_names=None, filter_type=None, include_last_number=True, do_rename=False, 
+            obj_names=None, filter_type=None, include_last_number=True, do_rename=False,
             search_hierarchy=False, selection_only=True, **kwargs):
         """
         Returns a unique node name by adding a number to the end of the node name
@@ -2494,7 +2494,7 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC remove_name_suffix() not implemented!')
-    
+
     @staticmethod
     @decorators.abstractmethod
     def auto_name_suffix(obj_names=None, filter_type=None, search_hierarchy=False, selection_only=True, **kwargs):

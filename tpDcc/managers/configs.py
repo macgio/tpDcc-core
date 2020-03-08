@@ -67,7 +67,7 @@ class ConfigsManager(object):
 
         self._package_configs[package_name][module_name][environment] = {
             'base': '{}{}'.format(base_config, config_extension),
-            'dcc':'{}{}'.format(dcc_config_path, config_extension),
+            'dcc': '{}{}'.format(dcc_config_path, config_extension),
             'dcc_version': '{}{}'.format(dcc_version_config_path, config_extension)
         }
 

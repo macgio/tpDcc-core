@@ -15,7 +15,7 @@ import appdirs
 
 import tpDcc as tp
 from tpDcc import register
-from tpDcc.core import plugin, tool, config as dcc_config
+from tpDcc.core import plugin, tool
 from tpDcc.libs.python import decorators, python, importer, path as path_utils
 
 if python.is_python2():
@@ -265,10 +265,10 @@ class ToolsManager(plugin.PluginsManager, object):
             dcc_import_order = list()
             dcc_skip_modules = list()
             if dcc_config:
-                dcc_import_order = ['{}.{}'.format(package_loader.fullname, mod) for mod in
-                                dcc_config.data.get('import_order', list())]
-                dcc_skip_modules = ['{}.{}'.format(package_loader.fullname, mod) for mod in
-                                dcc_config.data.get('skip_modules', list())]
+                dcc_import_order = ['{}.{}'.format(
+                    package_loader.fullname, mod) for mod in dcc_config.data.get('import_order', list())]
+                dcc_skip_modules = ['{}.{}'.format(
+                    package_loader.fullname, mod) for mod in dcc_config.data.get('skip_modules', list())]
             dcc_importer.import_packages(order=dcc_import_order, only_packages=False, skip_modules=dcc_skip_modules)
             dcc_importer.reload_all()
 
@@ -508,7 +508,7 @@ class ToolsManager(plugin.PluginsManager, object):
         tool_version = self._plugins[package_name][tool_to_run]['version']
         dcc_loader = self._plugins[package_name][tool_to_run]['dcc_loader']
         dcc_config = self._plugins[package_name][tool_to_run]['dcc_config']
-        
+
         # Initialize and reload tool modules if necessary
         tool_importer = ToolImporter(pkg_loader, debug=debug)
 
