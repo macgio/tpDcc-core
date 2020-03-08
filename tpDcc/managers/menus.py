@@ -254,17 +254,9 @@ class MenusManager(object):
         :param kwargs: dict
         """
 
-        # TODO: The reloading only should be done in DEV mode
-        tpDcc.ToolsMgr().launch_tool_by_id(tool_id, do_reload=True)
+        do_reload = kwargs.get('do_reload', False)
 
-    def _launch_tool_by_name(self, name, **kwargs):
-        """
-        Internal function that launch a tool by its name
-        :param name: str
-        :param kwargs: dict
-        """
-
-        self.launch_tool_by_name(name=name, kwargs=kwargs)
+        tpDcc.ToolsMgr().launch_tool_by_id(tool_id, do_reload=do_reload)
 
     def _launch_command(self, command, language='python', *args, **kwargs):
         """
