@@ -60,6 +60,10 @@ class DccConfig(object):
     def data(self):
         return self._parsed_data
 
+    @data.setter
+    def data(self, value):
+        self._parsed_data = value
+
     def get_path(self):
         if not self._parsed_data:
             return None

@@ -9,6 +9,7 @@ from __future__ import print_function, division, absolute_import
 
 import os
 import sys
+import copy
 import time
 import traceback
 from functools import partial
@@ -202,6 +203,9 @@ class DccTool(plugin.Plugin, object):
         if not toolset_class:
             tp.logger.warning('Impossible to run tool! No toolset found with id: "{}"'.format(tool_id))
             return None
+        toolset_data_copy = copy.deepcopy(self._config.data)
+        toolset_data_copy.update(toolset_class.CONFIG.data)
+        toolset_class.CONFIG.data = toolset_data_copy
 
         if tool_kwargs is None:
             tool_kwargs = dict()
@@ -226,6 +230,7 @@ class DccTool(plugin.Plugin, object):
         self._attacher.main_layout.setAlignment(Qt.AlignTop)
         toolset_inst.set_attacher(self._attacher)
         self._attacher.setWindowIcon(toolset_inst.get_icon())
+        self._attacher.setWindowTitle('{} - {}'.format(self._attacher.windowTitle(), self.VERSION))
         self._attacher.show()
 
         return self._attacher
@@ -273,7 +278,7 @@ class DccTool(plugin.Plugin, object):
             kwargs['settings'] = self._settings
             tool_config = self.config_dict(self.FILE_NAME) or dict()
             self._config.data.update(tool_config)
-            kwargs['config'] = tool_config
+            kwargs['config'] = self._config
 
             tool_data = self.launch(*args, **kwargs)
             if tool_data and tool_data.get('tool') is not None:

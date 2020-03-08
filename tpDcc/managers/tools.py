@@ -53,7 +53,8 @@ class ToolsManager(plugin.PluginsManager, object):
     # BASE
     # ============================================================================================================
 
-    def register_plugin(self, package_name, package_loaders, environment, config_dict=None, load=True):
+    def register_plugin(
+            self, package_name, package_loaders, environment, root_package_name=None, config_dict=None, load=True):
         """
         Implements register_plugin function
         Registers a plugin instance to the manager
@@ -140,9 +141,10 @@ class ToolsManager(plugin.PluginsManager, object):
         if len(plugins_found) > 1:
             tp.logger.warning(
                 'Multiple plugins found ({}) in module "{}". Loading first one. {} ...'.format(
-                    len(plugins_found), plugin_path, plugins_found[0]))
-
-        plugin_found = plugins_found[0]
+                    len(plugins_found), plugin_path, plugins_found[-1]))
+            plugin_found = plugins_found[-1]
+        else:
+            plugin_found = plugins_found[0]
         plugin_loader = loader.find_loader(plugin_found[0])
 
         # Check if DCC specific implementation for plugin exists
@@ -160,7 +162,7 @@ class ToolsManager(plugin.PluginsManager, object):
         plugin_icon = plugin_config_dict['icon']
         plugin_config_name = plugin_path.replace('.', '-')
         plugin_config = tp.ConfigsMgr().get_config(
-            config_name=plugin_config_name, package_name=package_name,
+            config_name=plugin_config_name, package_name=package_name, root_package_name=root_package_name,
             environment=environment, config_dict=config_dict)
 
         if dcc_loader:
@@ -340,7 +342,7 @@ class ToolsManager(plugin.PluginsManager, object):
     # TOOLS
     # ============================================================================================================
 
-    def load_package_tools(self, package_name, tools_to_load=None, dev=True):
+    def load_package_tools(self, package_name, root_package_name=None, tools_to_load=None, dev=True, config_dict=None):
         """
         Loads all tools available in given package
         """
@@ -351,13 +353,16 @@ class ToolsManager(plugin.PluginsManager, object):
             return
         tools_to_load = python.force_list(tools_to_load)
 
+        if config_dict is None:
+            config_dict = dict()
+
         tools_to_register = OrderedDict()
         tools_path = '{}.tools.{}'
         for tool_name in tools_to_load:
             pkg_path = tools_path.format(package_name, tool_name)
             pkg_loader = loader.find_loader(pkg_path)
             if not pkg_loader:
-                tp.logger.warning('No loader found for tool: {}'.format(pkg_path))
+                # tp.logger.warning('No loader found for tool: {}'.format(pkg_path))
                 continue
             if tool_name not in tools_to_register:
                 tools_to_register[tool_name] = list()
@@ -365,7 +370,8 @@ class ToolsManager(plugin.PluginsManager, object):
 
         for pkg_loaders in tools_to_register.values():
             self.register_plugin(
-                package_name=package_name, package_loaders=pkg_loaders, environment=environment, load=True)
+                package_name=package_name, root_package_name=root_package_name, package_loaders=pkg_loaders,
+                environment=environment, load=True, config_dict=config_dict)
 
     def launch_tool(self, tool_inst, *args, **kwargs):
         """
@@ -642,10 +648,6 @@ class ToolsManager(plugin.PluginsManager, object):
                 'Impossible to retrieve tool config for "{}" in package "{}"! Tool not found'.format(
                     tool_id, package_name))
             return None
-
-        # config = self._plugins[package_name][tool_id].get('dcc_config', None)
-        # if not config:
-        #     config = self._plugins[package_name][tool_id].get('config', None)
 
         config = self._plugins[package_name][tool_id].get('config', None)
 

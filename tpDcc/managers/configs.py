@@ -120,8 +120,8 @@ class ConfigsManager(object):
         config_data = self._get_config_data(
             package_name=package_name, config_name=config_name,
             config_dict=config_dict, root_package_name=root_package_name, environment=environment)
-        if not config_data:
-            return None
+        if config_data is None:
+            config_data = dict()
 
         parsed_data = parser_class(config_data).parse()
         new_config = config.DccConfig(config_name=config_name, environment=environment, data=parsed_data)
