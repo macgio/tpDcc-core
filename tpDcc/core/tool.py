@@ -225,7 +225,7 @@ class DccTool(plugin.Plugin, object):
             attacher_class = tp.Window
 
         self._attacher = attacher_class(
-            id=tool_id, title=tool_name, config=self.config, settings=self.settings,
+            id=tool_id, title=tool_name, config=toolset_class.CONFIG, settings=self.settings,
             show_on_initialize=True, frameless=frameless_active, dockable=True, toolset=toolset_inst)
         self._attacher.main_layout.setAlignment(Qt.AlignTop)
         toolset_inst.set_attacher(self._attacher)
