@@ -6,14 +6,17 @@ Submodules
 
 .. toctree::
 
+   tpDcc.core.config
    tpDcc.core.consts
    tpDcc.core.data
    tpDcc.core.dcc
    tpDcc.core.exceptions
    tpDcc.core.node
+   tpDcc.core.plugin
    tpDcc.core.project
    tpDcc.core.scene
    tpDcc.core.scripts
+   tpDcc.core.tool
 
 Module contents
 ---------------

@@ -1,0 +1,7 @@
+tpDcc.core.plugin module
+========================
+
+.. automodule:: tpDcc.core.plugin
+   :members:
+   :undoc-members:
+   :show-inheritance:

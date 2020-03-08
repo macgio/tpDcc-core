@@ -1,0 +1,7 @@
+tpDcc.managers.resources module
+===============================
+
+.. automodule:: tpDcc.managers.resources
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,6 +1,13 @@
 tpDcc.tools package
 ===================
 
+Subpackages
+-----------
+
+.. toctree::
+
+   tpDcc.tools.frameless_toggle
+
 Module contents
 ---------------
 

@@ -1,0 +1,7 @@
+tpDcc.managers.menus module
+===========================
+
+.. automodule:: tpDcc.managers.menus
+   :members:
+   :undoc-members:
+   :show-inheritance:
