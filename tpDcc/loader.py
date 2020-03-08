@@ -135,9 +135,9 @@ def init_dcc(do_reload=False):
         from tpDcc.dccs.nuke import loader
         loader.init_dcc(do_reload=do_reload)
     else:
-        global Dcc
+        from tpDcc import register
         from tpDcc.core import dcc
-        Dcc = dcc.UnknownDCC
+        register.register_class('Dcc', dcc.UnknownDCC)
 
 
 def init_managers(dev=True, do_reload=False):
