@@ -7,7 +7,7 @@ Module that contains DCC functionality for non DCC based environemnts
 
 from __future__ import print_function, division, absolute_import
 
-
+import tpDcc
 from tpDcc.abstract import dcc as abstract_dcc
 
 

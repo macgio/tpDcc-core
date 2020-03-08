@@ -276,10 +276,7 @@ class DccTool(plugin.Plugin, object):
         exc_type, exc_value, exc_tb = None, None, None
         try:
             kwargs['settings'] = self._settings
-            tool_config = self.config_dict(self.FILE_NAME) or dict()
-            self._config.data.update(tool_config)
             kwargs['config'] = self._config
-
             tool_data = self.launch(*args, **kwargs)
             if tool_data and tool_data.get('tool') is not None:
                 tool_data['tool'].ID = self.ID
@@ -290,8 +287,8 @@ class DccTool(plugin.Plugin, object):
                     # TODO: Make this piece of code DCC agnostic
                     # if multiple_tools:
                     #     uid = "{0} [{1}]".format(self.uiData["label"], str(uuid.uuid4()))
-                    ui_label = tool_config.get('name', '')
-                    ui_icon = tool_config.get('icon', 'tpdcc')
+                    ui_label = self._config.get('name', '')
+                    ui_icon = self._config.get('icon', 'tpdcc')
                     from tpDcc.dccs.maya.ui import window
                     bootstrap_widget = window.BootStrapWidget(
                         tool_data['tool'], title=ui_label, icon=tp.ResourcesMgr().icon(ui_icon), uid=uid)

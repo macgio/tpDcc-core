@@ -15,7 +15,7 @@ import appdirs
 
 import tpDcc as tp
 from tpDcc import register
-from tpDcc.core import plugin, tool
+from tpDcc.core import plugin, tool, config as dcc_config
 from tpDcc.libs.python import decorators, python, importer, path as path_utils
 
 if python.is_python2():
@@ -156,14 +156,15 @@ class ToolsManager(plugin.PluginsManager, object):
         except ImportError:
             pass
 
-        plugin_config_dict = plugin_found[2].config_dict(file_name=package_loader.filename)
+        plugin_config_dict = plugin_found[2].config_dict(file_name=package_loader.filename) or dict()
         plugin_id = plugin_config_dict['id']
         plugin_name = plugin_config_dict['name']
         plugin_icon = plugin_config_dict['icon']
+
         plugin_config_name = plugin_path.replace('.', '-')
         plugin_config = tp.ConfigsMgr().get_config(
             config_name=plugin_config_name, package_name=package_name, root_package_name=root_package_name,
-            environment=environment, config_dict=config_dict)
+            environment=environment, config_dict=config_dict, extra_data=plugin_config_dict)
 
         if dcc_loader:
             dcc_path = dcc_loader.fullname

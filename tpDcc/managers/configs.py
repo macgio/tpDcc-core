@@ -97,7 +97,7 @@ class ConfigsManager(object):
                     module_name=module_name, environment=environment)
 
     def get_config(self, config_name, package_name=None, root_package_name=None,
-                   environment=None, config_dict=None, parser_class=None):
+                   environment=None, config_dict=None, parser_class=None, extra_data=None):
         """
         Returns configuration
         :param package_name:
@@ -108,8 +108,10 @@ class ConfigsManager(object):
         :return:
         """
 
-        if not config_dict:
+        if config_dict is None:
             config_dict = dict()
+        if extra_data is None:
+            extra_data = dict()
 
         if not parser_class:
             parser_class = config.YAMLConfigurationParser
@@ -124,7 +126,8 @@ class ConfigsManager(object):
             config_data = dict()
 
         parsed_data = parser_class(config_data).parse()
-        new_config = config.DccConfig(config_name=config_name, environment=environment, data=parsed_data)
+        extra_data.update(parsed_data)
+        new_config = config.DccConfig(config_name=config_name, environment=environment, data=extra_data)
 
         return new_config
 

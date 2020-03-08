@@ -19,7 +19,6 @@ class MenusManager(object):
 
         self._parent = parent or tp.Dcc.get_main_window()
         self._menus = dict()
-        self._sub_menus = dict()
         self._menu_names = dict()
         self._object_menu_names = dict()
 
@@ -38,10 +37,10 @@ class MenusManager(object):
         for pkg_name, menu in self._menus.items():
             if package_name and pkg_name != package_name:
                 continue
-            if menu_name == self._menu.objectName():
-                return self._menus[menu_name]
+            # if menu_name == self._menu.objectName():
+            #     return self._menus[menu_name]
 
-        return self._sub_menus.get(package_name, dict()).get(menu_name, None)
+        return self._menus.get(package_name, dict()).get(menu_name, None)
 
     def create_main_menu(self, package_name, force_creation=True):
         """
@@ -75,7 +74,6 @@ class MenusManager(object):
 
         return main_menu
 
-    @decorators.abstractmethod
     def create_menus(self, package_name):
         """
         Loops through all loaded plugins and creates a menu/action for each one.
@@ -101,8 +99,10 @@ class MenusManager(object):
                 menu_data = tool_config.data.get('menu', None)
                 if not menu_data:
                     continue
+                if package_name not in tool_menus:
+                    tool_menus[package_name] = dict()
 
-                tool_menus[tool_name] = menu_data
+                tool_menus[package_name][tool_name] = menu_data
 
         return tool_menus
 
@@ -119,6 +119,9 @@ class MenusManager(object):
         object_menu_name = self._object_menu_names[
             package_name] if package_name in self._object_menu_names else '{}_Menu'.format(package_name)
 
+        if not self._parent:
+            return
+
         for child_widget in self._parent.menuBar().children():
             child_name = child_widget.objectName()
             for pkg_name, menu in self._menus.items():
@@ -131,8 +134,10 @@ class MenusManager(object):
             if child_name == object_menu_name and child_name not in deleted_menus:
                 child_widget.deleteLater()
 
-    def _menu_creator(self, parent_menu, data, dev=False):
-        menu = self.get_menu(data['label'])
+    def _menu_creator(self, parent_menu, data, package_name, dev=False):
+        if 'label' not in data:
+            return
+        menu = self.get_menu(data['label'], package_name=package_name)
         if menu is None and data.get('type', '') == 'menu':
             only_dev = data.get('only_dev', False)
             if only_dev and dev:
@@ -140,7 +145,9 @@ class MenusManager(object):
             menu = parent_menu.addMenu(data['label'])
             menu.setObjectName(data['label'])
             menu.setTearOffEnabled(True)
-            self._sub_menus[data['label']] = menu
+            if package_name not in self._menus:
+                self._menus[package_name] = dict()
+            self._menus[package_name][data['label']] = menu
 
         if 'children' not in data:
             return
@@ -158,7 +165,7 @@ class MenusManager(object):
                 sep.setText(i['label'])
                 continue
             elif action_type == 'menu':
-                self._menu_creator(menu, i, dev)
+                self._menu_creator(menu, i, dev, package_name=package_name)
                 continue
             self._add_action(i, menu)
 
