@@ -116,6 +116,11 @@ def init(do_reload=False, dev=False):
     from tpDcc.managers import callbacks
     callbacks.CallbacksManager.initialize()
 
+    # TODO: The initialization of extra libs should be managed by a specific LibManager
+    # Initialize tpDcc-libs-nameit
+    from tpDcc.libs.nameit import loader
+    loader.init(do_reload=do_reload)
+
 
 def init_dcc(do_reload=False):
     """
