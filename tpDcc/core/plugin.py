@@ -228,6 +228,7 @@ class PluginsManager(object):
         Registers a module by searching all class members of the package. This operation can be extensive.
         :param module_path: str
         :param package_name: str
+        :param do_reload: bool
         :return:
         """
 
@@ -238,11 +239,13 @@ class PluginsManager(object):
             module_path = modules.convert_to_dotted_path(os.path.normpath(sub_module))
             try:
                 sub_module_obj = modules.import_module(module_path)
-                if do_reload:
+                if do_reload and sub_module_obj:
                     reload(sub_module_obj)
-            except ImportError as exc:
+            except Exception as exc:
                 tp.logger.error('Error while importing module: {} | {}'.format(module_path, exc))
                 continue
+            if not sub_module_obj:
+                return
             for member in modules.iterate_module_members(sub_module_obj, predicate=inspect.isclass):
                 self.register_plugin(member[1], package_name=package_name)
 
@@ -266,14 +269,14 @@ class PluginsManager(object):
         elif os.path.isfile(module_path):
             try:
                 imported_module = modules.import_module(modules.convert_to_dotted_path(os.path.normpath(module_path)))
-            except ImportError:
-                tp.logger.error('Failed to import Plugin module: {}!'.format(module_path), exc_info=True)
+            except Exception as exc:
+                tp.logger.error('Failed to import Plugin module: {} | {}!'.format(module_path, exc), exc_info=True)
                 return None
         elif modules.is_dotted_module_path(module_path):
             try:
                 imported_module = modules.import_module(os.path.normpath(module_path))
-            except ImportError:
-                tp.logger.error('Failed to import Plugin module: {}!'.format(module_path), exc_info=True)
+            except Exception as exc:
+                tp.logger.error('Failed to import Plugin module: {} | {}!'.format(module_path, exc), exc_info=True)
                 return None
         if imported_module:
             self.register_plugin_by_module(imported_module)
