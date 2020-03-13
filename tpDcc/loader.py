@@ -101,8 +101,10 @@ def init(do_reload=False, dev=False):
 
     # We initialize then tpDcc-core library and DCC specific library
     dcclib_importer = importer.init_importer(importer_class=tpDcc, do_reload=False)
-    dcclib_importer.import_modules()
-    dcclib_importer.import_packages(only_packages=True, order=['tpDcc.widgets', 'tpDcc.core'])
+    dcclib_importer.import_modules(skip_modules=['tpDcc.dccs', 'tpDcc.libs', 'tpDcc.tools'])
+    dcclib_importer.import_packages(
+        only_packages=True,
+        order=['tpDcc.managers', 'tpDcc.core'], skip_modules=['tpDcc.dccs', 'tpDcc.libs', 'tpDcc.tools'])
     if do_reload:
         dcclib_importer.reload_all()
     init_dcc(do_reload=do_reload)
