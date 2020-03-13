@@ -1,1 +1,2 @@
 include tpDcc/__logging__.ini
+include tpDcc/toolsets/*.toolset
