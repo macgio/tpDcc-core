@@ -104,7 +104,7 @@ def init(do_reload=False, dev=False):
     dcclib_importer.import_modules(skip_modules=['tpDcc.dccs', 'tpDcc.libs', 'tpDcc.tools'])
     dcclib_importer.import_packages(
         only_packages=True,
-        order=['tpDcc.managers', 'tpDcc.core'], skip_modules=['tpDcc.dccs', 'tpDcc.libs', 'tpDcc.tools'])
+        order=['tpDcc.core'], skip_modules=['tpDcc.dccs', 'tpDcc.libs', 'tpDcc.tools'])
     if do_reload:
         dcclib_importer.reload_all()
     init_dcc(do_reload=do_reload)
