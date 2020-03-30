@@ -95,6 +95,21 @@ def init(do_reload=False, dev=False):
 
             return mod_dir
 
+    try:
+        if do_reload:
+            # If we reload, we make sure that all tpDcc windows are closed
+            # Otherwise we will start having errors
+            import tpDcc as tp
+            parent = tp.Dcc.get_main_window()
+            if parent:
+                for child in parent.children():
+                    if isinstance(child, tp.Window):
+                        child.close()
+                        child.setParent(None)
+                        child.deleteLater()
+    except Exception:
+        pass
+
     # We initialize first Python library
     from tpDcc.libs import python
     python.init(do_reload=do_reload)
@@ -107,11 +122,16 @@ def init(do_reload=False, dev=False):
         order=['tpDcc.core'], skip_modules=['tpDcc.dccs', 'tpDcc.libs', 'tpDcc.tools'])
     if do_reload:
         dcclib_importer.reload_all()
+
+    # Initialize current DCC modules
     init_dcc(do_reload=do_reload)
 
-    # After that we initialize Qt library (we must do it after tpDcc one because tpDcc-libs-qt depends on tpDcc-core)
+    # After thaxt we initialize Qt library (we must do it after tpDcc one because tpDcc-libs-qt depends on tpDcc-core)
     from tpDcc.libs.qt import loader
     loader.init(do_reload=do_reload)
+
+    # Once tpDcc-libs-qt is initialized (and core UI classes are loaded) we initialize specific DCC UI modules
+    init_dcc_ui(do_reload=do_reload)
 
     init_managers(dev=dev, do_reload=do_reload)
 
@@ -145,6 +165,25 @@ def init_dcc(do_reload=False):
         from tpDcc import register
         from tpDcc.core import dcc
         register.register_class('Dcc', dcc.UnknownDCC)
+
+
+def init_dcc_ui(do_reload=False):
+    """
+    Checks DCC we are working on an initializes proper variables
+    """
+
+    if 'cmds' in main.__dict__:
+        from tpDcc.dccs.maya import loader
+        loader.init_ui(do_reload=do_reload)
+    elif 'MaxPlus' in main.__dict__:
+        from tpDcc.dccs.max import loader
+        loader.init_ui(do_reload=do_reload)
+    elif 'hou' in main.__dict__:
+        from tpDcc.dccs.houdini import loader
+        loader.init_ui(do_reload=do_reload)
+    elif 'nuke' in main.__dict__:
+        from tpDcc.dccs.nuke import loader
+        loader.init_ui(do_reload=do_reload)
 
 
 def init_managers(dev=True, do_reload=False):
