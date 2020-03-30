@@ -517,6 +517,10 @@ class ToolsManager(plugin.PluginsManager, object):
                             tool_config.data.get('import_order', list())]
             skip_modules = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
                             tool_config.data.get('skip_modules', list())]
+            tools_to_reload = tool_config.data.get('tools_to_reload', list())
+            if tools_to_reload:
+                for tool_to_reload in tools_to_reload:
+                    self.reload_tool(tool_to_reload)
         else:
             import_order = list()
             skip_modules = list()
@@ -532,6 +536,10 @@ class ToolsManager(plugin.PluginsManager, object):
                                 dcc_config.data.get('import_order', list())]
             dcc_skip_modules = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
                                 dcc_config.data.get('skip_modules', list())]
+            tools_to_reload = dcc_config.data.get('tools_to_reload', list())
+            if tools_to_reload:
+                for tool_to_reload in tools_to_reload:
+                    self.reload_tool(tool_to_reload)
             dcc_importer.import_packages(order=dcc_import_order, only_packages=False, skip_modules=dcc_skip_modules)
             if do_reload:
                 dcc_importer.reload_all()
@@ -584,6 +592,14 @@ class ToolsManager(plugin.PluginsManager, object):
         :param kwargs: dict, keyword arguments to pas to the tool execute function
         :return: DccTool or None, executed tool instance
         """
+
+        parent = tp.Dcc.get_main_window()
+        if parent:
+            for child in parent.children():
+                if child.objectName() == tool_id:
+                    child.close()
+                    child.setParent(None)
+                    child.deleteLater()
 
         tool_inst = self.get_tool_by_id(
             tool_id=tool_id, package_name=package_name, do_reload=do_reload, debug=debug, *args, **kwargs)
@@ -680,7 +696,7 @@ class ToolsManagerSingleton(ToolsManager, object):
     Singleton class that holds preferences manager instance
     """
 
-    def __init__(self):
+    def __init__(self, ):
         ToolsManager.__init__(self)
 
 
