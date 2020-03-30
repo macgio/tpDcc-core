@@ -79,7 +79,7 @@ class AbstractDCC(object):
     def get_version_name():
         """
         Returns version of the DCC
-        :return: int
+        :return: str
         """
 
         raise NotImplementedError('abstract DCC function get_version_name() not implemented!')
@@ -93,6 +93,15 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function is_batch() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def enable_component_selection():
+        """
+        Enables DCC component selection mode
+        """
+
+        raise NotImplementedError('abstract DCC function enable_component_selection() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -116,6 +125,33 @@ class AbstractDCC(object):
         raise NotImplementedError('abstract DCC function is_window_floating() not implemented!')
 
     @staticmethod
+    def focus_ui_panel(panel_name):
+        """
+        Focus UI panel with given name
+        :param panel_name: str
+        """
+
+        raise NotImplementedError('abstract DCC function focus_ui_panel() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def enable_wait_cursor():
+        """
+        Enables wait cursor in current DCC
+        """
+
+        raise NotImplementedError('abstract DCC function enable_wait_cursor() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def disable_wait_cursor():
+        """
+        Enables wait cursor in current DCC
+        """
+
+        raise NotImplementedError('abstract DCC function disable_wait_cursor() not implemented!')
+
+    @staticmethod
     @decorators.abstractmethod
     def execute_deferred(fn):
         """
@@ -123,6 +159,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function execute_deferred() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def new_scene(force=True, do_save=True):
+        """
+        Creates a new DCC scene
+        :param force: bool, True if we want to save the scene without any prompt dialog
+        :param do_save: bool, True if you want to save the current scene before creating new scene
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function new_scene() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -171,7 +219,42 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def create_node(node_type, node_name):
+    def create_buffer_group(node, **kwargs):
+        """
+        Creates a buffer group on top of the given node
+        :param node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function create_buffer_group() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_buffer_group(node, **kwargs):
+        """
+        Returns buffer group above given node
+        :param node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function get_buffer_group() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def group_node(node, name, parent=None):
+        """
+        Creates a new group and parent give node to it
+        :param node: str
+        :param name: str
+        :param parent: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function group_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_node(node_type, node_name=None):
         """
         Creates a new node of the given type and with the given name
         :param node_type: str
@@ -239,6 +322,38 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_is_transform(node):
+        """
+        Returns whether or not given node is a transform node
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_transform() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_is_joint(node):
+        """
+        Returns whether or not given node is a joint node
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_joint() not implemented!')
+
+    @staticmethod
+    def node_is_locator(node):
+        """
+        Returns whether or not given node is a locator node
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_locator() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_world_space_translation(node):
         """
         Returns world translation of given node
@@ -250,7 +365,32 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def translate_node_in_world_space(node, translation_list):
+    def node_world_bounding_box(node):
+        """
+        Returns node_world_bounding_box box of given node
+        :param node: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function node_bounding_box() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def move_node(node, x, y, z, **kwargs):
+        """
+        Moves given node
+        :param node: str
+        :param x: float
+        :param y: float
+        :param z: float
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC function move_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def translate_node_in_world_space(node, translation_list, **kwargs):
         """
         Translates given node with the given translation vector
         :param node: str
@@ -258,6 +398,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC translate_node_in_world_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def translate_node_in_object_space(node, translation_list, **kwargs):
+        """
+        Translates given node with the given translation vector
+        :param node: str
+        :param translation_list:  list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC translate_node_in_object_space() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -272,7 +423,21 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def rotate_node_in_world_space(node, rotation_list):
+    def rotate_node(node, x, y, z, **kwargs):
+        """
+        Rotates given node
+        :param node: str
+        :param x: float
+        :param y: float
+        :param z: float
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC function rotate_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def rotate_node_in_world_space(node, rotation_list, **kwargs):
         """
         Translates given node with the given translation vector
         :param node: str
@@ -280,6 +445,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC rotate_node_in_world_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def rotate_node_in_object_space(node, rotation_list, **kwargs):
+        """
+        Translates given node with the given translation vector
+        :param node: str
+        :param rotation_list:  list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC rotate_node_in_object_space() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -294,7 +470,21 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def scale_node_in_world_space(node, scale_list):
+    def scale_node(node, x, y, z, **kwargs):
+        """
+        Scales node
+        :param node: str
+        :param x: float
+        :param y: float
+        :param z: float
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC function scale() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def scale_node_in_world_space(node, scale_list, **kwargs):
         """
         Scales given node with the given vector list
         :param node: str
@@ -302,6 +492,28 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC scale_node_in_world_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def scale_node_in_object_space(node, scale_list, **kwargs):
+        """
+        Scales given node with the given vector list
+        :param node: str
+        :param scale_list: list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC scale_node_in_object_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_world_space_pivot(node):
+        """
+        Returns node pivot in world space
+        :param node: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC node_world_space_pivot() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -325,6 +537,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function rename_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def rename_transform_shape_nodes(node):
+        """
+        Renames all shape nodes of the given transform node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function rename_transform_shape_nodes() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -390,6 +612,19 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def duplicate_object(node, name='', only_parent=False):
+        """
+        Duplicates given object in current scene
+        :param node: str
+        :param name: str
+        :param only_parent: bool, If True, only given node will be duplicated (ignoring its children)
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function duplicate_object() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def delete_object(node):
         """
         Removes given node from current scene
@@ -400,7 +635,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def selected_nodes(full_path=True):
+    def selected_nodes(full_path=True, **kwargs):
         """
         Returns a list of selected nodes
         :param full_path: bool
@@ -420,6 +655,32 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function select_nodes_of_type() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def selected_hilited_nodes(full_path=True):
+        """
+        Returns a list of selected nodes that are hilited for component selection
+        :param full_path: bool
+        :param kwargs:
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function selected_hilited_nodes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def filter_nodes_by_selected_components(filter_type, nodes=None, full_path=False, **kwargs):
+        """
+        Function that filter nodes taking into account specific component filters
+        :param filter_type: int
+        :param nodes: list(str)
+        :param full_path: bool
+        :param kwargs:
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function filter_nodes_by_selected_components() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -445,7 +706,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def node_short_name(node):
+    def node_short_name(node, **kwargs):
         """
         Returns short name of the given node
         :param node: str
@@ -588,6 +849,38 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_color(node):
+        """
+        Returns color of the given node
+        :param node: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function node_color() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_color(node, color):
+        """
+        Sets the color of the given node
+        :param node: str
+        :param color:
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_color() not implemented!')
+
+    @staticmethod
+    def node_components(node):
+        """
+        Returns all components of the given node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function node_components() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_is_referenced(node):
         """
         Returns whether given node is referenced or not
@@ -691,6 +984,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def set_shape_parent(shape, transform_node):
+        """
+        Sets given shape parent
+        :param shape: str
+        :param transform_node: str
+        """
+
+        raise NotImplementedError('abstract DCC function set_shape_parent() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def set_parent_to_world(node):
         """
         Parent given node to the root world node
@@ -747,6 +1051,26 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def show_node(node):
+        """
+        Shows given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function show_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_node(node):
+        """
+        Hides given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def list_node_types(type_string):
         """
         List all dependency node types satisfying given classification string
@@ -786,7 +1110,7 @@ class AbstractDCC(object):
     @staticmethod
     @decorators.abstractmethod
     def list_relatives(
-            node, all_hierarchy=True, full_path=True, relative_type=None, shapes=False, intermediate_shapes=False):
+            node, all_hierarchy=False, full_path=True, relative_type=None, shapes=False, intermediate_shapes=False):
         """
         Returns a list of relative nodes of the given node
         :param node:
@@ -802,6 +1126,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_is_a_shape(node):
+        """
+        Returns whether or not given node is a shape one
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_a_shape() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def list_shapes(node, full_path=True, intermediate_shapes=False):
         """
         Returns a list of shapes of the given node
@@ -812,6 +1147,32 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function list_shapes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def list_shapes_of_type(node, shape_type=None, full_path=True, intermediate_shapes=False):
+        """
+        Returns a list of shapes of the given node
+        :param node: str
+        :param shape_type: str
+        :param full_path: bool
+        :param intermediate_shapes: bool
+        :return: list<str>
+        """
+
+        raise NotImplementedError('abstract DCC function list_shapes_of_type() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_has_shape_of_type(node, shape_type):
+        """
+        Returns whether or not given node has a shape of the given type attached to it
+        :param node: str
+        :param shape_type: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_has_shape_of_type() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -839,6 +1200,28 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_bounding_box_pivot(node):
+        """
+        Returns the bounding box pivot center of the given node
+        :param node: str
+        :return: list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC function node_bounding_box_pivot_center() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def shapes_bounding_box_pivot(shapes):
+        """
+        Returns the bounding box pivot center point of the given meshes
+        :param shapes: list(str)
+        :return: list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC function shapes_bounding_box_pivot_center() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def default_shaders():
         """
         Returns a list with all thte default shadres of the current DCC
@@ -846,6 +1229,28 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function default_shaders() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_surface_shader(shader_name, **kwargs):
+        """
+        Creates a new basic DCC surface shader
+        :param shader_name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function create_surface_shader() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def apply_shader(material, node):
+        """
+        Applies shader to given node
+        :param material: str
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function apply_shader() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -938,50 +1343,99 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def add_bool_attribute(node, attribute_name, keyable=False, default_value=False):
+    def add_bool_attribute(node, attribute_name, default_value=False, **kwargs):
         """
         Adds a new boolean attribute into the given node
         :param node: str
         :param attribute_name: str
-        :param keyable: bool
         :param default_value: bool
         :return:
         """
 
-        raise NotImplementedError('abstract DCC function add_string_attribute() not implemented!')
+        raise NotImplementedError('abstract DCC function add_bool_attribute() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
-    def add_string_attribute(node, attribute_name, keyable=False):
+    def add_integer_attribute(node, attribute_name, default_value=0, **kwargs):
+        """
+        Adds a new float attribute into the given node
+        :param node: str
+        :param attribute_name: str
+        :param default_value: float
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function add_integer_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def add_float_attribute(node, attribute_name, default_value=0.0, **kwargs):
+        """
+        Adds a new boolean float into the given node
+        :param node: str
+        :param attribute_name: str
+        :param default_value: float
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function add_float_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def add_double_attribute(node, attribute_name, default_value=0.0, **kwargs):
+        """
+        Adds a new boolean float into the given node
+        :param node: str
+        :param attribute_name: str
+        :param default_value: float
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function add_double_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def add_string_attribute(node, attribute_name, default_value='', **kwargs):
         """
         Adds a new string attribute into the given node
         :param node: str
         :param attribute_name: str
-        :param keyable: bool
+        :param default_value: str
         """
 
         raise NotImplementedError('abstract DCC function add_string_attribute() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
-    def add_string_array_attribute(node, attribute_name, keyable=False):
+    def add_string_array_attribute(node, attribute_name, **kwargs):
         """
         Adds a new string array attribute into the given node
         :param node: str
         :param attribute_name: str
-        :param keyable: bool
         """
 
         raise NotImplementedError('abstract DCC function add_string_array_attribute() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
-    def add_message_attribute(node, attribute_name, keyable=False):
+    def add_title_attribute(node, attribute_name, **kwargs):
+        """
+        Adds a new title attribute into the given node
+        :param node: str
+        :param attribute_name: str
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function add_title_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def add_message_attribute(node, attribute_name, **kwargs):
         """
         Adds a new message attribute into the given node
         :param node: str
         :param attribute_name: str
-        :param keyable: bool
         """
 
         raise NotImplementedError('abstract DCC function add_message_attribute() not implemented!')
@@ -1015,13 +1469,122 @@ class AbstractDCC(object):
     @decorators.abstractmethod
     def is_attribute_locked(node, attribute_name):
         """
-        Returns whether atribute is locked or not
+        Returns whether given attribute is locked or not
         :param node: str
         :param attribute_name: str
         :return: bool
         """
 
         raise NotImplementedError('abstract DCC function is_attribute_locked() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def is_attribute_connected(self, node, attribute_name):
+        """
+        Returns whether given attribute is connected or not
+        :param node: str
+        :param attribute_name: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function is_attribute_connected() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_maximum_integer_attribute_value(node, attribute_name):
+        """
+        Returns the maximum value that a specific integer attribute has set
+        :param node: str
+        :param attribute_name: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC function get_maximum_integer_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_maximum_integer_attribute_value(node, attribute_name, max_value):
+        """
+        Sets the maximum value that a specific integer attribute has set
+        :param node: str
+        :param attribute_name: str
+        :param max_value: float
+        """
+
+        raise NotImplementedError('abstract DCC function set_maximum_integer_attribute_value() not implemented!')
+
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_maximum_float_attribute_value(node, attribute_name):
+        """
+        Returns the maximum value that a specific attribute has set
+        :param node: str
+        :param attribute_name: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC function get_maximum_float_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_maximum_float_attribute_value(node, attribute_name, max_value):
+        """
+        Sets the maximum value that a specific attribute has set
+        :param node: str
+        :param attribute_name: str
+        :param max_value: float
+        """
+
+        raise NotImplementedError('abstract DCC function set_maximum_float_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_minimum_integer_attribute_value(node, attribute_name):
+        """
+        Returns the minimum value that a specific integer attribute has set
+        :param node: str
+        :param attribute_name: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC function get_minimum_integer_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_minimum_integer_attribute_value(node, attribute_name, min_value):
+        """
+        Sets the minimum value that a specific integer attribute has set
+        :param node: str
+        :param attribute_name: str
+        :param min_value: float
+        """
+
+        raise NotImplementedError('abstract DCC function set_minimum_integer_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_minimum_float_attribute_value(node, attribute_name):
+        """
+        Returns the minimum value that a specific float attribute has set
+        :param node: str
+        :param attribute_name: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC function get_minimum_float_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_minimum_float_attribute_value(node, attribute_name, min_value):
+        """
+        Sets the minimum value that a specific float attribute has set
+        :param node: str
+        :param attribute_name: str
+        :param min_value: float
+        """
+
+        raise NotImplementedError('abstract DCC function set_minimum_float_attribute_value() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1044,6 +1607,29 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function hide_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_attributes(node, attributes_list):
+        """
+        Hides given attributes in DCC UI
+        :param node: str
+        :param attributes_list: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function hide_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def lock_attributes(node, attributes_list, **kwargs):
+        """
+        Locks given attributes in DCC UI
+        :param node: str
+        :param attributes_list: list(str)
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC function lock_attributes() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1088,6 +1674,125 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function unlock_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_translate_attributes(node):
+        """
+        Hides all translate transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_translate_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def lock_translate_attributes(node):
+        """
+        Locks all translate transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function lock_translate_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_rotate_attributes(node):
+        """
+        Hides all rotate transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_rotate_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def lock_rotate_attributes(node):
+        """
+        Locks all rotate transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function lock_rotate_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_scale_attributes(node):
+        """
+        Hides all scale transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_scale_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def lock_scale_attributes(node):
+        """
+        Locks all scale transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function lock_scale_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_visibility_attribute(node):
+        """
+        Hides visibility attribute of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_visibility_attribute() not implemented!')
+
+    @staticmethod
+    def lock_visibility_attribute(node):
+        """
+        Locks visibility attribute of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function lock_visibility_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_scale_and_visibility_attributes(node):
+        """
+        Hides scale and visibility attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_scale_and_visibility_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def lock_scale_and_visibility_attributes(node):
+        """
+        Locks scale and visibility attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function lock_scale_and_visibility_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def hide_keyable_attributes(node):
+        """
+        Hides all node attributes that are keyable
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function hide_keyable_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def lock_keyable_attributes(node):
+        """
+        Locks all node attributes that are keyable
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function lock_keyable_attributes() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1207,6 +1912,38 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_inherits_transform(node):
+        """
+        Returns whether or not given node inherits its parent transforms
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_inherits_transform() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_inherits_transform(node, flag):
+        """
+        Sets whether or not given node inherits parent transforms or not
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_inherits_transform() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def reset_transform_attributes(node):
+        """
+        Reset all transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function set_vector3_attribute_name() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def delete_attribute(node, attribute_name):
         """
         Deletes given attribute of given node
@@ -1230,6 +1967,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def delete_user_defined_attributes(node):
+        """
+        Removes all attributes in the given node that have been created by a user
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function delete_user_defined_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def connect_attribute(source_node, source_attribute, target_node, target_attribute, force=False):
         """
         Connects source attribute to given target attribute
@@ -1243,6 +1990,41 @@ class AbstractDCC(object):
         raise NotImplementedError('abstract DCC function connect_attribute() not implemented!')
 
     @staticmethod
+    @decorators.abstractmethod
+    def connect_translate(source_node, target_node):
+        """
+        Connects the translation of the source node into the rotation of the target node
+        :param source_node: str
+        :param target_node: str
+        """
+
+        raise NotImplementedError('abstract DCC function connect_translate() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def connect_rotate(source_node, target_node):
+        """
+        Connects the rotation of the source node into the rotation of the target node
+        :param source_node: str
+        :param target_node: str
+        """
+
+        raise NotImplementedError('abstract DCC function connect_rotate() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def connect_visibility(control_and_attr, target_node, default_value=True):
+        """
+        Connect the visibility of the target node into an attribute
+        :param control_and_attr: str, node.attribute name of a node. If it does not exists, it will ber created
+        :param target_node: str, target node to connect its visibility into the attribute
+        :param default_value: bool, Whether you want the visibility on/off by default
+        """
+
+        raise NotImplementedError('abstract DCC function connect_visibility() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def connect_message_attribute(source_node, target_node, message_attribute):
         """
         Connects the message attribute of the input_node into a custom message attribute on target_node
@@ -1253,6 +2035,53 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function connect_message_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_message_attributes(node, **kwargs):
+        """
+        Returns all message attributes of the give node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function connect_message_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_attribute_input(attribute_node, **kwargs):
+        """
+        Returns the input into given attribute
+        :param attribute_node: str, full node and attribute (node.attribute) attribute we want to retrieve inputs of
+        :param kwargs:
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function get_attribute_input() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_message_input(node, message_attribute):
+        """
+        Get the input value of a message attribute
+        :param node: str
+        :param message_attribute: str
+        :return: object
+        """
+
+        raise NotImplementedError('abstract DCC function get_message_input() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def store_world_matrix_to_attribute(node, attribute_name='worldMatrix', **kwargs):
+        """
+        Stores world matrix of given transform into an attribute in the same transform
+        :param node: str
+        :param attribute_name: str
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC function store_world_matrix_to_attribute() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1451,7 +2280,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def save_current_scene(force=True):
+    def save_current_scene(force=True, **kwargs):
         """
         Saves current scene
         :param force: bool
@@ -2071,6 +2900,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def match_translation_to_rotate_pivot(source_node, target_node):
+        """
+        Matches target translation to the source transform rotate pivot
+        :param source_node: str
+        :param target_node: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC match_translation_to_rotate_pivot() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def match_transform(source_node, target_node):
         """
         Match the transform (translation, rotation and scale) of the given node to the rotation of the target node
@@ -2356,14 +3197,122 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def create_point_constraint(source, constraint_to, **kwargs):
+        """
+        Creates a new point constraint
+        :param source:
+        :param constraint_to:
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC create_point_constraint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_orient_constraint(source, constraint_to, **kwargs):
+        """
+        Creates a new orient constraint
+        :param source:
+        :param constraint_to:
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC create_orient_constraint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_scale_constraint(source, constraint_to, **kwargs):
+        """
+        Creates a new scale constraint
+        :param source:
+        :param constraint_to:
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC create_scale_constraint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_parent_constraint(source, constraint_to, **kwargs):
+        """
+        Creates a new parent constraint
+        :param source:
+        :param constraint_to:
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC create_parent_constraint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def create_aim_constraint(source, point_to, **kwargs):
         """
-        Sets current animation frame range
+        Creates a new aim constraint
         :param source: str
         :param point_to: str
         """
 
         raise NotImplementedError('abstract DCC create_aim_constraint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_selection_groups(name=None):
+        """
+        Returns all selection groups (sets) in current DCC scene
+        :param name: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_selection_groupsº() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_is_selection_group(node):
+        """
+        Returns whether or not given node is a selection group (set)
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC create_selection_group() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_selection_group(name, empty=False):
+        """
+        Creates a new DCC selection group
+        :param name: str
+        :param empty: bool
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_selection_group() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def add_node_to_selection_group(node, selection_group_name):
+        """
+        Adds given node to selection group
+        :param node: str
+        :param selection_group_name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC add_node_to_selection_group() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def zero_transform_attribute_channels(node):
+        """
+        Sets to zero all transform attribute channels of the given node (transform rotate and scale)
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC zero_transform_attribute_channels() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -2374,6 +3323,59 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC zero_scale_joint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_joint_orient(jnt, orient_axis, secondary_orient_axis=None, **kwargs):
+        """
+        Sets the joint orientation and scale orientation so that the axis indicated by the first letter in the
+         argument will be aligned with the vector from this joint to its first child joint.
+        :param jnt: str
+        :param orient_axis: str
+        :param secondary_orient_axis: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC set_joint_orient() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def attach_joints(source_chain, target_chain, **kwargs):
+        """
+        Attaches a chain of joints to a matching chain
+        :param source_chain: str
+        :param target_chain: str
+        """
+
+        raise NotImplementedError('abstract DCC zero_scale_joint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_hierarchy(transforms, replace_str=None, new_str=None):
+        """
+        Creates a transforms hierarchy with the given list of joints
+        :param transforms: list(str)
+        :param replace_str: str, if given this string will be replace with the new_str
+        :param new_str: str, if given replace_str will be replace with this string
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC create_hierarchy() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def duplicate_hierarchy(transforms, stop_at=None, force_only_these=None, replace_str=None, new_str=None):
+        """
+        Duplicates given hierarchy of transform nodes
+        :param transforms: list(str), list of joints to duplicate
+        :param stop_at: str, if given the duplicate process will be stop in the given node
+        :param force_only_these: list(str), if given only these list of transforms will be duplicated
+        :param replace_str: str, if given this string will be replace with the new_str
+        :param new_str: str, if given replace_str will be replace with this string
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC duplicate_hierarchy() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -2393,6 +3395,27 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC freeze_transforms() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def move_pivot_to_zero(node):
+        """
+        Moves pivot of given node to zero (0, 0, 0 in the world)
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC move_pivot_to_zero() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def combine_meshes(meshes_to_combine=None, **kwargs):
+        """
+        Combines given meshes into one unique mesh. If no meshes given, all selected meshes will be combined
+        :param meshes_to_combine: list(str) or None
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC combine_meshes() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -2567,6 +3590,439 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC change_suffix_padding() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_vertex_name(mesh_node, vertex_id):
+        """
+        Returns the full name of the given node vertex
+        :param mesh_node: str
+        :param vertex_id: int
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC node_vertex_name() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def total_vertices(mesh_node):
+        """
+        Returns the total number of vertices of the given geometry
+        :param mesh_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC total_vertices() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_vertex_object_space_translation(mesh_node, vertex_id=None):
+        """
+        Returns the object space translation of the vertex id in the given node
+        :param mesh_node: str
+        :param vertex_id: int
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC node_vertex_object_space_translation() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_vertex_world_space_translation(mesh_node, vertex_id=None):
+        """
+        Returns the world space translation of the vertex id in the given node
+        :param mesh_node: str
+        :param vertex_id: int
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC node_vertex_world_space_translation() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_vertex_object_space_translation(mesh_node, translate_list, vertex_id=None):
+        """
+        Sets the object space translation of the vertex id in the given node
+        :param mesh_node: str
+        :param translate_list: list
+        :param vertex_id: int
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC set_node_vertex_object_space_translation() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_vertex_world_space_translation(mesh_node, translate_list, vertex_id=None):
+        """
+        Sets the world space translation of the vertex id in the given node
+        :param mesh_node: str
+        :param translate_list: list
+        :param vertex_id: int
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC set_node_vertex_world_space_translation() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_nurbs_sphere(name='sphere', radius=1.0, **kwargs):
+        """
+        Creates a new NURBS sphere
+        :param name: str
+        :param radius: float
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_cluster() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_nurbs_cylinder(name='sphere', radius=1.0, **kwargs):
+        """
+        Creates a new NURBS cylinder
+        :param name: str
+        :param radius: float
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_nurbs_cylinder() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def rebuild_curve(curve, spans, **kwargs):
+        """
+        Rebuilds curve with given parameters
+        :param curve: str
+        :param spans: int
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC rebuild_curve() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def convert_surface_to_bezier(surface, **kwargs):
+        """
+        Rebuilds given surface as a bezier surface
+        :param surface: str
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC convert_surface_to_bezier() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_locator(name='loc'):
+        """
+        Creates a new locator
+        :param name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_locator() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_cluster(objects, cluster_name='cluster', **kwargs):
+        """
+        Creates a new cluster in the given objects
+        :param objects: list(str)
+        :param cluster_name: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC create_cluster() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_decompose_matrix_node(node_name):
+        """
+        Creates a new decompose matrix node
+        :param node_name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_decompose_matrix_node() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_empty_mesh(mesh_name):
+        """
+        Creates a new empty mesh
+        :param mesh_name:str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_empty_mesh() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_circle_curve(name, **kwargs):
+        """
+        Creates a new circle control
+        :param name: str
+        :param kwargs:
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_circle_curve() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_joint(joint_name):
+        """
+        Creates a new joint
+        :param joint_name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_joint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_ik_handle(name, start_joint, end_joint, solver_type=None, curve=None, **kwargs):
+        """
+        Creates a new IK handle
+        :param name: str
+        :param start_joint: str
+        :param end_joint: str
+        :param solver_type: str
+        :param curve: str
+        :param kwargs:
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_ik_handle() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_spline_ik_stretch(
+            curve, joints, node_for_attribute=None, create_stretch_on_off=False, stretch_axis='X', **kwargs):
+        """
+        Makes the joints stretch on the curve
+        :param curve: str, name of the curve that joints are attached via Spline IK
+        :param joints: list<str>, list of joints attached to Spline IK
+        :param node_for_attribute: str, name of the node to create the attributes on
+        :param create_stretch_on_off: bool, Whether to create or not extra attributes to slide the stretch value on/off
+        :param stretch_axis: str('X', 'Y', 'Z'), axis that the joints stretch on
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC create_spline_ik_stretch() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_cluster_surface(
+            surface, name, first_cluster_pivot_at_start=True, last_cluster_pivot_at_end=True, join_ends=False):
+        """
+        Creates a new clustered surface
+        :param surface: str
+        :param name: str
+        :param first_cluster_pivot_at_start: str
+        :param last_cluster_pivot_at_end: str
+        :param join_ends: bool
+        :return: list(str), list(str)
+        """
+
+        raise NotImplementedError('abstract DCC create_cluster_surface() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_cluster_curve(
+        curve, name, first_cluster_pivot_at_start=True, last_cluster_pivot_at_end=True, join_ends=False):
+        """
+        Creates a new clustered curve
+        :param curve: str
+        :param name: str
+        :param first_cluster_pivot_at_start: str
+        :param last_cluster_pivot_at_end: str
+        :param last_cluster_pivot_at_end: str
+        :param join_ends: bool
+        :return: list(str), list(str)
+        """
+
+        raise NotImplementedError('abstract DCC create_cluster_curve() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_wire(surface, curves, name='wire', **kwargs):
+        """
+        Creates a new wire that wires given surface to given curves
+        :param surface:str
+        :param curves: list(str)
+        :param name:str
+        :param kwargs:
+        :return: str, str
+        """
+
+        raise NotImplementedError('abstract DCC create_wire() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def attach_transform_to_surface(transform, surface, u=None, v=None, constraint=False, attach_type=None):
+        """
+        Attaches a transform to given surface
+        If no U an V values are given, the command will try to find the closest position on the surface
+        :param transform: str, str, name of a transform to follicle to the surface
+        :param surface: str, name of a surface to attach follicle to
+        :param u: float, U value to attach to
+        :param v: float, V value to attach to
+        :param constraint: bool
+        :param attach_type: bool
+        :return: str, name of the follicle created
+        """
+
+        raise NotImplementedError('abstract DCC attach_transform_to_surface() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_curve_from_transforms(transforms, spans=None, description='from_transforms'):
+        """
+        Creates a curve from a list of transforms. Each transform will define a curve CV
+        Useful when creating a curve from a joint chain (spines/tails)
+        :param transforms: list<str>, list of tranfsorms to generate the curve from. Positions will be used to place CVs
+        :param spans: int, number of spans the final curve should have
+        :param description: str, description to given to the curve
+        :return: str name of the new curve
+        """
+
+        raise NotImplementedError('abstract DCC create_curve_from_transforms() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_nurbs_surface_from_transforms(transforms, name, spans=-1, offset_axis='Y', offset_amount=1):
+        """
+        Creates a NURBS surface from a list of transforms
+        Useful for creating a NURBS surface that follows a spine or tail
+        :param transforms: list<str>, list of transforms
+        :param name: str, name of the surface
+        :param spans: int, number of spans to given to the final surface.
+        If -1, the surface will have spans based on the number of transforms
+        :param offset_axis: str, axis to offset the surface relative to the transform ('X', 'Y' or 'Z')
+        :param offset_amount: int, amount the surface offsets from the transform
+        :return: str, name of the NURBS surface
+        """
+
+        raise NotImplementedError('abstract DCC create_nurbs_surface_from_transforms() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_follow_group(source_transform, target_transform, **kwargs):
+        """
+        Creates a group above a target transform that is constrained to the source transform
+        :param source_transform: str, name of the transform to follow
+        :param target_transform: str, name of the transform make follow
+        :param source_transform:
+        :param target_transform:
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC create_empty_mesh() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_constraints():
+        """
+        Returns all constraints nodes in current DCC scene
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_constraints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_constraint(node, constraint_type):
+        """
+        Returns a constraint on the transform with the given type
+        :param node: str
+        :param constraint_type: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC node_constraint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_constraints(node):
+        """
+        Returns all constraints a node is linked to
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC node_constraints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_transforms(node):
+        """
+        Returns all transforms nodes of a given node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC node_transforms() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_joints(node):
+        """
+        Returns all oints nodes of a give node
+        :param node: str
+        :return: listr(str)
+        """
+
+        raise NotImplementedError('abstract DCC node_joints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_shape_type(node):
+        """
+        Returns the type of the given shape node
+        :param node: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC node_shape_type() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_color_of_side(side='C', sub_color=False):
+        """
+        Returns override color of the given side
+        :param side: str
+        :param sub_color: fool, whether to return a sub color or not
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC get_color_of_side() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_parent_controller(control, parent_controller):
+        """
+        Sets the parent controller of the given control
+        :param control: str
+        :param parent_controller: str
+        """
+
+        raise NotImplementedError('abstract DCC set_parent_controller() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def distance_between_nodes(source_node=None, target_node=None):
+        """
+        Returns the distance between 2 given nodes
+        :param str source_node: first node to start measuring distance from. If not given, first selected node will be used.
+        :param str target_node: second node to end measuring distance to. If not given, second selected node will be used.
+        :return: distance between 2 nodes.
+        :rtype: float
+        """
+
+        raise NotImplementedError('abstract DCC distance_between_nodes() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
