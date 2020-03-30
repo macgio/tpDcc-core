@@ -94,7 +94,7 @@ class DccTool(plugin.Plugin, object):
             'help_url': 'www.tomipoveda.com',
             'tags': ['tpDcc', 'dcc', 'tool'],
             'logger_dir': os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs', 'tools'),
-            'logger_level': 'IFNO',
+            'logger_level': 'INFO',
             'resources_path': os.path.join(file_name, 'resources'),
             'logging_file': os.path.join(file_name, '__logging__.ini'),
             'is_checkable': False,

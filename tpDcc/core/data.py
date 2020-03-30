@@ -96,7 +96,6 @@ class Data(object):
 
         pass
 
-    # region Public Functions
     def set_name(self, new_name):
         """
         Set the name of the data
@@ -145,7 +144,6 @@ class FileData(Data, object):
         self.file = None
         self._sub_folder = None
 
-    # region Static Functions
     @staticmethod
     def get_data_extension():
         """
@@ -155,9 +153,7 @@ class FileData(Data, object):
         """
 
         return DataExtensions.FileDataExtension
-    # endregion
 
-    # region Public Functions
     def set_directory(self, directory):
         """
         Sets the directory where data file is stored
@@ -167,6 +163,8 @@ class FileData(Data, object):
         self.directory = directory
         if self.SETTINGS_FILE:
             self.settings.set_directory(self.directory, self.SETTINGS_FILE)
+            self.settings.set('name', self._name)
+            self.settings.set('data_type', self.get_data_type())
 
         if not self.name:
             self.name = self.settings.get('name')

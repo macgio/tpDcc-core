@@ -5,6 +5,7 @@
 Module that contains abstract definition of basic DCC progress bar
 """
 
+from tpDcc import register
 from tpDcc.libs.python import decorators
 
 
@@ -35,5 +36,14 @@ class AbstractProgressBar(object):
     def break_signaled(self):
         pass
 
+    @decorators.abstractmethod
+    def set_progress(self, value):
+        pass
+
     def inc(self, inc=1):
         self.__class__.inc_value += inc
+
+
+
+
+register.register_class('DccProgressBar', AbstractProgressBar)

@@ -135,6 +135,15 @@ class MenusManager(object):
                 child_widget.deleteLater()
 
     def _menu_creator(self, parent_menu, data, package_name, dev=False):
+        """
+        Internal function that manages the creation of the menus
+        :param parent_menu: QWidget
+        :param data: 
+        :param package_name: str 
+        :param dev: bool
+        :return: 
+        """
+        
         if 'label' not in data:
             return
         menu = self.get_menu(data['label'], package_name=package_name)
@@ -165,7 +174,7 @@ class MenusManager(object):
                 sep.setText(i['label'])
                 continue
             elif action_type == 'menu':
-                self._menu_creator(menu, i, dev, package_name=package_name)
+                self._menu_creator(menu, i, package_name=package_name, dev=dev)
                 continue
             self._add_action(i, menu)
 

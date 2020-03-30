@@ -223,9 +223,9 @@ class ConfigsManager(object):
         valid_package_configs = self._get_all_package_configs(
             package_name=package_name, root_package_name=root_package_name, environment=environment)
         if not valid_package_configs or config_name not in valid_package_configs:
-            tp.logger.info(
-                'Impossible to load configuration "{}" for package "{}" because it does not exists in '
-                'configuration folders!'.format(config_name, package_name))
+            # tp.logger.info(
+            #     'Impossible to load configuration "{}" for package "{}" because it does not exists in '
+            #     'configuration folders!'.format(config_name, package_name))
             return
 
         module_configs = valid_package_configs[config_name]
