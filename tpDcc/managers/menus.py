@@ -138,12 +138,12 @@ class MenusManager(object):
         """
         Internal function that manages the creation of the menus
         :param parent_menu: QWidget
-        :param data: 
-        :param package_name: str 
+        :param data:
+        :param package_name: str
         :param dev: bool
-        :return: 
+        :return:
         """
-        
+
         if 'label' not in data:
             return
         menu = self.get_menu(data['label'], package_name=package_name)
