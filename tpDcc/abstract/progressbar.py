@@ -44,6 +44,4 @@ class AbstractProgressBar(object):
         self.__class__.inc_value += inc
 
 
-
-
 register.register_class('DccProgressBar', AbstractProgressBar)

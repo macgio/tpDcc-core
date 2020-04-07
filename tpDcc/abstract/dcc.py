@@ -1513,7 +1513,6 @@ class AbstractDCC(object):
 
         raise NotImplementedError('abstract DCC function set_maximum_integer_attribute_value() not implemented!')
 
-
     @staticmethod
     @decorators.abstractmethod
     def get_maximum_float_attribute_value(node, attribute_name):
@@ -3831,7 +3830,7 @@ class AbstractDCC(object):
     @staticmethod
     @decorators.abstractmethod
     def create_cluster_curve(
-        curve, name, first_cluster_pivot_at_start=True, last_cluster_pivot_at_end=True, join_ends=False):
+            curve, name, first_cluster_pivot_at_start=True, last_cluster_pivot_at_end=True, join_ends=False):
         """
         Creates a new clustered curve
         :param curve: str
@@ -4016,8 +4015,10 @@ class AbstractDCC(object):
     def distance_between_nodes(source_node=None, target_node=None):
         """
         Returns the distance between 2 given nodes
-        :param str source_node: first node to start measuring distance from. If not given, first selected node will be used.
-        :param str target_node: second node to end measuring distance to. If not given, second selected node will be used.
+        :param str source_node: first node to start measuring distance from.
+            If not given, first selected node will be used.
+        :param str target_node: second node to end measuring distance to.
+            If not given, second selected node will be used.
         :return: distance between 2 nodes.
         :rtype: float
         """
