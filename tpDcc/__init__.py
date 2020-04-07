@@ -18,4 +18,9 @@ if False:
     from tpDcc.abstract import dcc
     Dcc = dcc.AbstractDCC()
 
+__version__ = get_versions()['version']
+del get_versions
+
 __path__ = extend_path(__path__, __name__)
+
+
