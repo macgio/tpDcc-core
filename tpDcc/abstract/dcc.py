@@ -115,6 +115,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_main_menubar():
+        """
+        Returns Qt object that references to the main DCC menubar
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function get_main_menubar() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def is_window_floating(window_name):
         """
         Returns whether or not DCC window is floating
