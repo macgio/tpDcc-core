@@ -61,7 +61,8 @@ class MenusManager(object):
             package_name] if package_name in self._object_menu_names else '{}_Menu'.format(package_name)
         menu_name = self._menu_names[package_name] if package_name in self._menu_names else package_name
 
-        parent_menu_bar = qtutils.get_window_menu_bar(tp.Dcc.get_main_window())
+        main_win = tpDcc.Dcc.get_main_window()
+        parent_menu_bar = main_win.menuBar()
         if not parent_menu_bar:
             tp.logger.warning(
                 'Impossible to create Tools main menu for "{}" because not found menu bar to attach menu to!'.format(
