@@ -1,7 +1,7 @@
 tpDcc-core
 ============================================================
 
-çCollection of Python modules to create tools in a DCC agnostic way
+Collection of Python modules to create tools in a DCC agnostic way
 
 .. image:: https://travis-ci.com/tpDcc/tpDcc-core.svg?branch=master&kill_cache=1
     :target: https://travis-ci.com/tpDcc/tpDcc-core
