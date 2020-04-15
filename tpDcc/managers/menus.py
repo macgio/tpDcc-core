@@ -62,7 +62,7 @@ class MenusManager(object):
         menu_name = self._menu_names[package_name] if package_name in self._menu_names else package_name
 
         main_win = tpDcc.Dcc.get_main_window()
-        parent_menu_bar = main_win.menuBar()
+        parent_menu_bar = main_win.menuBar() if main_win else None
         if not parent_menu_bar:
             tp.logger.warning(
                 'Impossible to create Tools main menu for "{}" because not found menu bar to attach menu to!'.format(
