@@ -14,6 +14,8 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 
+from Qt.QtCore import QFileInfo
+from Qt.QtWidgets import QApplication, QStyle, QFileIconProvider
 from Qt.QtGui import QIcon, QPixmap
 
 from tpDcc import register
@@ -34,6 +36,7 @@ class ResourcesManager(object):
 
     def __init__(self):
         self._resources = dict()
+        self._icon_provider = None
 
     def register_resource(self, resources_path, key=None):
         """
@@ -177,6 +180,23 @@ class ResourcesManager(object):
             return None
 
         return self.get(resource_type=ResourceTypes.ICON, *args, **kwargs) or QIcon()
+
+    def icon_from_filename(self, file_path):
+        """
+        Returns icon of the given file path
+        :param file_path: str
+        :return: QIcon
+        """
+
+        if not self._icon_provider:
+            self._icon_provider = QFileIconProvider()
+
+        file_info = QFileInfo(file_path)
+        file_icon = self._icon_provider.icon(file_info)
+        if not file_icon or file_icon.isNull():
+            return QApplication.style().standardIcon(QStyle.SP_FileIcon)
+        else:
+            return file_icon
 
     def pixmap(self, *args, **kwargs):
         """
