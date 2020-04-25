@@ -2117,6 +2117,18 @@ class AbstractDCC(object):
         raise NotImplementedError('abstract DCC function list_connections_of_type() not implemented!')
 
     @staticmethod
+    @decorators.abstractmethod
+    def list_node_parents(node):
+        """
+        Returns all parent nodes of the given Maya node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function list_node_parents() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def list_node_connections(node):
         """
         Returns all connections of the given node
@@ -2158,6 +2170,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function list_destination_connections() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def scene_is_modified():
+        """
+        Returns whether or not current opened DCC file has been modified by the user or not
+        :return: True if current DCC file has been modified by the user; False otherwise
+        :rtype: bool
+        """
+
+        raise NotImplementedError('abstract DCC function scene_is_modified() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
