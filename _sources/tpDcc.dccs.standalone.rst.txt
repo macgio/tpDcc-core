@@ -1,5 +1,5 @@
-tpDcc.dccs package
-==================
+tpDcc.dccs.standalone package
+=============================
 
 Subpackages
 -----------
@@ -7,12 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   tpDcc.dccs.standalone
+   tpDcc.dccs.standalone.core
 
 Module contents
 ---------------
 
-.. automodule:: tpDcc.dccs
+.. automodule:: tpDcc.dccs.standalone
    :members:
    :undoc-members:
    :show-inheritance:
