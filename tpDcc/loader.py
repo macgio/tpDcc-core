@@ -46,6 +46,7 @@ class DccCallbacks(object):
 
 class Dccs(object):
     Unknown = 'unknown'
+    Standalone = 'standalone'
     Houdini = 'houdini'
     Maya = 'maya'
     Max = 'max'
@@ -163,8 +164,8 @@ def init_dcc(do_reload=False):
         loader.init_dcc(do_reload=do_reload)
     else:
         from tpDcc import register
-        from tpDcc.core import dcc
-        register.register_class('Dcc', dcc.UnknownDCC)
+        from tpDcc.dccs.standalone.core import dcc
+        register.register_class('Dcc', dcc.StandaloneDcc)
 
 
 def init_dcc_ui(do_reload=False):
@@ -247,6 +248,28 @@ def get_logging_config():
     return os.path.normpath(os.path.join(os.path.dirname(__file__), '__logging__.ini'))
 
 
+def is_unknown():
+    """
+    Check if current environment is unknown or not
+    :return: bool
+    """
+
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.Unknown
+
+
+def is_standalone():
+    """
+    Check if current environment is standalone or not
+    :return: bool
+    """
+
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.Standalone
+
+
 def is_nuke():
     """
     Checks if Nuke is available or not
@@ -312,6 +335,8 @@ register.register_class('Shelf', abstract_shelf.AbstractShelf)
 register.register_class('Dccs', Dccs)
 register.register_class('DccCallbacks', DccCallbacks)
 register.register_class('callbacks', callbacks)
+register.register_class('is_unknown', is_unknown)
+register.register_class('is_standalone', is_standalone)
 register.register_class('is_maya', is_maya)
 register.register_class('is_max', is_max)
 register.register_class('is_houdini', is_houdini)
