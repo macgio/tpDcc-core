@@ -17,6 +17,7 @@ import tpDcc as tp
 from tpDcc import register
 from tpDcc.core import plugin, tool
 from tpDcc.libs.python import decorators, python, importer, path as path_utils
+from tpDcc.libs.qt.core import contexts
 
 if python.is_python2():
     import pkgutil as loader
@@ -606,9 +607,9 @@ class ToolsManager(plugin.PluginsManager, object):
         if not tool_inst:
             return None
 
-        self.launch_tool(tool_inst, *args, **kwargs)
-
-        return tool_inst
+        with contexts.application():
+            self.launch_tool(tool_inst, *args, **kwargs)
+            return tool_inst
 
     def reload_tool(self, tool_id):
         """
