@@ -287,8 +287,8 @@ class DccTool(plugin.Plugin, object):
                     # TODO: Make this piece of code DCC agnostic
                     # if multiple_tools:
                     #     uid = "{0} [{1}]".format(self.uiData["label"], str(uuid.uuid4()))
-                    ui_label = self._config.get('name', '')
-                    ui_icon = self._config.get('icon', 'tpdcc')
+                    ui_label = self._config.get('name', default='')
+                    ui_icon = self._config.get('icon', default='tpdcc')
                     from tpDcc.dccs.maya.ui import window
                     bootstrap_widget = window.BootStrapWidget(
                         tool_data['tool'], title=ui_label, icon=tp.ResourcesMgr().icon(ui_icon), uid=uid)
