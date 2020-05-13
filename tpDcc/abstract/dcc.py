@@ -580,7 +580,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def select_object(node, replace_selection=False, **kwargs):
+    def select_object(node, replace_selection=True, **kwargs):
         """
         Selects given object in the current scene
         :param replace_selection: bool
@@ -2019,6 +2019,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function connect_rotate() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def connect_scale(source_node, target_node):
+        """
+        Connects the scale of the source node into the rotation of the target node
+        :param source_node: str
+        :param target_node: str
+        """
+
+        raise NotImplementedError('abstract DCC function connect_scale() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod

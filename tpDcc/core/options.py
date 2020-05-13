@@ -12,10 +12,22 @@ from tpDcc.libs.python import settings
 
 
 class OptionObject(object):
-    def __init__(self):
+    def __init__(self, option_settings=None):
         super(OptionObject, self).__init__()
 
-        self._option_settings = None
+        self._option_settings = option_settings
+
+    # ================================================================================================
+    # ======================== PROPERTIES
+    # ================================================================================================
+
+    @property
+    def get_options(self):
+        return self._option_settings
+
+    # ================================================================================================
+    # ======================== BASE
+    # ================================================================================================
 
     def get_option_file(self):
         """
@@ -77,6 +89,8 @@ class OptionObject(object):
             value = [value, 'nonedittext']
         elif option_type == 'directory':
             value = [value, 'directory']
+        elif option_type == 'list':
+            value = [value, 'list']
         elif option_type == 'file':
             value = [value, 'file']
 
@@ -115,7 +129,7 @@ class OptionObject(object):
 
         return value
 
-    def get_option(self, name, group=None):
+    def get_option(self, name, group=None, default=None):
         """
         Returns option by name and group
         :param name: str, name of the option we want to retrieve
@@ -127,13 +141,17 @@ class OptionObject(object):
 
         value = self.get_unformatted_option(name, group)
         if value is None:
-            tp.logger.warning(
-                'Impossible to access option with proper format from {}'.format(self._option_settings.directory))
-            if self.has_option(name, group):
-                if group:
-                    tp.logger.warning('Could not find option: "{}" in group: "{}"'.format(name, group))
-                else:
-                    tp.logger.warning('Could not find option: {}'.format(name))
+            if default is not None:
+                return default
+            else:
+                tp.logger.warning(
+                    'Impossible to access option with proper format from {}'.format(self._option_settings.directory))
+                if self.has_option(name, group):
+                    if group:
+                        tp.logger.warning('Could not find option: "{}" in group: "{}"'.format(name, group))
+                    else:
+                        tp.logger.warning('Could not find option: {}'.format(name))
+                return None
 
         value = self._format_option_value(value)
 
@@ -182,6 +200,54 @@ class OptionObject(object):
 
         if self._option_settings:
             self._option_settings.clear()
+        self._option_settings = None
+
+    # ================================================================================================
+    # ======================== OVERRIDES
+    # ================================================================================================
+
+    def _format_option_value(self, value):
+        """
+        Internal function used to format object option value
+        :param value: variant
+        :return: variant
+        """
+
+        new_value = value
+        option_type = None
+        if type(value) == list:
+            try:
+                option_type = value[1]
+            except Exception:
+                pass
+            value = value[0]
+            if option_type == 'dictionary':
+                new_value = value[0]
+                if type(new_value) == list:
+                    new_value = new_value[0]
+                return new_value
+            elif option_type == 'list':
+                return value
+
+        if not option_type == 'script':
+            if type(value) == str or type(value) in [unicode, str]:
+                eval_value = None
+                try:
+                    if value:
+                        eval_value = eval(value)
+                except Exception:
+                    pass
+                if eval_value:
+                    if type(eval_value) in [list, tuple, dict]:
+                        new_value = eval_value
+                        value = eval_value
+            if type(value) in [str, unicode]:
+                if value.find(',') > -1:
+                    new_value = value.split(',')
+
+        tp.logger.debug('Formatted value: {}'.format(new_value))
+
+        return new_value
 
     def _setup_options(self):
         """

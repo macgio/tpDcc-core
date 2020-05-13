@@ -285,7 +285,17 @@ class CustomData(FileData, object):
     Class used to define custom data stored in disk files
     """
 
-    def export_data(self, file_path, force=False):
+    def open(self, file_path=None):
+        """
+        Open data object from disk
+        This functions must be implemented in custom data classes
+        :param file_path: str, file path where data to open is located
+        :return: bool, Whether or not the operation was successful
+        """
+
+        return False
+
+    def export_data(self, file_path=None, force=False, *args, **kwargs):
         """
         Save data object to file on disk
         Override for custom export functionality
@@ -293,6 +303,7 @@ class CustomData(FileData, object):
         :param force: bool, True to force save if the file already exists (overwrite)
         """
 
+        file_path = file_path or self.get_file()
         dir_path = os.path.dirname(file_path)
         if not os.path.isdir(dir_path):
             os.makedirs(dir_path)
@@ -300,15 +311,14 @@ class CustomData(FileData, object):
         if os.path.isfile(file_path) and not force:
             raise Exception('File "{}" already exists! Enable force saving to override the file.'.format(file_path))
 
-        file_out = open(file_path, 'w')
-        json.dump(self, file_out)
-        file_out.close()
+        with open(file_path, 'w') as fh:
+            json.dump(self, fh)
 
         LOGGER.debug('Saved {0}: "{1}"'.format(self.__class__.__name__, file_path))
 
         return file_path
 
-    def export_data_as(self):
+    def export_data_as(self, file_path=None, force=True, *args, **kwargs):
         """
         Save data object to file on disk by opening a file dialog to allow the user to specify a file path
         Override for custom export as functionality
@@ -318,13 +328,15 @@ class CustomData(FileData, object):
 
         from tpDcc.libs.qt.core import dialog
 
-        file_path_dialog = dialog.SaveFileDialog(parent=self, use_app_browser=False)
-        file_path_dialog.set_filters(self.file_filter)
-        file_path = file_path_dialog.exec_()
-        if not file_path:
-            return None
-        file_path = file_path[0]
-        file_path = self.save(file_path, force=True)
+        if not file_path or not os.path.isfile(file_path):
+            file_path_dialog = dialog.SaveFileDialog(parent=self, use_app_browser=False)
+            file_path_dialog.set_filters(self.file_filter)
+            file_path = file_path_dialog.exec_()
+            if not file_path:
+                return None
+            file_path = file_path[0]
+
+        file_path = self.export_data(file_path, force=force)
 
         return file_path
 
