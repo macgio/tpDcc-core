@@ -13,6 +13,7 @@ Submodules
    tpDcc.core.dcc
    tpDcc.core.exceptions
    tpDcc.core.node
+   tpDcc.core.options
    tpDcc.core.plugin
    tpDcc.core.project
    tpDcc.core.scene
