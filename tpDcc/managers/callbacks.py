@@ -8,13 +8,10 @@ Module that contains base callbackManager class
 from __future__ import print_function, division, absolute_import
 
 import sys
-import logging
 
 import tpDcc
 from tpDcc import register
 from tpDcc.abstract import callback
-
-LOGGER = logging.getLogger()
 
 
 class CallbacksManager(object):
@@ -51,18 +48,18 @@ class CallbacksManager(object):
             elif n_type == 'filter':
                 callback_type = callback.FilterCallback
             else:
-                LOGGER.warning('Callback Type "{}" is not valid! Using Simplecallback instead ...'.format(n_type))
+                tpDcc.logger.warning('Callback Type "{}" is not valid! Using Simplecallback instead ...'.format(n_type))
                 callback_type = callback.SimpleCallback
 
             # We extract callback types from the specific registered callbacks module
             if not hasattr(tpDcc, 'Callbacks'):
-                LOGGER.warning('DCC {} has no callbacks registered!'.format(tpDcc.Dcc.get_name()))
+                tpDcc.logger.warning('DCC {} has no callbacks registered!'.format(tpDcc.Dcc.get_name()))
                 return
 
             callback_class = getattr(tpDcc.Callbacks, '{}Callback'.format(callback_name), None)
             if not callback_class:
                 callback_class = default_callbacks.get(callback_name, callback.ICallback)
-                LOGGER.warning(
+                tpDcc.logger.warning(
                     'Dcc {} does not provides an ICallback for {}Callback. Using {} instead'.format(
                         tpDcc.Dcc.get_name(), callback_name, callback_class.__name__))
 
@@ -71,7 +68,7 @@ class CallbacksManager(object):
                 new_callback.cleanup()
             register.register_class(callback_name, callback_type(callback_class, shutdown_type))
 
-            LOGGER.debug('Creating Callback "{}" of type "{}" ...'.format(callback_name, callback_class))
+            tpDcc.logger.debug('Creating Callback "{}" of type "{}" ...'.format(callback_name, callback_class))
 
         cls._initialized = True
 

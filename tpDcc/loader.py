@@ -63,13 +63,13 @@ def init(do_reload=False, dev=False):
     """
     Initializes module
     :param do_reload: bool, Whether to reload modules or not
-    :param dev: bool, Whether artellapipe is initialized in dev mode or not
+    :param dev: bool, Whether tpDcc-core is initialized in dev mode or not
     """
 
     from tpDcc.libs.python import importer
     from tpDcc import register
 
-    logger = create_logger()
+    logger = create_logger(dev=dev)
     register.register_class('logger', logger)
 
     class tpDcc(importer.Importer, object):
@@ -112,7 +112,9 @@ def init(do_reload=False, dev=False):
         pass
 
     # We initialize first Python library
+    # NOTE: We don't pass dev because this module generates LOT of log debugs related with imports
     from tpDcc.libs import python
+    # python.init(do_reload=do_reload, dev=dev)
     python.init(do_reload=do_reload)
 
     # We initialize then tpDcc-core library and DCC specific library
@@ -125,11 +127,11 @@ def init(do_reload=False, dev=False):
         dcclib_importer.reload_all()
 
     # Initialize current DCC modules
-    init_dcc(do_reload=do_reload)
+    init_dcc(do_reload=do_reload, dev=dev)
 
     # After thaxt we initialize Qt library (we must do it after tpDcc one because tpDcc-libs-qt depends on tpDcc-core)
     from tpDcc.libs.qt import loader
-    loader.init(do_reload=do_reload)
+    loader.init(do_reload=do_reload, dev=dev)
 
     # Once tpDcc-libs-qt is initialized (and core UI classes are loaded) we initialize specific DCC UI modules
     init_dcc_ui(do_reload=do_reload)
@@ -145,23 +147,23 @@ def init(do_reload=False, dev=False):
     loader.init(do_reload=do_reload)
 
 
-def init_dcc(do_reload=False):
+def init_dcc(do_reload=False, dev=False):
     """
     Checks DCC we are working on an initializes proper variables
     """
 
     if 'cmds' in main.__dict__:
         from tpDcc.dccs.maya import loader
-        loader.init_dcc(do_reload=do_reload)
-    elif 'MaxPlus' in main.__dict__:
+        loader.init_dcc(do_reload=do_reload, dev=dev)
+    elif ['MaxPlus', 'pymxs'] in main.__dict__:
         from tpDcc.dccs.max import loader
-        loader.init_dcc(do_reload=do_reload)
+        loader.init_dcc(do_reload=do_reload, dev=dev)
     elif 'hou' in main.__dict__:
         from tpDcc.dccs.houdini import loader
-        loader.init_dcc(do_reload=do_reload)
+        loader.init_dcc(do_reload=do_reload, dev=dev)
     elif 'nuke' in main.__dict__:
         from tpDcc.dccs.nuke import loader
-        loader.init_dcc(do_reload=do_reload)
+        loader.init_dcc(do_reload=do_reload, dev=dev)
     else:
         from tpDcc import register
         from tpDcc.dccs.standalone.core import dcc
@@ -216,20 +218,24 @@ def init_managers(dev=True, do_reload=False):
     tpDcc.ToolsetsMgr().load_registered_toolsets('tpDcc', tools_to_load=tools_to_load, dev=dev, do_reload=do_reload)
 
 
-def create_logger():
+def create_logger(dev=False):
     """
     Returns logger of current module
     """
 
     logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
     logger = logging.getLogger('tpDcc-core')
+    if dev:
+        logger.setLevel(logging.DEBUG)
+        for handler in logger.handlers:
+            handler.setLevel(logging.DEBUG)
 
     return logger
 
 
 def create_logger_directory():
     """
-    Creates artellapipe logger directory
+    Creates tpDcc-core logger directory
     """
 
     logger_directory = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs'))
