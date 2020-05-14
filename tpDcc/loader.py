@@ -155,7 +155,7 @@ def init_dcc(do_reload=False, dev=False):
     if 'cmds' in main.__dict__:
         from tpDcc.dccs.maya import loader
         loader.init_dcc(do_reload=do_reload, dev=dev)
-    elif ['MaxPlus', 'pymxs'] in main.__dict__:
+    elif 'MaxPlus' in main.__dict__:
         from tpDcc.dccs.max import loader
         loader.init_dcc(do_reload=do_reload, dev=dev)
     elif 'hou' in main.__dict__:
