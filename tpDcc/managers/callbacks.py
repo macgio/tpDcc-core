@@ -112,7 +112,8 @@ class CallbacksManager(object):
             return
 
         for k, v in sys.modules[tpDcc.__name__].__dict__.items():
-            if isinstance(v, callback.AbstractCallback) or ('Callback' in v.__class__.__name__ and hasattr(v, 'cleanup')):
+            if isinstance(
+                    v, callback.AbstractCallback) or ('Callback' in v.__class__.__name__ and hasattr(v, 'cleanup')):
                 v.unregister_owner_callbacks(owner=owner)
 
     @classmethod
@@ -127,7 +128,8 @@ class CallbacksManager(object):
         #     return
 
         for k, v in sys.modules[tpDcc.__name__].__dict__.items():
-            if isinstance(v, callback.AbstractCallback) or ('Callback' in v.__class__.__name__ and hasattr(v, 'cleanup')):
+            if isinstance(
+                    v, callback.AbstractCallback) or ('Callback' in v.__class__.__name__ and hasattr(v, 'cleanup')):
                 v.cleanup()
                 sys.modules[tpDcc.__name__].__dict__.pop(k)
 
