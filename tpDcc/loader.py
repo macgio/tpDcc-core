@@ -8,19 +8,15 @@ Initialization module for tpDcc
 from __future__ import print_function, division, absolute_import
 
 import os
-import inspect
+import importlib
 import logging.config
 
-from tpDcc import register
-from tpDcc.libs.python import python
-from tpDcc.abstract import dcc as abstract_dcc, shelf as abstract_shelf, menu as abstract_menu
+# =================================================================================
 
-if python.is_python2():
-    import pkgutil as loader
-else:
-    import importlib as loader
-
+PACKAGE = 'tpDcc'
 main = __import__('__main__')
+
+# =================================================================================
 
 
 class DccCallbacks(object):
@@ -51,145 +47,134 @@ class Dccs(object):
     Maya = 'maya'
     Max = 'max'
     Nuke = 'nuke'
+    Unreal = 'unreal'
 
     @staticmethod
     def get_available_dccs():
         return {k: v for k, v in Dccs.__class__.__dict__.items() if not k.startswith('__')}
 
+    packages = {
+        'cmds': Maya,
+        'MaxPlus': Max,
+        'hou': Houdini,
+        'nuke': Nuke
+    }
+
 # =================================================================================
 
 
-def init(do_reload=False, dev=False):
+def init(dev=False):
     """
     Initializes module
-    :param do_reload: bool, Whether to reload modules or not
     :param dev: bool, Whether tpDcc-core is initialized in dev mode or not
     """
 
-    from tpDcc.libs.python import importer
     from tpDcc import register
+    from tpDcc.managers import callbacks as callbacks_manager
+    from tpDcc.libs.python import importer, loader as python_loader
+    from tpDcc.libs.qt import loader as qt_loader
+    from tpDcc.abstract import dcc as abstract_dcc, menu as abstract_menu, shelf as abstract_shelf
+
+    if dev:
+        register.cleanup()
+        importer.reload_module(register)
+        importer.reload_module(callbacks_manager)
+        importer.reload_module(python_loader)
+        importer.reload_module(qt_loader)
+        importer.reload_module(abstract_dcc)
+        importer.reload_module(abstract_menu)
+        importer.reload_module(abstract_shelf)
 
     logger = create_logger(dev=dev)
+
     register.register_class('logger', logger)
+    register.register_class('Dcc', abstract_dcc.AbstractDCC(), is_unique=False)
+    register.register_class('Menu', abstract_menu.AbstractMenu, is_unique=False)
+    register.register_class('Shelf', abstract_shelf.AbstractShelf, is_unique=False)
+    register.register_class('Dccs', Dccs)
+    register.register_class('DccCallbacks', DccCallbacks)
+    register.register_class('callbacks', callbacks)
+    register.register_class('is_unknown', is_unknown)
+    register.register_class('is_standalone', is_standalone)
+    register.register_class('is_maya', is_maya)
+    register.register_class('is_max', is_max)
+    register.register_class('is_houdini', is_houdini)
+    register.register_class('is_nuke', is_nuke)
+    register.register_class('is_unreal', is_unreal)
+    register.register_class('get_dcc_loader_module', get_dcc_loader_module)
 
-    class tpDcc(importer.Importer, object):
-        def __init__(self, *args, **kwargs):
-            super(tpDcc, self).__init__(module_name='tpDcc', *args, **kwargs)
+    callbacks_manager.CallbacksManager.cleanup()
 
-        def get_module_path(self):
-            """
-            Returns path where tpDcc module is stored
-            :return: str
-            """
-
-            try:
-                mod_dir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)
-            except Exception:
-                try:
-                    mod_dir = os.path.dirname(__file__)
-                except Exception:
-                    try:
-                        import tpDcc
-                        mod_dir = tpDcc.__path__[0]
-                    except Exception:
-                        return None
-
-            return mod_dir
-
-    try:
-        if do_reload:
-            # If we reload, we make sure that all tpDcc windows are closed
-            # Otherwise we will start having errors
-            import tpDcc as tp
-            parent = tp.Dcc.get_main_window()
-            if parent:
-                for child in parent.children():
-                    if isinstance(child, tp.Window):
-                        child.close()
-                        child.setParent(None)
-                        child.deleteLater()
-    except Exception:
-        pass
+    # try:
+    #     if do_reload:
+    #         # If we reload, we make sure that all tools and tpDcc windows are closed
+    #         import tpDcc as tp
+    #         tp.ToolsMgr().close_tools()
+    #         parent = tp.Dcc.get_main_window()
+    #         if parent:
+    #             for child in parent.children():
+    #                 if isinstance(child, tp.Window):
+    #                     child.close()
+    #                     child.setParent(None)
+    #                     child.deleteLater()
+    # except Exception:
+    #     pass
 
     # We initialize first Python library
     # NOTE: We don't pass dev because this module generates LOT of log debugs related with imports
-    from tpDcc.libs import python
     # python.init(do_reload=do_reload, dev=dev)
-    python.init(do_reload=do_reload)
+    python_loader.init(dev=dev)
 
     # We initialize then tpDcc-core library and DCC specific library
-    dcclib_importer = importer.init_importer(importer_class=tpDcc, do_reload=False)
-    dcclib_importer.import_modules(skip_modules=['tpDcc.dccs', 'tpDcc.libs', 'tpDcc.tools'])
-    dcclib_importer.import_packages(
-        only_packages=True,
-        order=['tpDcc.core'], skip_modules=['tpDcc.dccs', 'tpDcc.libs', 'tpDcc.tools'])
-    if do_reload:
-        dcclib_importer.reload_all()
+    skip_modules = ['{}.{}'.format(PACKAGE, name) for name in ['loader', 'dccs', 'libs', 'tools']]
+    importer.init_importer(package=PACKAGE, skip_modules=skip_modules)
 
-    # Initialize current DCC modules
-    init_dcc(do_reload=do_reload, dev=dev)
-
-    # After thaxt we initialize Qt library (we must do it after tpDcc one because tpDcc-libs-qt depends on tpDcc-core)
-    from tpDcc.libs.qt import loader
-    loader.init(do_reload=do_reload, dev=dev)
-
-    # Once tpDcc-libs-qt is initialized (and core UI classes are loaded) we initialize specific DCC UI modules
-    init_dcc_ui(do_reload=do_reload)
-
-    init_managers(dev=dev, do_reload=do_reload)
-
-    from tpDcc.managers import callbacks
-    callbacks.CallbacksManager.initialize()
-
-    # TODO: The initialization of extra libs should be managed by a specific LibManager
-    # Initialize tpDcc-libs-nameit
-    from tpDcc.libs.nameit import loader
-    loader.init(do_reload=do_reload)
-
-
-def init_dcc(do_reload=False, dev=False):
-    """
-    Checks DCC we are working on an initializes proper variables
-    """
-
-    if 'cmds' in main.__dict__:
-        from tpDcc.dccs.maya import loader
-        loader.init_dcc(do_reload=do_reload, dev=dev)
-    elif 'MaxPlus' in main.__dict__:
-        from tpDcc.dccs.max import loader
-        loader.init_dcc(do_reload=do_reload, dev=dev)
-    elif 'hou' in main.__dict__:
-        from tpDcc.dccs.houdini import loader
-        loader.init_dcc(do_reload=do_reload, dev=dev)
-    elif 'nuke' in main.__dict__:
-        from tpDcc.dccs.nuke import loader
-        loader.init_dcc(do_reload=do_reload, dev=dev)
-    else:
-        from tpDcc import register
+    # Get DCC
+    dcc_mod = get_dcc_loader_module()
+    print('Retrieved DCC MOD: {}'.format(dcc_mod))
+    if not dcc_mod:
         from tpDcc.dccs.standalone.core import dcc
         register.register_class('Dcc', dcc.StandaloneDcc)
 
+    # Initialize current DCC modules
+    if dcc_mod:
+        dcc_mod.init_dcc(dev=dev)
 
-def init_dcc_ui(do_reload=False):
+    # After that, we initialize Qt library (we must do it after tpDcc one because tpDcc-libs-qt depends on tpDcc-core)
+    # NOTE: DCC UI modules are automatically loaded by tpDcc-libs-qt
+    qt_loader.init(dev=dev)
+
+    init_managers(dev=dev)
+
+    # # TODO: The initialization of extra libs should be managed by a specific LibManager
+    # # Initialize tpDcc-libs-nameit
+    # from tpDcc.libs.nameit import loader
+    # loader.init(do_reload=do_reload)
+
+
+def get_dcc_loader_module(package='tpDcc.dccs'):
     """
     Checks DCC we are working on an initializes proper variables
     """
 
-    if 'cmds' in main.__dict__:
-        from tpDcc.dccs.maya import loader
-        loader.init_ui(do_reload=do_reload)
-    elif 'MaxPlus' in main.__dict__:
-        from tpDcc.dccs.max import loader
-        loader.init_ui(do_reload=do_reload)
-    elif 'hou' in main.__dict__:
-        from tpDcc.dccs.houdini import loader
-        loader.init_ui(do_reload=do_reload)
-    elif 'nuke' in main.__dict__:
-        from tpDcc.dccs.nuke import loader
-        loader.init_ui(do_reload=do_reload)
+    dcc_mod = None
+    for dcc_package, dcc_name in Dccs.packages.items():
+        if dcc_package in main.__dict__:
+            module_to_import = '{}.{}.loader'.format(package, dcc_name)
+            dcc_mod = importlib.import_module(module_to_import)
+            if dcc_mod:
+                break
+    if not dcc_mod:
+        try:
+            import unreal
+            dcc_mod = importlib.import_module('{}.unreal.loader')
+        except Exception as exc:
+            pass
+
+    return dcc_mod
 
 
-def init_managers(dev=True, do_reload=False):
+def init_managers(dev=True):
     """
     Initializes all tpDcc managers
     """
@@ -197,8 +182,9 @@ def init_managers(dev=True, do_reload=False):
     import tpDcc
     from tpDcc import config
     from tpDcc import toolsets
+    from tpDcc.managers import callbacks
 
-    tpDcc.ConfigsMgr().register_package_configs('tpDcc', os.path.dirname(config.__file__))
+    tpDcc.ConfigsMgr().register_package_configs(PACKAGE, os.path.dirname(config.__file__))
 
     core_config = tpDcc.ConfigsMgr().get_config('tpDcc-core')
     if not core_config:
@@ -209,13 +195,15 @@ def init_managers(dev=True, do_reload=False):
     tools_to_load = core_config.get('tools', list())
 
     # Tools
-    tpDcc.ToolsMgr().load_package_tools('tpDcc', tools_to_load=tools_to_load, dev=dev)
-    if do_reload:
-        tpDcc.ToolsMgr().reload_tools()
+    tpDcc.ToolsMgr().register_package_tools(pkg_name=PACKAGE, tools_to_register=tools_to_load, dev=dev)
+    tpDcc.ToolsMgr().load_registered_tools(PACKAGE)
 
     # Toolsets
-    tpDcc.ToolsetsMgr().register_path('tpDcc', os.path.dirname(toolsets.__file__))
-    tpDcc.ToolsetsMgr().load_registered_toolsets('tpDcc', tools_to_load=tools_to_load, dev=dev, do_reload=do_reload)
+    tpDcc.ToolsetsMgr().register_path(PACKAGE, os.path.dirname(toolsets.__file__))
+    tpDcc.ToolsetsMgr().load_registered_toolsets(PACKAGE, tools_to_load=tools_to_load)
+
+    # Callbacks
+    callbacks.CallbacksManager.initialize()
 
 
 def create_logger(dev=False):
@@ -223,7 +211,13 @@ def create_logger(dev=False):
     Returns logger of current module
     """
 
-    logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
+    logger_directory = os.path.normpath(os.path.join(os.path.expanduser('~'), PACKAGE, 'logs'))
+    if not os.path.isdir(logger_directory):
+        os.makedirs(logger_directory)
+
+    logging_config = os.path.normpath(os.path.join(os.path.dirname(__file__), '__logging__.ini'))
+
+    logging.config.fileConfig(logging_config, disable_existing_loggers=False)
     logger = logging.getLogger('tpDcc-core')
     if dev:
         logger.setLevel(logging.DEBUG)
@@ -231,27 +225,6 @@ def create_logger(dev=False):
             handler.setLevel(logging.DEBUG)
 
     return logger
-
-
-def create_logger_directory():
-    """
-    Creates tpDcc-core logger directory
-    """
-
-    logger_directory = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs'))
-    if not os.path.isdir(logger_directory):
-        os.makedirs(logger_directory)
-
-
-def get_logging_config():
-    """
-    Returns logging configuration file path
-    :return: str
-    """
-
-    create_logger_directory()
-
-    return os.path.normpath(os.path.join(os.path.dirname(__file__), '__logging__.ini'))
 
 
 def is_unknown():
@@ -320,6 +293,17 @@ def is_houdini():
     return tpDcc.Dcc.get_name() == Dccs.Houdini
 
 
+def is_unreal():
+    """
+    Checks if Houdini is available or not
+    :return: bool
+    """
+
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.Unreal
+
+
 def callbacks():
     """
     Return a full list of callbacks based on DccCallbacks dictionary
@@ -333,17 +317,3 @@ def callbacks():
         new_list.append(v[0])
 
     return new_list
-
-
-register.register_class('Dcc', abstract_dcc.AbstractDCC())
-register.register_class('Menu', abstract_menu.AbstractMenu)
-register.register_class('Shelf', abstract_shelf.AbstractShelf)
-register.register_class('Dccs', Dccs)
-register.register_class('DccCallbacks', DccCallbacks)
-register.register_class('callbacks', callbacks)
-register.register_class('is_unknown', is_unknown)
-register.register_class('is_standalone', is_standalone)
-register.register_class('is_maya', is_maya)
-register.register_class('is_max', is_max)
-register.register_class('is_houdini', is_houdini)
-register.register_class('is_nuke', is_nuke)
