@@ -66,7 +66,7 @@ class CallbacksManager(object):
             new_callback = getattr(tpDcc, callback_name, None)
             if new_callback:
                 new_callback.cleanup()
-            register.register_class(callback_name, callback_type(callback_class, shutdown_type))
+            register.register_class(callback_name, callback_type(callback_class, shutdown_type), skip_store=True)
 
             tpDcc.logger.debug('Creating Callback "{}" of type "{}" ...'.format(callback_name, callback_class))
 
@@ -112,7 +112,7 @@ class CallbacksManager(object):
             return
 
         for k, v in sys.modules[tpDcc.__name__].__dict__.items():
-            if isinstance(v, callback.AbstractCallback):
+            if isinstance(v, callback.AbstractCallback) or ('Callback' in v.__class__.__name__ and hasattr(v, 'cleanup')):
                 v.unregister_owner_callbacks(owner=owner)
 
     @classmethod
@@ -123,11 +123,12 @@ class CallbacksManager(object):
         :return:
         """
 
-        if not cls._initialized:
-            return
+        # if not cls._initialized:
+        #     return
 
         for k, v in sys.modules[tpDcc.__name__].__dict__.items():
-            if isinstance(v, callback.AbstractCallback):
+            if isinstance(v, callback.AbstractCallback) or ('Callback' in v.__class__.__name__ and hasattr(v, 'cleanup')):
                 v.cleanup()
+                sys.modules[tpDcc.__name__].__dict__.pop(k)
 
         cls._initialized = False
