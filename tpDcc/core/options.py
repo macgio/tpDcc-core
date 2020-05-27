@@ -8,7 +8,7 @@ Module that contains base classes to handle options
 from __future__ import print_function, division, absolute_import
 
 import tpDcc as tp
-from tpDcc.libs.python import settings
+from tpDcc.libs.python import settings, python
 
 
 class OptionObject(object):
@@ -22,7 +22,7 @@ class OptionObject(object):
     # ================================================================================================
 
     @property
-    def get_options(self):
+    def options(self):
         return self._option_settings
 
     # ================================================================================================
@@ -81,20 +81,9 @@ class OptionObject(object):
         else:
             name = str(name)
 
-        if option_type == 'script':
-            value = [value, 'script']
-        elif option_type == 'dictionary':
-            value = [value, 'dictionary']
-        elif option_type == 'nonedittext':
-            value = [value, 'nonedittext']
-        elif option_type == 'directory':
-            value = [value, 'directory']
-        elif option_type == 'list':
-            value = [value, 'list']
-        elif option_type == 'file':
-            value = [value, 'file']
+        value_from_option_type = self._get_value_from_option_type(value, option_type)
 
-        self._option_settings.set(name, value)
+        self._option_settings.set(name, value_from_option_type)
 
     def set_option(self, name, value, group=None):
         """
@@ -140,7 +129,7 @@ class OptionObject(object):
         self._setup_options()
 
         value = self.get_unformatted_option(name, group)
-        if value is None:
+        if value is None or value == '':
             if default is not None:
                 return default
             else:
@@ -151,7 +140,7 @@ class OptionObject(object):
                         tp.logger.warning('Could not find option: "{}" in group: "{}"'.format(name, group))
                     else:
                         tp.logger.warning('Could not find option: {}'.format(name))
-                return None
+                return value
 
         value = self._format_option_value(value)
 
@@ -206,6 +195,30 @@ class OptionObject(object):
     # ======================== OVERRIDES
     # ================================================================================================
 
+    def _get_value_from_option_type(self, value, option_type):
+        """
+        Internal function that returns a value depending on the option type
+        :param option_type: str
+        :return: object
+        """
+
+        if option_type == 'script':
+            value = [value, 'script']
+        elif option_type == 'dictionary':
+            value = [value, 'dictionary']
+        elif option_type == 'nonedittext':
+            value = [value, 'nonedittext']
+        elif option_type == 'directory':
+            value = [value, 'directory']
+        elif option_type == 'list':
+            value = [value, 'list']
+        elif option_type == 'file':
+            value = [value, 'file']
+        elif option_type == 'color':
+            value = [value, 'color']
+
+        return value
+
     def _format_option_value(self, value):
         """
         Internal function used to format object option value
@@ -223,11 +236,15 @@ class OptionObject(object):
             value = value[0]
             if option_type == 'dictionary':
                 new_value = value[0]
+                dict_order = value[1]
                 if type(new_value) == list:
                     new_value = new_value[0]
+                new_value = python.order_dict_by_list_of_keys(new_value, dict_order)
                 return new_value
-            elif option_type == 'list':
+            elif option_type == 'list' or option_type == 'file':
                 return value
+            else:
+                new_value = self._format_custom_option_value(option_type, value)
 
         if not option_type == 'script':
             if type(value) == str or type(value) in [unicode, str]:
@@ -248,6 +265,16 @@ class OptionObject(object):
         tp.logger.debug('Formatted value: {}'.format(new_value))
 
         return new_value
+
+    def _format_custom_option_value(self, option_type, value):
+        """
+        Internal function used to format object option value with custom option types
+        :param option_type: str
+        :param value: object
+        :return: object
+        """
+
+        return value
 
     def _setup_options(self):
         """
