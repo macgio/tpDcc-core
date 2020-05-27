@@ -364,6 +364,29 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_world_matrix(node):
+        """
+        Returns node world matrix of given node
+        :param node: str
+        :return: list
+        """
+
+        raise NotImplementedError('abstract DCC function node_world_matrix() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_world_matrix(node, world_matrix):
+        """
+        Sets node world matrix of given node
+        :param node: str
+        :param world_matrix: list
+        :return: list
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_world_matrix() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_world_space_translation(node):
         """
         Returns world translation of given node
@@ -1210,6 +1233,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def rename_shapes(node):
+        """
+        Rename all shapes of the given node with a standard DCC shape name
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function rename_shapes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_bounding_box_pivot(node):
         """
         Returns the bounding box pivot center of the given node
@@ -1489,7 +1522,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def is_attribute_connected(self, node, attribute_name):
+    def is_attribute_connected(node, attribute_name):
         """
         Returns whether given attribute is connected or not
         :param node: str
@@ -2093,7 +2126,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def store_world_matrix_to_attribute(node, attribute_name='worldMatrix', **kwargs):
+    def store_world_matrix_to_attribute(node, attribute_name='origMatrix', **kwargs):
         """
         Stores world matrix of given transform into an attribute in the same transform
         :param node: str
@@ -2639,7 +2672,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def set_flat_key_frame(self, node, attribute_name, start_time, end_time):
+    def set_flat_key_frame(node, attribute_name, start_time, end_time):
         """
         Sets flat tangent in given keyframe
         :param node: str
@@ -3240,6 +3273,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def list_node_constraints(node):
+        """
+        Returns all constraints linked to given node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC list_node_constraints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def create_point_constraint(source, constraint_to, **kwargs):
         """
         Creates a new point constraint
@@ -3337,11 +3381,12 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def add_node_to_selection_group(node, selection_group_name):
+    def add_node_to_selection_group(node, selection_group_name, force=True):
         """
         Adds given node to selection group
         :param node: str
         :param selection_group_name: str
+        :param force: bool
         :return: str
         """
 
@@ -4033,18 +4078,6 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def get_color_of_side(side='C', sub_color=False):
-        """
-        Returns override color of the given side
-        :param side: str
-        :param sub_color: fool, whether to return a sub color or not
-        :return:
-        """
-
-        raise NotImplementedError('abstract DCC get_color_of_side() not implemented!')
-
-    @staticmethod
-    @decorators.abstractmethod
     def set_parent_controller(control, parent_controller):
         """
         Sets the parent controller of the given control
@@ -4179,6 +4212,39 @@ class AbstractDCC(object):
             return True
 
         return False
+
+    @classmethod
+    def get_color_of_side(cls, side='C', sub_color=False):
+        """
+        Returns override color of the given side
+        :param side: str
+        :param sub_color: fool, whether to return a sub color or not
+        :return:
+        """
+
+        if cls.name_is_center(side):
+            side = 'C'
+        elif cls.name_is_left(side):
+            side = 'L'
+        elif cls.name_is_right(side):
+            side = 'R'
+        else:
+            side = 'C'
+
+        if not sub_color:
+            if side == 'L':
+                return [0, 0, 255]
+            elif side == 'R':
+                return [2551, 0, 0]
+            else:
+                return [255, 255, 0]
+        else:
+            if side == 'L':
+                return [99, 220, 255]
+            elif side == 'R':
+                return [255, 175, 175]
+            else:
+                return [227, 172, 121]
 
     @staticmethod
     def get_dockable_window_class():
