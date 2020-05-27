@@ -7,12 +7,10 @@ from __future__ import print_function, division, absolute_import
 Module that base classes used by the callback system
 """
 
-import logging
 from traceback import format_exc
 
+import tpDcc
 from tpDcc.libs.python import decorators
-
-LOGGER = logging.getLogger()
 
 
 class ICallback(object):
@@ -268,15 +266,15 @@ class SimpleCallback(AbstractCallback):
         Forces an unregistering from the notifier
         """
 
-        LOGGER.debug('Started: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Started: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
         for entry in self._registry:
-            LOGGER.debug(
+            tpDcc.logger.debug(
                 '{}._shutdown - Disconnecting ({})'.format(str(self._notifier), self.__class__.__name__, str(entry)))
             entry.token = self._disconnect(entry.token)
         del self._registry[:]
 
         super(self.__class__, self)._shutdown(*args)
-        LOGGER.debug('Complete: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Complete: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
 
     @property
     def empty(self):
@@ -315,7 +313,7 @@ class SimpleCallback(AbstractCallback):
                 entry.callback()
             except Exception:
                 from traceback import format_exc
-                LOGGER.error(format_exc())
+                tpDcc.logger.error(format_exc())
 
     @enabled.setter
     def enabled(self, value):
@@ -340,15 +338,15 @@ class SimpleCallback(AbstractCallback):
         """
 
         entry = next((e for e in self._registry if e.callback == fn), None)
-        LOGGER.debug(
+        tpDcc.logger.debug(
             'Started: ({}) {} Register - fn:"{}", owner:"{}", entry:"{}"'.format(
                 str(self._notifier), self.__class__.__name__, str(fn), owner, str(entry)))
         if not entry:
             token = self._connect(fn) if self.connected else None
-            LOGGER.debug(
+            tpDcc.logger.debug(
                 '({}) {} Register - token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(token)))
             self._registry.append(SimpleCallback.RegistryEntry(fn, token, owner=owner))
-        LOGGER.debug('Completed: ({}) {} Register'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Completed: ({}) {} Register'.format(str(self._notifier), self.__class__.__name__))
 
     def unregister(self, fn):
         """
@@ -357,13 +355,13 @@ class SimpleCallback(AbstractCallback):
         """
 
         entry = next((e for e in self._registry if e.callback == fn), None)
-        LOGGER.debug(
+        tpDcc.logger.debug(
             'Started: ({}) {} Unregister - fn:"{}", entry:"{}"'.format(
                 str(self._notifier), self.__class__.__name__, str(fn), str(entry)))
         if entry:
             self._disconnect(entry.token)
             self._registry.remove(entry)
-        LOGGER.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
 
     def unregister_owner_callbacks(self, owner):
         """
@@ -372,13 +370,13 @@ class SimpleCallback(AbstractCallback):
         """
 
         entry = next((e for e in self._registry if e.owner == owner), None)
-        LOGGER.debug(
+        tpDcc.logger.debug(
             'Started: ({}) {} Unregister - owner:"{}", entry:"{}"'.format(
                 str(self._notifier), self.__class__.__name__, str(owner), str(entry)))
         if entry:
             self._disconnect(entry.token)
             self._registry.remove(entry)
-        LOGGER.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
 
 
 class FilterCallback(AbstractCallback, object):
@@ -402,14 +400,14 @@ class FilterCallback(AbstractCallback, object):
         Forces an unregistering from the notifier
         """
 
-        LOGGER.debug('Started: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Started: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
         if self._token:
             self._token = self._disconnect(self._token)
             self._token = None
         del self._registry[:]
 
         super(self.__class__, self)._shutdown(*args)
-        LOGGER.debug('Complete: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Complete: ({}) {} Shutdown'.format(str(self._notifier), self.__class__.__name__))
 
     def _notify(self, *args):
         """
@@ -434,7 +432,7 @@ class FilterCallback(AbstractCallback, object):
             try:
                 entry.callback(*args)
             except Exception:
-                LOGGER.error(format_exc())
+                tpDcc.logger.error(format_exc())
 
     @property
     def empty(self):
@@ -484,15 +482,15 @@ class FilterCallback(AbstractCallback, object):
         @param owner: class, owner of the callback
         """
 
-        LOGGER.debug(
+        tpDcc.logger.debug(
             'Started: ({}) {} Register - fn:"{}", owner:"{}", IsEmpty:"{}"'.format(
                 str(self._notifier), self.__class__.__name__, str(fn), owner, bool(self.empty)))
         if self.empty:
             self._token = self._connect(self._notify)
-            LOGGER.debug(
+            tpDcc.logger.debug(
                 '({}) {} Register - token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
         self._registry.append(FilterCallback.RegistryEntry(fn, owner=owner))
-        LOGGER.debug('Completed: ({}) {} Register'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Completed: ({}) {} Register'.format(str(self._notifier), self.__class__.__name__))
 
     def unregister(self, fn):
         """
@@ -501,7 +499,7 @@ class FilterCallback(AbstractCallback, object):
         """
 
         entry = next((e for e in self._registry if e.callback == fn), None)
-        LOGGER.debug(
+        tpDcc.logger.debug(
             'Started: ({}) {} Unregister - fn:"{}", IsEmpty:"{}"'.format(
                 str(self._notifier), self.__class__.__name__, str(fn), bool(self.empty)))
 
@@ -512,10 +510,10 @@ class FilterCallback(AbstractCallback, object):
         #     str(self._notifier), self.__class__.__name__, str(fn)))
 
         if self.empty and self.connected:
-            LOGGER.debug(
+            tpDcc.logger.debug(
                 '({}) {} Unregister token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
             self._token = self._disconnect(self._token)
-        LOGGER.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
 
     def unregister_owner_callbacks(self, owner):
         """
@@ -524,7 +522,7 @@ class FilterCallback(AbstractCallback, object):
         """
 
         entry = next((e for e in self._registry if e.owner == owner), None)
-        LOGGER.debug(
+        tpDcc.logger.debug(
             'Started: ({}) {} Unregister - owner:"{}", entry:"{}"'.format(
                 str(self._notifier), self.__class__.__name__, str(owner), str(entry)))
         if entry:
@@ -534,10 +532,10 @@ class FilterCallback(AbstractCallback, object):
         #     str(self._notifier), self.__class__.__name__, str(owner)))
 
         if self.empty and self.connected:
-            LOGGER.debug(
+            tpDcc.logger.debug(
                 '({}) {} Unregister token:"{}"'.format(str(self._notifier), self.__class__.__name__, str(self._token)))
             self._token = self._disconnect(self._token)
-        LOGGER.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
+        tpDcc.logger.debug('Completed: ({}) {} Unregister'.format(str(self._notifier), self.__class__.__name__))
 
 
 class CallbackInstance(object):
@@ -596,7 +594,7 @@ class PythonTickCallback(ICallback, object):
 
         fn_id = id(fn)
         if cls.tick_threads.get(fn_id, None) is not None:
-            LOGGER.warning('{} already registered with PythonTickNotifier'.format(str(fn)))
+            tpDcc.logger.warning('{} already registered with PythonTickNotifier'.format(str(fn)))
             return None
 
         repeater = cls._tick(fn_id)

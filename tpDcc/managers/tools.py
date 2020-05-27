@@ -16,29 +16,13 @@ import appdirs
 import tpDcc as tp
 from tpDcc import register
 from tpDcc.core import plugin, tool
-from tpDcc.libs.python import decorators, python, importer, path as path_utils
+from tpDcc.libs.python import decorators, python, path as path_utils
 from tpDcc.libs.qt.core import contexts
 
 if python.is_python2():
     import pkgutil as loader
 else:
     import importlib as loader
-
-
-class ToolImporter(importer.Importer, object):
-    def __init__(self, tool_pkg, debug=False):
-
-        self.tool_path = tool_pkg.filename
-
-        super(ToolImporter, self).__init__(module_name=tool_pkg.fullname, debug=debug)
-
-    def get_module_path(self):
-        """
-        Returns path where module is located
-        :return: str
-        """
-
-        return self.tool_path
 
 
 class ToolsManager(plugin.PluginsManager, object):
@@ -49,27 +33,30 @@ class ToolsManager(plugin.PluginsManager, object):
         super(ToolsManager, self).__init__()
 
         self._layout = dict()
+        self._loaded_tools = dict()
+        self._tools_to_load = OrderedDict()
 
     # ============================================================================================================
     # BASE
     # ============================================================================================================
 
-    def register_plugin(
-            self, package_name, package_loaders, environment, root_package_name=None, config_dict=None, load=True):
+    def load_plugin(self, pkg_name, pkg_loaders, environment, root_pkg_name=None, config_dict=None, load=True):
         """
-        Implements register_plugin function
+        Implements load_plugin function
         Registers a plugin instance to the manager
-        :param package_loaders: plugin instance to register
+        :param pkg_name: str
+        :param pkg_loaders: plugin instance to register
         :param environment:
+        :param root_pkg_name:
         :param config_dict:
         :param load:
         :return: Plugin
         """
 
-        if not package_loaders:
+        if not pkg_loaders:
             return False
 
-        package_loader = package_loaders[0]
+        package_loader = pkg_loaders[0] if isinstance(pkg_loaders, (list, tuple)) else pkg_loaders
 
         plugin_path = package_loader.fullname
 
@@ -83,8 +70,8 @@ class ToolsManager(plugin.PluginsManager, object):
             'fullname': package_loader.fullname
         })
 
-        if package_name not in self._plugins:
-            self._plugins[package_name] = dict()
+        if pkg_name not in self._plugins:
+            self._plugins[pkg_name] = dict()
 
         plugins_found = list()
         version_found = None
@@ -121,7 +108,7 @@ class ToolsManager(plugin.PluginsManager, object):
                         tp.logger.warning(
                             'Impossible to register plugin "{}" because its name is not defined!'.format(plugin_path))
                         continue
-                    if plugin_id in self._plugins[package_name]:
+                    if root_pkg_name and plugin_id in self._plugins[root_pkg_name]:
                         tp.logger.warning(
                             'Impossible to register plugin "{}" because its ID "{}" its already defined!'.format(
                                 plugin_path, plugin_id))
@@ -164,13 +151,13 @@ class ToolsManager(plugin.PluginsManager, object):
 
         plugin_config_name = plugin_path.replace('.', '-')
         plugin_config = tp.ConfigsMgr().get_config(
-            config_name=plugin_config_name, package_name=package_name, root_package_name=root_package_name,
+            config_name=plugin_config_name, package_name=pkg_name, root_package_name=root_pkg_name,
             environment=environment, config_dict=config_dict, extra_data=plugin_config_dict)
 
         if dcc_loader:
             dcc_path = dcc_loader.fullname
             dcc_config = tp.ConfigsMgr().get_config(
-                config_name=dcc_path.replace('.', '-'), package_name=package_name,
+                config_name=dcc_path.replace('.', '-'), package_name=pkg_name,
                 environment=environment, config_dict=config_dict)
 
         # Register resources
@@ -203,10 +190,10 @@ class ToolsManager(plugin.PluginsManager, object):
             os.makedirs(logger_dir)
         logging_file = plugin_config_dict.get('logging_file', default_logging_config)
 
-        self._plugins[package_name][plugin_id] = {
+        self._plugins[pkg_name][plugin_id] = {
             'name': plugin_name,
             'icon': plugin_icon,
-            'package_name': package_name,
+            'package_name': pkg_name,
             'loader': package_loader,
             'config': plugin_config,
             'config_dict': plugin_config_dict,
@@ -225,53 +212,6 @@ class ToolsManager(plugin.PluginsManager, object):
         tp.logger.info('Plugin "{}" registered successfully!'.format(plugin_path))
 
         return True
-
-    def reload_plugin(self, plugin_id, debug=False):
-        """
-        Implements reload_plugin function
-        Reloads given plugin
-        :param plugin_id: str
-        :param debug: bool
-        :return:
-        """
-
-        plugin_data = self.get_plugin_data_from_id(plugin_id)
-        if not plugin_data:
-            tp.logger.warning('Plugin with id "{}" not found! Impossible to reload.'.format(plugin_id))
-            return False
-
-        package_loader = plugin_data.get('loader', None)
-        if not package_loader:
-            tp.logger.warning('Loader for plugin with id "{}" not found! Impossible to reload'.format(plugin_id))
-            return False
-
-        plugin_config = plugin_data.get('config', None)
-        if not plugin_config:
-            tp.logger.warning('Config for plugin id "{}" not found! Impossible to reload'.format(plugin_id))
-            return False
-
-        dcc_loader = plugin_data.get('dcc_loader', None)
-        dcc_config = plugin_data.get('dcc_config', None)
-
-        plugin_importer = plugin.PluginImporter(package_loader, debug=debug)
-        import_order = ['{}.{}'.format(package_loader.fullname, mod) for mod in
-                        plugin_config.data.get('import_order', list())]
-        skip_modules = ['{}.{}'.format(package_loader.fullname, mod) for mod in
-                        plugin_config.data.get('skip_modules', list())]
-        plugin_importer.import_packages(order=import_order, only_packages=False, skip_modules=skip_modules)
-        plugin_importer.reload_all()
-
-        if dcc_loader:
-            dcc_importer = plugin.PluginImporter(dcc_loader, debug=debug)
-            dcc_import_order = list()
-            dcc_skip_modules = list()
-            if dcc_config:
-                dcc_import_order = ['{}.{}'.format(
-                    package_loader.fullname, mod) for mod in dcc_config.data.get('import_order', list())]
-                dcc_skip_modules = ['{}.{}'.format(
-                    package_loader.fullname, mod) for mod in dcc_config.data.get('skip_modules', list())]
-            dcc_importer.import_packages(order=dcc_import_order, only_packages=False, skip_modules=dcc_skip_modules)
-            dcc_importer.reload_all()
 
     def get_plugin_data_from_id(self, plugin_id, package_name=None):
         """
@@ -334,7 +274,8 @@ class ToolsManager(plugin.PluginsManager, object):
         for plug_name, plug in self._plugins.items():
             plug.cleanup()
             tp.logger.info('Shutting down tool: {}'.format(plug.ID))
-            self.unload(plug_name)
+            plugin_id = plug.keys()[0]
+            self._plugins.pop(plug_name)
 
         self._plugins = dict()
         for package_name in self._plugins.keys():
@@ -344,50 +285,61 @@ class ToolsManager(plugin.PluginsManager, object):
     # TOOLS
     # ============================================================================================================
 
-    def load_package_tools(self, package_name, root_package_name=None, tools_to_load=None, dev=True, config_dict=None):
+    def register_package_tools(self, pkg_name, root_pkg_name=None, tools_to_register=None, dev=True, config_dict=None):
         """
         Loads all tools available in given package
         """
 
         environment = 'development' if dev else 'production'
 
-        if not tools_to_load:
+        if not tools_to_register:
             return
-        tools_to_load = python.force_list(tools_to_load)
+        tools_to_register = python.force_list(tools_to_register)
 
         if config_dict is None:
             config_dict = dict()
 
-        tools_to_register = OrderedDict()
         tools_path = '{}.tools.{}'
-        for tool_name in tools_to_load:
-            pkg_path = tools_path.format(package_name, tool_name)
+        for tool_name in tools_to_register:
+            pkg_path = tools_path.format(pkg_name, tool_name)
             pkg_loader = loader.find_loader(pkg_path)
             if not pkg_loader:
-                # tp.logger.warning('No loader found for tool: {}'.format(pkg_path))
+                # if tool_name in self._tools_to_load:
+                #     self._tools_to_load.pop(tool_name)
                 continue
-            if tool_name not in tools_to_register:
-                tools_to_register[tool_name] = list()
-            tools_to_register[tool_name].append(pkg_loader)
+            else:
+                tool_data = {
+                    'loaders': pkg_loader,
+                    'pkg_name': pkg_name,
+                    'root_pkg_name': root_pkg_name,
+                    'environment': environment,
+                    'config_dict': config_dict
+                }
+                self._tools_to_load[tool_name] = tool_data
 
-        for pkg_loaders in tools_to_register.values():
-            self.register_plugin(
-                package_name=package_name, root_package_name=root_package_name, package_loaders=pkg_loaders,
-                environment=environment, load=True, config_dict=config_dict)
+        return self._tools_to_load
 
-    def launch_tool(self, tool_inst, *args, **kwargs):
+    def load_registered_tools(self, package_name):
         """
-        Launches given tool class
-        :param tool_inst: cls, DccTool instance
-        :param args: tuple, arguments to pass to tool execute function
-        :param kwargs: dict, keyword arguments to pass to the tool execute function
-        :return: DccTool or None, executed tool instance
+        Load all tools that were already registered
+        :return:
         """
+        if not self._tools_to_load:
+            tp.logger.warning('No tools to register found!')
+            return
 
-        tool_inst._launch(*args, **kwargs)
-        tp.logger.debug('Execution time: {}'.format(tool_inst.stats.execution_time))
+        for tool_name, tool_data in self._tools_to_load.items():
+            pkg_name = tool_data['pkg_name']
+            if pkg_name != package_name:
+                continue
+            root_pkg_name = tool_data['root_pkg_name']
+            pkg_loaders = tool_data['loaders']
+            environment = tool_data['environment']
+            config_dict = tool_data['config_dict']
 
-        return tool_inst
+            self.load_plugin(
+                pkg_name=pkg_name, root_pkg_name=root_pkg_name, pkg_loaders=pkg_loaders, environment=environment,
+                load=True, config_dict=config_dict)
 
     def get_registered_tools(self, package_name=None):
         """
@@ -457,18 +409,18 @@ class ToolsManager(plugin.PluginsManager, object):
 
         return None
 
-    def get_tool_by_id(self, tool_id, package_name=None, do_reload=False, debug=False, *args, **kwargs):
+    def get_tool_by_id(self, tool_id, package_name=None, dev=False, *args, **kwargs):
         """
         Launches tool of a specific package by its ID
         :param tool_id: str, tool ID
         :param package_name: str, str
-        :param do_reload: bool
-        :param debug: bool
+        :param dev: bool
         :param args: tuple, arguments to pass to the tool execute function
         :param kwargs: dict, keyword arguments to pas to the tool execute function
         :return: DccTool or None, executed tool instance
         """
 
+        from tpDcc.libs.python import importer
         from tpDcc.libs.qt.core import settings
 
         if not package_name:
@@ -481,8 +433,6 @@ class ToolsManager(plugin.PluginsManager, object):
         if tool_id in self._plugins[package_name]:
             tool_inst = self._plugins[package_name][tool_id].get('tool_instance', None)
             if tool_inst:
-                if do_reload:
-                    self.reload_plugin(tool_id, debug=debug)
                 return tool_inst
 
         tool_to_run = None
@@ -510,47 +460,25 @@ class ToolsManager(plugin.PluginsManager, object):
         dcc_loader = self._plugins[package_name][tool_to_run]['dcc_loader']
         dcc_config = self._plugins[package_name][tool_to_run]['dcc_config']
 
-        # Initialize and reload tool modules if necessary
-        tool_importer = ToolImporter(pkg_loader, debug=debug)
-
         if tool_config:
-            import_order = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
-                            tool_config.data.get('import_order', list())]
             skip_modules = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
                             tool_config.data.get('skip_modules', list())]
-            tools_to_reload = tool_config.data.get('tools_to_reload', list())
-            if tools_to_reload:
-                for tool_to_reload in tools_to_reload:
-                    self.reload_tool(tool_to_reload)
         else:
-            import_order = list()
             skip_modules = list()
-        tool_importer.import_packages(order=import_order, only_packages=False, skip_modules=skip_modules)
-        if do_reload:
-            tool_importer.reload_all()
+        importer.init_importer(pkg_loader.fullname, skip_modules=skip_modules)
 
-        # Initialize and reload DCC tool implementation modules if necessary
         if dcc_loader:
-
-            dcc_importer = ToolImporter(dcc_loader, debug=debug)
-            dcc_import_order = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
-                                dcc_config.data.get('import_order', list())]
             dcc_skip_modules = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
                                 dcc_config.data.get('skip_modules', list())]
-            tools_to_reload = dcc_config.data.get('tools_to_reload', list())
-            if tools_to_reload:
-                for tool_to_reload in tools_to_reload:
-                    self.reload_tool(tool_to_reload)
-            dcc_importer.import_packages(order=dcc_import_order, only_packages=False, skip_modules=dcc_skip_modules)
-            if do_reload:
-                dcc_importer.reload_all()
+            importer.init_importer(dcc_loader.fullname, skip_modules=dcc_skip_modules)
 
         tool_found = None
         for sub_module in loader.walk_packages([self._plugins[package_name][tool_to_run]['plugin_package_path']]):
-            importer, sub_module_name, _ = sub_module
-            mod = importer.find_module(sub_module_name).load_module(sub_module_name)
+            tool_importer, sub_module_name, _ = sub_module
+            mod = tool_importer.find_module(sub_module_name).load_module(sub_module_name)
             for cname, obj in inspect.getmembers(mod, inspect.isclass):
                 if issubclass(obj, tool.DccTool):
+                    obj.FILE_NAME = pkg_loader.filename
                     obj.FILE_NAME = pkg_loader.filename
                     obj.FULL_NAME = pkg_loader.fullname
                     tool_found = obj
@@ -582,63 +510,79 @@ class ToolsManager(plugin.PluginsManager, object):
 
         return tool_inst
 
-    def launch_tool_by_id(self, tool_id, package_name=None, do_reload=False, debug=False, *args, **kwargs):
+    def launch_tool_by_id(self, tool_id, package_name=None, dev=False, *args, **kwargs):
         """
         Launches tool of a specific package by its ID
         :param tool_id: str, tool ID
         :param package_name: str, str
-        :param do_reload: str, bool
-        :param debug: str, bool
+        :param dev: bool
         :param args: tuple, arguments to pass to the tool execute function
         :param kwargs: dict, keyword arguments to pas to the tool execute function
         :return: DccTool or None, executed tool instance
         """
 
+        tool_inst = self.get_tool_by_id(
+            tool_id=tool_id, package_name=package_name, dev=dev, *args, **kwargs)
+        if not tool_inst:
+            return None
+
+        self.close_tool(tool_id)
+
+        with contexts.application():
+            self._launch_tool(tool_inst, tool_id, *args, **kwargs)
+            return tool_inst
+
+    def close_tool(self, tool_id, force=True):
+        """
+        Closes tool with given ID
+        :param tool_id: str
+        """
+
+        if tool_id not in self._loaded_tools:
+            return False
+
+        closed_tool = False
         parent = tp.Dcc.get_main_window()
         if parent:
             for child in parent.children():
                 if child.objectName() == tool_id:
-                    child.close()
-                    child.setParent(None)
-                    child.deleteLater()
+                    child.fade_close() if hasattr(child, 'fade_close') else child.close()
+                    closed_tool = True
 
-        tool_inst = self.get_tool_by_id(
-            tool_id=tool_id, package_name=package_name, do_reload=do_reload, debug=debug, *args, **kwargs)
-        if not tool_inst:
-            return None
+        tool_to_close = self._loaded_tools[tool_id].attacher
+        if not closed_tool and tool_to_close:
+            tool_to_close.fade_close() if hasattr(tool_to_close, 'fade_close') else tool_to_close.close()
+        if force:
+            tool_to_close.setParent(None)
+            tool_to_close.deleteLater()
+        self._loaded_tools.pop(tool_id)
 
-        with contexts.application():
-            self.launch_tool(tool_inst, *args, **kwargs)
-            return tool_inst
+        return True
 
-    def reload_tool(self, tool_id):
+    def close_tools(self):
         """
-        Reloads tool with given id
-        :param tool_id: str
-        """
-
-        all_tools = self.get_registered_tools()
-        if not all_tools:
-            return
-
-        tool_ids = all_tools.keys()
-        if tool_id not in tool_ids:
-            return
-
-        self.reload_plugin(tool_id)
-
-    def reload_tools(self):
-        """
-        Reload all available tools
+        Closes all available tools
         :return:
         """
 
-        all_tools = self.get_registered_tools()
-        if not all_tools:
-            return
-        tool_ids = all_tools.keys()
-        for tool_id in tool_ids:
-            self.reload_plugin(tool_id)
+        for tool_id in self._loaded_tools.keys():
+            self.close_tool(tool_id, force=True)
+
+    def _launch_tool(self, tool_inst, tool_id, *args, **kwargs):
+        """
+        Launches given tool class
+        :param tool_inst: cls, DccTool instance
+        :param args: tuple, arguments to pass to tool execute function
+        :param kwargs: dict, keyword arguments to pass to the tool execute function
+        :return: DccTool or None, executed tool instance
+        """
+
+        self.close_tool(tool_id)
+        tool_inst._launch(*args, **kwargs)
+        self._loaded_tools[tool_id] = tool_inst
+        tp.logger.debug('Execution time: {}'.format(tool_inst.stats.execution_time))
+
+        return tool_inst
 
     # ============================================================================================================
     # CONFIGS

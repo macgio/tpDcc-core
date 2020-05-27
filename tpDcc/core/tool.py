@@ -289,13 +289,14 @@ class DccTool(plugin.Plugin, object):
                     #     uid = "{0} [{1}]".format(self.uiData["label"], str(uuid.uuid4()))
                     ui_label = self._config.get('name', default='')
                     ui_icon = self._config.get('icon', default='tpdcc')
-                    from tpDcc.dccs.maya.ui import window
-                    bootstrap_widget = window.BootStrapWidget(
-                        tool_data['tool'], title=ui_label, icon=tp.ResourcesMgr().icon(ui_icon), uid=uid)
-                    tool_data['bootstrap'] = bootstrap_widget
-                    tool_data['bootstrap'].show(
-                        retain=False, dockable=True, tabToControl=('AttributeEditor', -1), floating=False)
-                    self._bootstrap.append(bootstrap_widget)
+                    if tp.is_maya():
+                        from tpDcc.dccs.maya.ui import window
+                        bootstrap_widget = window.BootStrapWidget(
+                            tool_data['tool'], title=ui_label, icon=tp.ResourcesMgr().icon(ui_icon), uid=uid)
+                        tool_data['bootstrap'] = bootstrap_widget
+                        tool_data['bootstrap'].show(
+                            retain=False, dockable=True, tabToControl=('AttributeEditor', -1), floating=False)
+                        self._bootstrap.append(bootstrap_widget)
         except Exception:
             exc_type, exc_value, exc_tb = sys.exc_info()
             traceback.print_exception(exc_type, exc_value, exc_tb)

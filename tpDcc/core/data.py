@@ -285,6 +285,9 @@ class CustomData(FileData, object):
     Class used to define custom data stored in disk files
     """
 
+    # When dealing with custom files we are not interested in generating a settings file
+    SETTINGS_FILE = None
+
     def open(self, file_path=None):
         """
         Open data object from disk

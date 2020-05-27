@@ -11,7 +11,6 @@ import tpDcc
 from tpDcc import register
 from tpDcc.abstract import dcc as abstract_dcc
 
-from Qt.QtCore import *
 from Qt.QtWidgets import *
 
 

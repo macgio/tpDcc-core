@@ -12,7 +12,7 @@ import time
 import inspect
 
 import tpDcc as tp
-from tpDcc.libs.python import importer, modules
+from tpDcc.libs.python import modules
 
 
 class Plugin(object):
@@ -104,22 +104,6 @@ class PluginStats(object):
             self._info['traceback'] = trace
 
 
-class PluginImporter(importer.Importer, object):
-    def __init__(self, plugin_package, debug=False):
-
-        self.plugin_path = plugin_package.filename
-
-        super(PluginImporter, self).__init__(module_name=plugin_package.fullname, debug=debug)
-
-    def get_module_path(self):
-        """
-        Returns path where module is located
-        :return: str
-        """
-
-        return self.plugin_path
-
-
 class PluginsManager(object):
 
     INTERFACE = Plugin
@@ -133,7 +117,7 @@ class PluginsManager(object):
     def plugins(self):
         return self._plugins
 
-    def register_plugin(self, class_obj, package_name):
+    def load_plugin(self, class_obj, package_name):
         """
         Registers a plugin instance to the manager
         :param class_obj:
@@ -223,12 +207,11 @@ class PluginsManager(object):
 
         return None
 
-    def register_plugin_by_package(self, module_path, package_name, do_reload=False):
+    def load_plugin_by_package(self, module_path, package_name):
         """
         Registers a module by searching all class members of the package. This operation can be extensive.
         :param module_path: str
         :param package_name: str
-        :param do_reload: bool
         :return:
         """
 
@@ -239,17 +222,15 @@ class PluginsManager(object):
             module_path = modules.convert_to_dotted_path(os.path.normpath(sub_module))
             try:
                 sub_module_obj = modules.import_module(module_path)
-                if do_reload and sub_module_obj:
-                    reload(sub_module_obj)
             except Exception as exc:
                 tp.logger.error('Error while importing module: {} | {}'.format(module_path, exc))
                 continue
             if not sub_module_obj:
                 return
             for member in modules.iterate_module_members(sub_module_obj, predicate=inspect.isclass):
-                self.register_plugin(member[1], package_name=package_name)
+                self.load_plugin(member[1], package_name=package_name)
 
-    def register_plugin_by_module(self, module, package_name):
+    def load_plugin_by_module(self, module, package_name):
         """
         Registers a module by searching all class members of the module and registers any class that is an instance of
         the plugin class
@@ -259,12 +240,12 @@ class PluginsManager(object):
 
         if inspect.ismodule(module):
             for member in modules.iterate_module_members(module, predicate=inspect.isclass):
-                self.register_plugin(member[1], package_name=package_name)
+                self.load_plugin(member[1], package_name=package_name)
 
-    def register_path(self, module_path, package_name, do_reload=False):
+    def register_path(self, module_path, package_name):
         imported_module = None
         if os.path.isdir(module_path):
-            self.register_plugin_by_package(module_path, package_name, do_reload=do_reload)
+            self.load_plugin_by_package(module_path, package_name)
             return None
         elif os.path.isfile(module_path):
             try:
@@ -279,11 +260,11 @@ class PluginsManager(object):
                 tp.logger.error('Failed to import Plugin module: {} | {}!'.format(module_path, exc), exc_info=True)
                 return None
         if imported_module:
-            self.register_plugin_by_module(imported_module)
+            self.load_plugin_by_module(imported_module)
 
         return imported_module
 
-    def register_paths(self, paths_to_register, package_name, do_reload=False):
+    def register_paths(self, paths_to_register, package_name):
         self._base_paths.extend(paths_to_register)
         visited = set()
         for path_to_register in paths_to_register:
@@ -296,4 +277,4 @@ class PluginsManager(object):
             if base_name in visited:
                 continue
             visited.add(base_name)
-            self.register_path(path_to_register, package_name=package_name, do_reload=do_reload)
+            self.register_path(path_to_register, package_name=package_name)
