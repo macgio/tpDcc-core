@@ -21,6 +21,11 @@ class AbstractDCC(object):
         Close = 'No'
 
     TYPE_FILTERS = OrderedDict()
+    SIDE_PATTERNS = {
+        'center': ['C', 'c', 'Center', 'ct', 'center', 'middle', 'm'],
+        'left': ['L', 'l', 'Left', 'left', 'lf'],
+        'right':  ['R', 'r', 'Right', 'right', 'rt']
+    }
 
     @staticmethod
     @decorators.abstractmethod
@@ -761,6 +766,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_attribute_name(node_and_attr):
+        """
+        Returns the attribute part of a given node name
+        :param node_and_attr: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function node_attribute_name() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_object_color(node):
         """
         Returns the color of the given node
@@ -1485,6 +1501,44 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def add_enum_attribute(node, attribute_name, value, **kwargs):
+        """
+        Adds a new enum attribute into the given node
+        :param node: str
+        :param attribute_name: str
+        :param value: list(str)
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function add_enum_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_enum_attribute_values(node, attribute_name):
+        """
+        Return list of enum attribute values in the given attribute
+        :param node: str
+        :param attribute_name: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function get_enum_attribute_values() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_enum_attribute_value(node, attribute_name, value):
+        """
+        Return list of enum attribute values in the given attribute
+        :param node: str
+        :param attribute_name: str
+        :param value: str
+        """
+
+        raise NotImplementedError('abstract DCC function set_enum_attribute_value() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def attribute_query(node, attribute_name, **kwargs):
         """
         Returns attribute qyer
@@ -1531,6 +1585,20 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function is_attribute_connected() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def is_attribute_connected_to_attribute(source_node, source_attribute_name, target_node, target_attribute_name):
+        """
+        Returns whether given source attribute is connected or not to given target attribute
+        :param source_node: str
+        :param source_attribute_name: str
+        :param target_node: str
+        :param target_attribute_name: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function is_attribute_connected_to_attribute() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -2033,6 +2101,21 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def connect_multiply(source_node, source_attribute, target_node, target_attribute, value=0.1):
+        """
+        Connects source attribute into target attribute with a multiply node inbetween
+        :param source_node: str
+        :param source_attribute: str
+        :param target_node: str
+        :param target_attribute: str
+        :param value: float, value of the multiply node
+        :return: str, name of the created multiply node
+        """
+
+        raise NotImplementedError('abstract DCC function connect_multiply() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def connect_translate(source_node, target_node):
         """
         Connects the translation of the source node into the rotation of the target node
@@ -2078,12 +2161,13 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def connect_message_attribute(source_node, target_node, message_attribute):
+    def connect_message_attribute(source_node, target_node, message_attribute, force=False):
         """
         Connects the message attribute of the input_node into a custom message attribute on target_node
         :param source_node: str, name of a node
         :param target_node: str, name of a node
         :param message_attribute: str, name of the message attribute to create and connect into. If already exists,
+        :param force, Whether or not force the connection of the message attribute
         just connect
         """
 
@@ -2967,7 +3051,7 @@ class AbstractDCC(object):
     @decorators.abstractmethod
     def match_translation_rotation(source_node, target_node):
         """
-        Match translation and rotation of the given node to the translation and rotation of the target node
+        Match translation and rotation of the target node to the translation and rotation of the source node
         :param source_node: str
         :param target_node: str
         """
@@ -3344,6 +3428,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC create_aim_constraint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_pole_vector_constraint(control, handle):
+        """
+        Creates a new pole vector constraint
+        :param control: str
+        :param handle: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_pole_vector_constraint() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -3997,18 +4093,38 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def create_empty_follow_group(target_transform, **kwargs):
+        """
+        Creates a new follow group above a target transform
+        :param target_transform: str, name of the transform make follow
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC create_empty_follow_group() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def create_follow_group(source_transform, target_transform, **kwargs):
         """
         Creates a group above a target transform that is constrained to the source transform
         :param source_transform: str, name of the transform to follow
         :param target_transform: str, name of the transform make follow
-        :param source_transform:
-        :param target_transform:
         :param kwargs:
         :return:
         """
 
-        raise NotImplementedError('abstract DCC create_empty_mesh() not implemented!')
+        raise NotImplementedError('abstract DCC create_follow_group() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_constraint_functions_dict():
+        """
+        Returns a dict that maps each constraint type with its function in DCC API
+        :return: dict(str, fn)
+        """
+
+        raise NotImplementedError('abstract DCC get_constraint_functions_dict() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -4019,6 +4135,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC get_constraints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_constraint_targets(constraint_node):
+        """
+        Returns target of the given constraint node
+        :param constraint_node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_constraint_targets() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -4117,6 +4244,20 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_pole_vector_position(transform_init, transform_mid, transform_end, offset=1):
+        """
+        Given 3 transform (such as arm, elbow, wrist), returns a position where pole vector should be located
+        :param transform_init: str, name of a transform node
+        :param transform_mid: str, name of a transform node
+        :param transform_end: str, name of a transform node
+        :param offset: float, offset value for the final pole vector position
+        :return: list(float, float, float), pole vector with offset
+        """
+
+        raise NotImplementedError('abstract DCC create_pole_vector() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def deferred_function(fn, *args, **kwargs):
         """
         Calls given function with given arguments in a deferred way
@@ -4162,8 +4303,8 @@ class AbstractDCC(object):
 
     # ================================================================================================================
 
-    @staticmethod
-    def name_is_center(side, patterns=None):
+    @classmethod
+    def name_is_center(cls, side, patterns=None):
         """
         Returns whether given side is a valid center side or not
         :param side: str
@@ -4172,15 +4313,17 @@ class AbstractDCC(object):
         """
 
         if not patterns:
-            patterns = ['C', 'c', 'Center', 'ct', 'center', 'middle', 'm']
+            patterns = cls.SIDE_PATTERNS['center']
 
-        if str(side) in patterns:
-            return True
+        side = str(side)
+        for pattern in patterns:
+            return side.startswith('{}_'.format(pattern)) or side.endswith(
+                '_{}'.format(pattern)) or '_{}_'.format(pattern) in side
 
         return False
 
-    @staticmethod
-    def name_is_left(side, patterns=None):
+    @classmethod
+    def name_is_left(cls, side, patterns=None):
         """
         Returns whether given side is a valid left side or not
         :param side: str
@@ -4189,15 +4332,18 @@ class AbstractDCC(object):
         """
 
         if not patterns:
-            patterns = ['L', 'l', 'Left', 'left', 'lf']
+            patterns = cls.SIDE_PATTERNS['left']
 
-        if str(side) in patterns:
-            return True
+        side = str(side)
+        for pattern in patterns:
+            if side.startswith('{}_'.format(pattern)) or side.endswith(
+                    '_{}'.format(pattern)) or '_{}_'.format(pattern) in side or side == pattern:
+                return True
 
         return False
 
-    @staticmethod
-    def name_is_right(side, patterns=None):
+    @classmethod
+    def name_is_right(cls, side, patterns=None):
         """
         Returns whether given side is a valid right side or not
         :param side: str
@@ -4206,12 +4352,45 @@ class AbstractDCC(object):
         """
 
         if not patterns:
-            patterns = ['R', 'r', 'Right', 'right', 'rt']
+            patterns = cls.SIDE_PATTERNS['right']
 
-        if str(side) in patterns:
-            return True
+        side = str(side)
+        for pattern in patterns:
+            if side.startswith('{}_'.format(pattern)) or side.endswith(
+                    '_{}'.format(pattern)) or '_{}_'.format(pattern) in side or side == pattern:
+                return True
 
         return False
+
+    @classmethod
+    def get_mirror_name(cls, name, center_patterns=None, left_patterns=None, right_patterns=None):
+        """
+        Returns mirrored name of the given name
+        :param name: str
+        :return: str
+        """
+
+        if cls.name_is_center(name, patterns=center_patterns):
+            return name
+
+        if cls.name_is_left(name, patterns=left_patterns):
+            from_side = 'L'
+            to_side = 'R'
+        elif cls.name_is_left(name, patterns=right_patterns):
+            from_side = 'R'
+            to_side = 'L'
+        else:
+            return name
+
+        mirror_name = name
+        if name.startswith('{}_'.format(from_side)):
+            mirror_name = '{}_'.format(to_side) + mirror_name[2:]
+        elif name.endswith('_{}'.format(from_side)):
+            mirror_name = mirror_name[:-2] + '_{}'.format(to_side)
+        elif '_{}_'.format(from_side) in name:
+            mirror_name = name.replace('_{}_'.format(from_side), '_{}_'.format(to_side))
+
+        return mirror_name
 
     @classmethod
     def get_color_of_side(cls, side='C', sub_color=False):
