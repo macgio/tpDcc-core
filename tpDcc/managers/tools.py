@@ -500,7 +500,7 @@ class ToolsManager(plugin.PluginsManager, object):
             tool_settings.set('theme', 'default')
         tool_settings.setFallbacksEnabled(False)
 
-        tool_inst = tool_found(self, config=tool_config, settings=tool_settings, *args, **kwargs)
+        tool_inst = tool_found(self, config=tool_config, settings=tool_settings, dev=dev, *args, **kwargs)
         tool_inst.ID = tool_id
         tool_inst.VERSION = tool_version
         tool_inst.AUTHOR = tool_inst.config_dict().get('creator', None)

@@ -29,7 +29,7 @@ class DccTool(plugin.Plugin, object):
     FILE_NAME = ''
     FULL_NAME = ''
 
-    def __init__(self, manager, config=None, settings=None, *args, **kwargs):
+    def __init__(self, manager, config=None, settings=None, dev=False, *args, **kwargs):
         super(DccTool, self).__init__(manager=manager)
 
         self._tool = list()
@@ -37,6 +37,7 @@ class DccTool(plugin.Plugin, object):
         self._bootstrap = list()
         self._attacher = None
         self._settings = settings
+        self._dev = dev
 
     @property
     def config(self):
@@ -49,6 +50,10 @@ class DccTool(plugin.Plugin, object):
     @property
     def attacher(self):
         return self._attacher
+
+    @property
+    def dev(self):
+        return self._dev
 
     @decorators.abstractmethod
     def creator(self):
@@ -189,6 +194,7 @@ class DccTool(plugin.Plugin, object):
         Function that launches current tool
         :param frameless_active: bool, Whether the tool will be launch in frameless mode or not
         :param tool_kwargs: dict, dictionary of arguments to launch tool with
+        :param attacher_class:
         :return:
         """
 
@@ -277,6 +283,7 @@ class DccTool(plugin.Plugin, object):
         try:
             kwargs['settings'] = self._settings
             kwargs['config'] = self._config
+            kwargs['dev'] = self._dev
             tool_data = self.launch(*args, **kwargs)
             if tool_data and tool_data.get('tool') is not None:
                 tool_data['tool'].ID = self.ID

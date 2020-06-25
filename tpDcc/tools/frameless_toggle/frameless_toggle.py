@@ -2,8 +2,8 @@ from tpDcc.core import tool
 
 
 class FramelessWindowToggle(tool.DccTool, object):
-    def __init__(self, manager, config, settings=None):
-        super(FramelessWindowToggle, self).__init__(manager=manager, config=config, settings=settings)
+    def __init__(self, manager, config, settings=None, dev=False):
+        super(FramelessWindowToggle, self).__init__(manager=manager, config=config, settings=settings, dev=dev)
 
         self._state = self.config_dict().get('is_checked', False)
 

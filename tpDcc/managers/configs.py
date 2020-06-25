@@ -105,6 +105,8 @@ class ConfigsManager(object):
         :param config_name:
         :param environment:
         :param config_dict:
+        :param parser_class:
+        :param extra_data:
         :return:
         """
 
