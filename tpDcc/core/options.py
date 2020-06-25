@@ -98,6 +98,9 @@ class OptionObject(object):
         else:
             name = str(name)
 
+        # TODO: We should do checks by type. At this moment there are some options types that will be broken
+        # TODO: if we set them directly using this function (for example, 'combo').
+
         self._option_settings.set(name, value)
 
     def get_unformatted_option(self, name, group=None):
@@ -216,6 +219,17 @@ class OptionObject(object):
             value = [value, 'file']
         elif option_type == 'color':
             value = [value, 'color']
+        elif option_type == 'combo':
+            format_value = list()
+            if value:
+                if isinstance(value[0], (list, tuple)):
+                    if len(value) == 1:
+                        format_value = [value, []]
+                    else:
+                        format_value = value
+                else:
+                    format_value = [value, []]
+            return [format_value, 'combo']
 
         return value
 
@@ -243,6 +257,11 @@ class OptionObject(object):
                 return new_value
             elif option_type == 'list' or option_type == 'file':
                 return value
+            elif option_type == 'combo':
+                try:
+                    return value[1]
+                except Exception:
+                    return [-1, '']
             else:
                 new_value = self._format_custom_option_value(option_type, value)
 
