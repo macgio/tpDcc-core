@@ -81,7 +81,7 @@ class OptionObject(object):
         else:
             name = str(name)
 
-        value_from_option_type = self._get_value_from_option_type(value, option_type)
+        value_from_option_type = self._get_option_value(value=value, option_type=option_type)
 
         self._option_settings.set(name, value_from_option_type)
 
@@ -198,41 +198,6 @@ class OptionObject(object):
     # ======================== OVERRIDES
     # ================================================================================================
 
-    def _get_value_from_option_type(self, value, option_type):
-        """
-        Internal function that returns a value depending on the option type
-        :param option_type: str
-        :return: object
-        """
-
-        if option_type == 'script':
-            value = [value, 'script']
-        elif option_type == 'dictionary':
-            value = [value, 'dictionary']
-        elif option_type == 'nonedittext':
-            value = [value, 'nonedittext']
-        elif option_type == 'directory':
-            value = [value, 'directory']
-        elif option_type == 'list':
-            value = [value, 'list']
-        elif option_type == 'file':
-            value = [value, 'file']
-        elif option_type == 'color':
-            value = [value, 'color']
-        elif option_type == 'combo':
-            format_value = list()
-            if value:
-                if isinstance(value[0], (list, tuple)):
-                    if len(value) == 1:
-                        format_value = [value, []]
-                    else:
-                        format_value = value
-                else:
-                    format_value = [value, []]
-            return [format_value, 'combo']
-
-        return value
-
     def _format_option_value(self, value):
         """
         Internal function used to format object option value
@@ -255,7 +220,7 @@ class OptionObject(object):
                     new_value = new_value[0]
                 new_value = python.order_dict_by_list_of_keys(new_value, dict_order)
                 return new_value
-            elif option_type == 'list' or option_type == 'file':
+            elif option_type == 'list' or option_type == 'file' or option_type == 'vector3f':
                 return value
             elif option_type == 'combo':
                 try:
@@ -285,6 +250,44 @@ class OptionObject(object):
 
         return new_value
 
+    def _get_option_value(self, value, option_type):
+        """
+        Returns a value depending on the option type
+        :param value:
+        :param option_type:
+        :return:
+        """
+
+        if option_type == 'script':
+            value = [value, 'script']
+        elif option_type == 'dictionary':
+            value = [value, 'dictionary']
+        elif option_type == 'nonedittext':
+            value = [value, 'nonedittext']
+        elif option_type == 'directory':
+            value = [value, 'directory']
+        elif option_type == 'list':
+            value = [value, 'list']
+        elif option_type == 'file':
+            value = [value, 'file']
+        elif option_type == 'color':
+            value = [value, 'color']
+        elif option_type == 'vector3f':
+            value = [value, 'vector3f']
+        elif option_type == 'combo':
+            format_value = list()
+            if value:
+                if isinstance(value[0], (list, tuple)):
+                    if len(value) == 1:
+                        format_value = [value, []]
+                    else:
+                        format_value = value
+                else:
+                    format_value = [value, []]
+            return [format_value, 'combo']
+
+        return value
+
     def _format_custom_option_value(self, option_type, value):
         """
         Internal function used to format object option value with custom option types
@@ -301,4 +304,11 @@ class OptionObject(object):
         """
 
         if not self._option_settings:
-            self._option_settings = settings.JSONSettings()
+            self._load_options()
+
+    def _load_options(self):
+        """
+        Internal function that load options settings
+        """
+
+        self._option_settings = settings.JSONSettings()
