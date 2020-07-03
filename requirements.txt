@@ -8,4 +8,5 @@ PySide;python_version < '2.7' and sys_platform == 'darwin'
 PySide2;python_version >= '2.7'  and sys_platform == 'darwin'
 Qt.py
 appdirs
+python-json-logger
 tpDcc-libs-python
