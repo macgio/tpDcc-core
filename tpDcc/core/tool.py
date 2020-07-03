@@ -201,6 +201,7 @@ class DccTool(plugin.Plugin, object):
         tool_config_dict = self.config_dict()
         tool_name = tool_config_dict.get('name', None)
         tool_id = tool_config_dict.get('id', None)
+        tool_size = tool_config_dict.get('size', None)
         if not tool_name or not tool_id:
             tp.logger.warning('Impossible to run tool "{}" with id: "{}"'.format(tool_name, tool_id))
             return None
@@ -237,6 +238,8 @@ class DccTool(plugin.Plugin, object):
         toolset_inst.set_attacher(self._attacher)
         self._attacher.setWindowIcon(toolset_inst.get_icon())
         self._attacher.setWindowTitle('{} - {}'.format(self._attacher.windowTitle(), self.VERSION))
+        if tool_size:
+            self._attacher.resize(tool_size[0], tool_size[1])
         self._attacher.show()
 
         return self._attacher
