@@ -8,15 +8,12 @@ Module that contains generic functionality when dealing with projects
 from __future__ import print_function, division, absolute_import
 
 import os
-import logging
 
 from Qt.QtGui import *
 
 import tpDcc
 from tpDcc.libs.python import path, folder, settings
 from tpDcc.core import options, consts
-
-LOGGER = logging.getLogger()
 
 
 class ProjectData(options.OptionObject):
@@ -82,7 +79,7 @@ class ProjectData(options.OptionObject):
 
         project_file = self.get_project_file()
         if not self._settings.has_settings():
-            LOGGER.warning('No valid project data found on Project Data File: {}'.format(project_file))
+            tpDcc.logger.warning('No valid project data found on Project Data File: {}'.format(project_file))
 
         encoded_image = self._settings.get('image')
         if not encoded_image:
@@ -98,7 +95,7 @@ class ProjectData(options.OptionObject):
 
         project_file = self.get_project_file()
         if not self._settings.has_settings():
-            LOGGER.warning('No valid project data found on Project Data File: {}'.format(project_file))
+            tpDcc.logger.warning('No valid project data found on Project Data File: {}'.format(project_file))
 
         self._name = self._settings.get('name')
         self._project_path = path.get_dirname(path.get_dirname(project_file))
@@ -112,7 +109,7 @@ class ProjectData(options.OptionObject):
         from tpDcc.libs.qt.core import image
 
         if not os.path.isfile(image_path):
-            LOGGER.warning('Given image path "{}" is not valid!'.format(image_path))
+            tpDcc.logger.warning('Given image path "{}" is not valid!'.format(image_path))
             return False
 
         if not self._settings:
@@ -120,7 +117,7 @@ class ProjectData(options.OptionObject):
 
         project_file = self.get_project_file()
         if not self._settings.has_settings():
-            LOGGER.warning('No valid project data found on Project Data File: {}'.format(project_file))
+            tpDcc.logger.warning('No valid project data found on Project Data File: {}'.format(project_file))
 
         self._settings.set('image', image.image_to_base64(image_path))
 
@@ -129,7 +126,7 @@ class ProjectData(options.OptionObject):
     def create_project(self):
         project_full_path = self.full_path
         if path.is_dir(project_full_path):
-            LOGGER.warning('Project Path {} already exists! Choose another one ...'.format(project_full_path))
+            tpDcc.logger.warning('Project Path {} already exists! Choose another one ...'.format(project_full_path))
             return
 
         folder.create_folder(name=self.name, directory=self._project_path)
@@ -173,4 +170,4 @@ class ProjectData(options.OptionObject):
         self._settings.set('name', self.name)
         self._settings.set('path', self._project_path)
         self._settings.set('full_path', self.full_path)
-        self._settings.set('image', image.image_to_base64(tpDcc.ResourcesMgr().get('icons', 'rignode_icon.png')))
+        self._settings.set('image', image.image_to_base64(tpDcc.ResourcesMgr().get('icons', 'default', 'tpdcc.png')))

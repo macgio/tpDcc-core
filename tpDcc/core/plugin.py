@@ -10,6 +10,7 @@ from __future__ import print_function, division, absolute_import
 import os
 import time
 import inspect
+import traceback
 
 import tpDcc as tp
 from tpDcc.libs.python import modules
@@ -223,7 +224,7 @@ class PluginsManager(object):
             try:
                 sub_module_obj = modules.import_module(module_path)
             except Exception as exc:
-                tp.logger.error('Error while importing module: {} | {}'.format(module_path, exc))
+                tp.logger.error('Error while importing module: {} | {}'.format(module_path, traceback.format_exc()))
                 continue
             if not sub_module_obj:
                 return
