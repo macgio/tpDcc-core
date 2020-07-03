@@ -19,9 +19,11 @@ from tpDcc.core import plugin, tool
 from tpDcc.libs.python import decorators, python, path as path_utils
 from tpDcc.libs.qt.core import contexts
 
+import pkgutil
 if python.is_python2():
     import pkgutil as loader
 else:
+    import importlib.util
     import importlib as loader
 
 
@@ -58,7 +60,8 @@ class ToolsManager(plugin.PluginsManager, object):
 
         package_loader = pkg_loaders[0] if isinstance(pkg_loaders, (list, tuple)) else pkg_loaders
 
-        plugin_path = package_loader.fullname
+        plugin_name = package_loader.filename if python.is_python2() else os.path.dirname(package_loader.loader.path)
+        plugin_path = package_loader.fullname if python.is_python2() else package_loader.loader.name
 
         if not config_dict:
             config_dict = dict()
@@ -66,8 +69,8 @@ class ToolsManager(plugin.PluginsManager, object):
         config_dict.update({
             'join': os.path.join,
             'user': os.path.expanduser('~'),
-            'filename': package_loader.filename,
-            'fullname': package_loader.fullname
+            'filename': plugin_name,
+            'fullname': plugin_path
         })
 
         if pkg_name not in self._plugins:
@@ -75,9 +78,10 @@ class ToolsManager(plugin.PluginsManager, object):
 
         plugins_found = list()
         version_found = None
-        for sub_module in loader.walk_packages([package_loader.filename]):
+        packages_to_walk = [plugin_name] if python.is_python2() else [os.path.dirname(plugin_name)]
+        for sub_module in pkgutil.walk_packages(packages_to_walk):
             importer, sub_module_name, _ = sub_module
-            qname = '{}.{}'.format(package_loader.fullname, sub_module_name)
+            qname = '{}.{}'.format(plugin_path, sub_module_name)
             try:
                 mod = importer.find_module(sub_module_name).load_module(sub_module_name)
             except Exception as exc:
@@ -94,42 +98,43 @@ class ToolsManager(plugin.PluginsManager, object):
 
             for cname, obj in inspect.getmembers(mod, inspect.isclass):
                 if issubclass(obj, self.INTERFACE):
-                    plugin_config_dict = obj.config_dict(file_name=package_loader.filename) or dict()
+                    plugin_config_dict = obj.config_dict(file_name=plugin_name) or dict()
                     if not plugin_config_dict:
                         continue
                     plugin_id = plugin_config_dict.get('id', None)
-                    plugin_name = plugin_config_dict.get('name', None)
+                    plugin_config_name = plugin_config_dict.get('name', None)
                     plugin_icon = plugin_config_dict.get('icon', None)
                     if not plugin_id:
                         tp.logger.warning(
-                            'Impossible to register plugin "{}" because its ID is not defined!'.format(plugin_path))
+                            'Impossible to register plugin "{}" because its ID is not defined!'.format(plugin_id))
                         continue
-                    if not plugin_name:
+                    if not plugin_config_name:
                         tp.logger.warning(
-                            'Impossible to register plugin "{}" because its name is not defined!'.format(plugin_path))
+                            'Impossible to register plugin "{}" because its name is not defined!'.format(
+                                plugin_config_name))
                         continue
                     if root_pkg_name and plugin_id in self._plugins[root_pkg_name]:
                         tp.logger.warning(
                             'Impossible to register plugin "{}" because its ID "{}" its already defined!'.format(
-                                plugin_path, plugin_id))
+                                plugin_config_name, plugin_id))
                         continue
 
                     if not version_found:
                         version_found = '0.0.0'
                     obj.VERSION = version_found
-                    obj.FILE_NAME = package_loader.filename
-                    obj.FULL_NAME = package_loader.fullname
+                    obj.FILE_NAME = plugin_name
+                    obj.FULL_NAME = plugin_path
 
                     plugins_found.append((qname, version_found, obj))
                     version_found = True
 
         if not plugins_found:
-            tp.logger.warning('No plugins found in module "{}". Skipping ...'.format(plugin_path))
+            tp.logger.warning('No plugins found in module "{}". Skipping ...'.format(plugin_name))
             return False
         if len(plugins_found) > 1:
             tp.logger.warning(
                 'Multiple plugins found ({}) in module "{}". Loading first one. {} ...'.format(
-                    len(plugins_found), plugin_path, plugins_found[-1]))
+                    len(plugins_found), plugin_name, plugins_found[-1]))
             plugin_found = plugins_found[-1]
         else:
             plugin_found = plugins_found[0]
@@ -144,9 +149,9 @@ class ToolsManager(plugin.PluginsManager, object):
         except ImportError:
             pass
 
-        plugin_config_dict = plugin_found[2].config_dict(file_name=package_loader.filename) or dict()
+        plugin_config_dict = plugin_found[2].config_dict(file_name=plugin_name) or dict()
         plugin_id = plugin_config_dict['id']
-        plugin_name = plugin_config_dict['name']
+        _plugin_name = plugin_config_dict['name']
         plugin_icon = plugin_config_dict['icon']
 
         plugin_config_name = plugin_path.replace('.', '-')
@@ -161,7 +166,7 @@ class ToolsManager(plugin.PluginsManager, object):
                 environment=environment, config_dict=config_dict)
 
         # Register resources
-        def_resources_path = os.path.join(package_loader.filename, 'resources')
+        def_resources_path = os.path.join(plugin_name, 'resources')
         # resources_path = plugin_config.data.get('resources_path', def_resources_path)
         resources_path = plugin_config_dict.get('resources_path', None)
         if not resources_path or not os.path.isdir(resources_path):
@@ -169,7 +174,7 @@ class ToolsManager(plugin.PluginsManager, object):
         if os.path.isdir(resources_path):
             tp.ResourcesMgr().register_resource(resources_path, key='tools')
         else:
-            tp.logger.info('No resources directory found for plugin "{}" ...'.format(plugin_name))
+            tp.logger.info('No resources directory found for plugin "{}" ...'.format(_plugin_name))
 
         # Register DCC specific resources
         if dcc_loader and dcc_config:
@@ -180,30 +185,38 @@ class ToolsManager(plugin.PluginsManager, object):
             if os.path.isdir(resources_path):
                 tp.ResourcesMgr().register_resource(resources_path, key='plugins')
             else:
-                tp.logger.info('No resources directory found for plugin "{}" ...'.format(plugin_name))
+                tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
 
         # Create tool loggers directory
         default_logger_dir = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs', 'tools'))
-        default_logging_config = os.path.join(package_loader.filename, '__logging__.ini')
+        default_logging_config = os.path.join(plugin_name, '__logging__.ini')
         logger_dir = plugin_config_dict.get('logger_dir', default_logger_dir)
         if not os.path.isdir(logger_dir):
             os.makedirs(logger_dir)
         logging_file = plugin_config_dict.get('logging_file', default_logging_config)
 
+        plugin_package = plugin_path
+        plugin_package_path = plugin_name
+        dcc_package = None
+        dcc_package_path = None
+        if dcc_loader:
+            dcc_package = dcc_loader.fullname if python.is_python2() else dcc_loader.loader.path
+            dcc_package_path = dcc_loader.filename if python.is_python2() else dcc_loader.loader.name
+
         self._plugins[pkg_name][plugin_id] = {
-            'name': plugin_name,
+            'name': _plugin_name,
             'icon': plugin_icon,
             'package_name': pkg_name,
             'loader': package_loader,
             'config': plugin_config,
             'config_dict': plugin_config_dict,
             'plugin_loader': plugin_loader,
-            'plugin_package': package_loader.fullname,
-            'plugin_package_path': package_loader.filename,
+            'plugin_package': plugin_package,
+            'plugin_package_path': plugin_package_path,
             'version': plugin_found[1] if plugin_found[1] is not None else "0.0.0",
             'dcc_loader': dcc_loader,
-            'dcc_package': dcc_loader.fullname if dcc_loader else None,
-            'dcc_package_path': dcc_loader.filename if dcc_loader else None,
+            'dcc_package': dcc_package,
+            'dcc_package_path': dcc_package_path,
             'dcc_config': dcc_config,
             'logging_file': logging_file,
             'plugin_instance': None
@@ -302,7 +315,10 @@ class ToolsManager(plugin.PluginsManager, object):
         tools_path = '{}.tools.{}'
         for tool_name in tools_to_register:
             pkg_path = tools_path.format(pkg_name, tool_name)
-            pkg_loader = loader.find_loader(pkg_path)
+            if python.is_python2():
+                pkg_loader = loader.find_loader(pkg_path)
+            else:
+                pkg_loader = importlib.util.find_spec(pkg_path)
             if not pkg_loader:
                 # if tool_name in self._tools_to_load:
                 #     self._tools_to_load.pop(tool_name)
@@ -453,34 +469,37 @@ class ToolsManager(plugin.PluginsManager, object):
             tp.logger.warning('Tool "{}" is not registered!'.format(tool_id))
             return None
 
+        tool_loader = self._plugins[package_name][tool_to_run]['loader']
         pkg_loader = self._plugins[package_name][tool_to_run]['loader']
         tool_config = self._plugins[package_name][tool_to_run]['config']
-        tool_fullname = self._plugins[package_name][tool_to_run]['loader'].fullname
+        tool_fullname = tool_loader.fullname if python.is_python2() else tool_loader.loader.name
         tool_version = self._plugins[package_name][tool_to_run]['version']
         dcc_loader = self._plugins[package_name][tool_to_run]['dcc_loader']
         dcc_config = self._plugins[package_name][tool_to_run]['dcc_config']
 
+        pkg_name = pkg_loader.filename if python.is_python2() else os.path.dirname(pkg_loader.loader.path)
+        pkg_path = pkg_loader.fullname if python.is_python2() else pkg_loader.loader.name
+
         if tool_config:
-            skip_modules = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
+            skip_modules = ['{}.{}'.format(pkg_path, mod) for mod in
                             tool_config.data.get('skip_modules', list())]
         else:
             skip_modules = list()
-        importer.init_importer(pkg_loader.fullname, skip_modules=skip_modules)
+        importer.init_importer(pkg_path, skip_modules=skip_modules)
 
         if dcc_loader:
-            dcc_skip_modules = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
+            dcc_skip_modules = ['{}.{}'.format(pkg_path, mod) for mod in
                                 dcc_config.data.get('skip_modules', list())]
-            importer.init_importer(dcc_loader.fullname, skip_modules=dcc_skip_modules)
+            importer.init_importer(pkg_path, skip_modules=dcc_skip_modules)
 
         tool_found = None
-        for sub_module in loader.walk_packages([self._plugins[package_name][tool_to_run]['plugin_package_path']]):
+        for sub_module in pkgutil.walk_packages([self._plugins[package_name][tool_to_run]['plugin_package_path']]):
             tool_importer, sub_module_name, _ = sub_module
             mod = tool_importer.find_module(sub_module_name).load_module(sub_module_name)
             for cname, obj in inspect.getmembers(mod, inspect.isclass):
                 if issubclass(obj, tool.DccTool):
-                    obj.FILE_NAME = pkg_loader.filename
-                    obj.FILE_NAME = pkg_loader.filename
-                    obj.FULL_NAME = pkg_loader.fullname
+                    obj.FILE_NAME = pkg_name
+                    obj.FULL_NAME = pkg_path
                     tool_found = obj
                     break
             if tool_found:
