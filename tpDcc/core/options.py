@@ -185,6 +185,16 @@ class OptionObject(object):
 
         return options
 
+    def reload_options(self):
+        """
+        Reload settings
+        """
+
+        if not self._option_settings:
+            return
+
+        self._option_settings.reload()
+
     def clear_options(self):
         """
         Clears all the options
@@ -258,23 +268,7 @@ class OptionObject(object):
         :return:
         """
 
-        if option_type == 'script':
-            value = [value, 'script']
-        elif option_type == 'dictionary':
-            value = [value, 'dictionary']
-        elif option_type == 'nonedittext':
-            value = [value, 'nonedittext']
-        elif option_type == 'directory':
-            value = [value, 'directory']
-        elif option_type == 'list':
-            value = [value, 'list']
-        elif option_type == 'file':
-            value = [value, 'file']
-        elif option_type == 'color':
-            value = [value, 'color']
-        elif option_type == 'vector3f':
-            value = [value, 'vector3f']
-        elif option_type == 'combo':
+        if option_type == 'combo':
             format_value = list()
             if value:
                 if isinstance(value[0], (list, tuple)):
@@ -285,6 +279,9 @@ class OptionObject(object):
                 else:
                     format_value = [value, []]
             return [format_value, 'combo']
+        else:
+            if option_type:
+                value = [value, option_type]
 
         return value
 
