@@ -673,6 +673,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def clean_construction_history(node):
+        """
+        Removes the construction history of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function clean_construction_history() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def selected_nodes(full_path=True, **kwargs):
         """
         Returns a list of selected nodes
@@ -2101,7 +2111,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def connect_multiply(source_node, source_attribute, target_node, target_attribute, value=0.1):
+    def connect_multiply(source_node, source_attribute, target_node, target_attribute, value=0.1, multiply_name=None):
         """
         Connects source attribute into target attribute with a multiply node inbetween
         :param source_node: str
@@ -2109,6 +2119,7 @@ class AbstractDCC(object):
         :param target_node: str
         :param target_attribute: str
         :param value: float, value of the multiply node
+        :param multiply_name: str
         :return: str, name of the created multiply node
         """
 
@@ -3955,10 +3966,10 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def create_joint(joint_name, size=1.0):
+    def create_joint(name, size=1.0, *args, **kwargs):
         """
         Creates a new joint
-        :param joint_name: str, name of the new joint
+        :param name: str, name of the new joint
         :param size: float, size of the joint
         :return: str
         """
@@ -4060,6 +4071,21 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC attach_transform_to_surface() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_curve(name, degree, points, knots, periodic):
+        """
+        Creates a new Nurbs curve
+        :param name: str, name of the new curve
+        :param degree: int
+        :param points: list
+        :param knots: list
+        :param periodic: bool
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_curve() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -4255,7 +4281,27 @@ class AbstractDCC(object):
         :return: list(float, float, float), pole vector with offset
         """
 
-        raise NotImplementedError('abstract DCC create_pole_vector() not implemented!')
+        raise NotImplementedError('abstract DCC get_pole_vector_position() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_control_colors():
+        """
+        Returns control colors available in DCC
+        :return: list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC get_dcc_control_colors() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_all_fonts():
+        """
+        Returns all fonts available in DCC
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_all_fonts() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -4375,21 +4421,25 @@ class AbstractDCC(object):
             return name
 
         if cls.name_is_left(name, patterns=left_patterns):
-            from_side = 'L'
-            to_side = 'R'
+            from_side = cls.SIDE_PATTERNS['left']
+            to_side = cls.SIDE_PATTERNS['right']
         elif cls.name_is_left(name, patterns=right_patterns):
-            from_side = 'R'
-            to_side = 'L'
+            from_side = cls.SIDE_PATTERNS['right']
+            to_side = cls.SIDE_PATTERNS['left']
         else:
             return name
 
         mirror_name = name
-        if name.startswith('{}_'.format(from_side)):
-            mirror_name = '{}_'.format(to_side) + mirror_name[2:]
-        elif name.endswith('_{}'.format(from_side)):
-            mirror_name = mirror_name[:-2] + '_{}'.format(to_side)
-        elif '_{}_'.format(from_side) in name:
-            mirror_name = name.replace('_{}_'.format(from_side), '_{}_'.format(to_side))
+        for i, side in enumerate(from_side):
+            if name.startswith('{}_'.format(side)):
+                mirror_name = '{}_'.format(to_side[i]) + mirror_name[2:]
+                break
+            elif name.endswith('_{}'.format(side)):
+                mirror_name = mirror_name[:-2] + '_{}'.format(to_side[i])
+                break
+            elif '_{}_'.format(side) in name:
+                mirror_name = name.replace('_{}_'.format(side), '_{}_'.format(to_side[i]))
+                break
 
         return mirror_name
 
