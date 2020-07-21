@@ -5,11 +5,9 @@
 Module that contains implementation to handle DCC logs themes
 """
 
-import os
 import logging
 
 import tpDcc
-from tpDcc import register
 from tpDcc.libs.python import decorators
 
 
@@ -48,6 +46,3 @@ class LogsManagerSingleton(LogsManager, object):
 
     def __init__(self):
         LogsManager.__init__(self)
-
-
-register.register_class('LogsMgr', LogsManagerSingleton)

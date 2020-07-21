@@ -11,6 +11,15 @@ import os
 import importlib
 import logging.config
 
+from tpDcc import register
+from tpDcc.abstract import dcc as abstract_dcc, menu as abstract_menu, shelf as abstract_shelf
+from tpDcc.abstract import progressbar as abstract_progressbar
+from tpDcc.managers import callbacks as callbacks_manager, configs as configs_manager, logs as logs_manager
+from tpDcc.managers import menus as menus_manager, resources as resources_manager, tools as tools_manager
+
+from tpDcc.libs.python import importer, loader as python_loader
+from tpDcc.libs.qt import loader as qt_loader
+
 # =================================================================================
 
 PACKAGE = 'tpDcc'
@@ -60,20 +69,14 @@ class Dccs(object):
         'nuke': Nuke
     }
 
-# =================================================================================
 
+# =================================================================================
 
 def init(dev=False):
     """
     Initializes module
     :param dev: bool, Whether tpDcc-core is initialized in dev mode or not
     """
-
-    from tpDcc import register
-    from tpDcc.managers import callbacks as callbacks_manager
-    from tpDcc.libs.python import importer, loader as python_loader
-    from tpDcc.libs.qt import loader as qt_loader
-    from tpDcc.abstract import dcc as abstract_dcc, menu as abstract_menu, shelf as abstract_shelf
 
     if dev:
         register.cleanup()
@@ -84,24 +87,11 @@ def init(dev=False):
         importer.reload_module(abstract_dcc)
         importer.reload_module(abstract_menu)
         importer.reload_module(abstract_shelf)
+        importer.reload_module(abstract_progressbar)
 
     logger = create_logger(dev=dev)
 
     register.register_class('logger', logger)
-    register.register_class('Dcc', abstract_dcc.AbstractDCC(), is_unique=False)
-    register.register_class('Menu', abstract_menu.AbstractMenu, is_unique=False)
-    register.register_class('Shelf', abstract_shelf.AbstractShelf, is_unique=False)
-    register.register_class('Dccs', Dccs)
-    register.register_class('DccCallbacks', DccCallbacks)
-    register.register_class('callbacks', callbacks)
-    register.register_class('is_unknown', is_unknown)
-    register.register_class('is_standalone', is_standalone)
-    register.register_class('is_maya', is_maya)
-    register.register_class('is_max', is_max)
-    register.register_class('is_houdini', is_houdini)
-    register.register_class('is_nuke', is_nuke)
-    register.register_class('is_unreal', is_unreal)
-    register.register_class('get_dcc_loader_module', get_dcc_loader_module)
 
     callbacks_manager.CallbacksManager.cleanup()
 
@@ -121,13 +111,11 @@ def init(dev=False):
     #     pass
 
     # We initialize first Python library
-    # NOTE: We don't pass dev because this module generates LOT of log debugs related with imports
-    # python.init(do_reload=do_reload, dev=dev)
     python_loader.init(dev=dev)
 
     # We initialize then tpDcc-core library and DCC specific library
-    skip_modules = ['{}.{}'.format(PACKAGE, name) for name in ['loader', 'dccs', 'libs', 'tools']]
-    importer.init_importer(package=PACKAGE, skip_modules=skip_modules)
+    # skip_modules = ['{}.{}'.format(PACKAGE, name) for name in ['loader', 'dccs', 'libs', 'tools']]
+    # importer.init_importer(package=PACKAGE, skip_modules=skip_modules)
 
     # Get DCC
     dcc_mod = get_dcc_loader_module()
@@ -317,3 +305,29 @@ def callbacks():
         new_list.append(v[0])
 
     return new_list
+
+
+# =================================================================================
+
+register.register_class('Dcc', abstract_dcc.AbstractDCC(), is_unique=False)
+register.register_class('Menu', abstract_menu.AbstractMenu, is_unique=False)
+register.register_class('Shelf', abstract_shelf.AbstractShelf, is_unique=False)
+register.register_class('ProgressBar', abstract_progressbar.AbstractProgressBar, is_unique=False)
+register.register_class('Dccs', Dccs)
+register.register_class('DccCallbacks', DccCallbacks)
+register.register_class('callbacks', callbacks)
+register.register_class('is_unknown', is_unknown)
+register.register_class('is_standalone', is_standalone)
+register.register_class('is_maya', is_maya)
+register.register_class('is_max', is_max)
+register.register_class('is_houdini', is_houdini)
+register.register_class('is_nuke', is_nuke)
+register.register_class('is_unreal', is_unreal)
+register.register_class('get_dcc_loader_module', get_dcc_loader_module)
+register.register_class('CallbacksMgr', callbacks_manager.CallbacksManager)
+register.register_class('ConfigsMgr', configs_manager.ConfigsManagerSingleton)
+register.register_class('LogsMgr', logs_manager.LogsManagerSingleton)
+register.register_class('MenusMgr', menus_manager.MenusManagerSingleton)
+register.register_class('ResourcesMgr', resources_manager.ResourcesManagerSingleton)
+register.register_class('ResourcesMgr', resources_manager.ResourcesManagerSingleton)
+register.register_class('ToolsMgr', tools_manager.ToolsManagerSingleton)

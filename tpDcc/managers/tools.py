@@ -174,7 +174,7 @@ class ToolsManager(plugin.PluginsManager, object):
         if os.path.isdir(resources_path):
             tp.ResourcesMgr().register_resource(resources_path, key='tools')
         else:
-            tp.logger.info('No resources directory found for plugin "{}" ...'.format(_plugin_name))
+            tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
 
         # Register DCC specific resources
         if dcc_loader and dcc_config:
@@ -662,6 +662,3 @@ class ToolsManagerSingleton(ToolsManager, object):
 
     def __init__(self, ):
         ToolsManager.__init__(self)
-
-
-register.register_class('ToolsMgr', ToolsManagerSingleton)

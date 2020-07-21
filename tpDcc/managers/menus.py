@@ -10,7 +10,7 @@ from functools import partial
 import tpDcc as tp
 import tpDcc.register
 from tpDcc.libs.python import decorators
-from tpDcc.libs.qt.core import qtutils, menu
+from tpDcc.libs.qt.core import menu
 
 
 class MenusManager(object):
@@ -288,4 +288,3 @@ class MenusManagerSingleton(MenusManager, object):
         MenusManager.__init__(self)
 
 
-tpDcc.register.register_class('MenusMgr', MenusManagerSingleton)

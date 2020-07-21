@@ -12,7 +12,6 @@ import os
 import metayaml
 
 import tpDcc as tp
-from tpDcc import register
 from tpDcc.core import config
 from tpDcc.libs.python import decorators, folder
 
@@ -258,6 +257,3 @@ class ConfigsManagerSingleton(ConfigsManager, object):
 
     def __init__(self):
         ConfigsManager.__init__(self)
-
-
-register.register_class('ConfigsMgr', ConfigsManagerSingleton)

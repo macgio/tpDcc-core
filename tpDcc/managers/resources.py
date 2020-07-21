@@ -18,7 +18,6 @@ from Qt.QtCore import QFileInfo
 from Qt.QtWidgets import QApplication, QStyle, QFileIconProvider
 from Qt.QtGui import QIcon, QPixmap
 
-from tpDcc import register
 from tpDcc.libs.python import decorators, python, folder
 
 
@@ -258,6 +257,3 @@ class ResourcesManagerSingleton(ResourcesManager, object):
 
     def __init__(self):
         ResourcesManager.__init__(self)
-
-
-register.register_class('ResourcesMgr', ResourcesManagerSingleton)
