@@ -92,7 +92,7 @@ class DccTool(plugin.Plugin, object):
         return {
             'name': 'DccTool',
             'id': 'tpDcc-tools-tool',
-            'supported_dccs': [],
+            'supported_dccs': dict(),
             'creator': 'Tomas Poveda',
             'icon': 'tpdcc',
             'tooltip': '',
