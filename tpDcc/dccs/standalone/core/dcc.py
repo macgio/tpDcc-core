@@ -107,6 +107,216 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
         return None
 
     @staticmethod
+    def execute_deferred(fn):
+        """
+        Executes given function in deferred mode
+        """
+
+        return fn()
+
+    @staticmethod
+    def new_scene(force=True, do_save=True):
+        """
+        Creates a new DCC scene
+        :param force: bool, True if we want to save the scene without any prompt dialog
+        :param do_save: bool, True if you want to save the current scene before creating new scene
+        :return:
+        """
+
+        return None
+
+    @staticmethod
+    def object_exists(node):
+        """
+        Returns whether given object exists or not
+        :return: bool
+        """
+
+        return False
+
+    @staticmethod
+    def object_type(node):
+        """
+        Returns type of given object
+        :param node: str
+        :return: str
+        """
+
+        return None
+
+    @staticmethod
+    def check_object_type(node, node_type, check_sub_types=False):
+        """
+        Returns whether give node is of the given type or not
+        :param node: str
+        :param node_type: str
+        :param check_sub_types: bool
+        :return: bool
+        """
+
+        return False
+
+    @staticmethod
+    def node_is_empty(node, *args, **kwargs):
+        """
+        Returns whether given node is an empty one.
+        In Maya, an emtpy node is the one that is not referenced, has no child transforms, has no custom attributes
+        and has no connections
+        :param node: str
+        :return: bool
+        """
+
+        return True
+
+    @staticmethod
+    def node_is_transform(node):
+        """
+        Returns whether or not given node is a transform node
+        :param node: str
+        :return: bool
+        """
+
+        return False
+
+    @staticmethod
+    def all_scene_objects(full_path=True):
+        """
+        Returns a list with all scene nodes
+        :param full_path: bool
+        :return: list<str>
+        """
+
+        return list()
+
+    @staticmethod
+    def rename_node(node, new_name, **kwargs):
+        """
+        Renames given node with new given name
+        :param node: str
+        :param new_name: str
+        :return: str
+        """
+
+        return False
+
+    @staticmethod
+    def rename_transform_shape_nodes(node):
+        """
+        Renames all shape nodes of the given transform node
+        :param node: str
+        """
+
+        return False
+
+    @staticmethod
+    def show_object(node):
+        """
+        Shows given object
+        :param node: str
+        """
+
+        return False
+
+    @staticmethod
+    def select_object(node, replace_selection=True, **kwargs):
+        """
+        Selects given object in the current scene
+        :param replace_selection: bool
+        :param node: str
+        """
+
+        return False
+
+    @staticmethod
+    def select_hierarchy(root=None, add=False):
+        """
+        Selects the hierarchy of the given node
+        If no object is given current selection will be used
+        :param root: str
+        :param add: bool, Whether new selected objects need to be added to current selection or not
+        """
+
+        return False
+
+    @staticmethod
+    def deselect_object(node):
+        """
+        Deselects given node from current selection
+        :param node: str
+        """
+
+        return False
+
+    @staticmethod
+    def clear_selection():
+        """
+        Clears current scene selection
+        """
+
+        return False
+
+    @staticmethod
+    def duplicate_object(node, name='', only_parent=False):
+        """
+        Duplicates given object in current scene
+        :param node: str
+        :param name: str
+        :param only_parent: bool, If True, only given node will be duplicated (ignoring its children)
+        :return: str
+        """
+
+        return False
+
+    @staticmethod
+    def delete_object(node):
+        """
+        Removes given node from current scene
+        :param node: str
+        """
+
+        return False
+
+    @staticmethod
+    def clean_construction_history(node):
+        """
+        Removes the construction history of the given node
+        :param node: str
+        """
+
+        return False
+
+    @staticmethod
+    def selected_nodes(full_path=True, **kwargs):
+        """
+        Returns a list of selected nodes
+        :param full_path: bool
+        :return: list<str>
+        """
+
+        return list()
+
+    @staticmethod
+    def selected_nodes_of_type(node_type, full_path=True):
+        """
+        Returns a list of selected nodes of given type
+        :param node_type: str
+        :param full_path: bool
+        :return: list(str)
+        """
+
+        return list()
+
+    @staticmethod
+    def selected_hilited_nodes(full_path=True):
+        """
+        Returns a list of selected nodes that are hilited for component selection
+        :param full_path: bool
+        :return: list(str)
+        """
+
+        return list()
+
+    @staticmethod
     def confirm_dialog(title, message, button=None, cancel_button=None, default_button=None, dismiss_string=None):
         """
         Shows DCC confirm dialog
@@ -146,6 +356,25 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
         """
 
         print('ERROR: {}'.format(message))
+
+    @staticmethod
+    def get_control_colors():
+        """
+        Returns control colors available in DCC
+        :return: list(float, float, float)
+        """
+
+        return []
+
+    @staticmethod
+    def get_all_fonts():
+        """
+        Returns all fonts available in DCC
+        :return: list(str)
+        """
+
+        # TODO: We can use Qt to retrieve system fonts
+        return []
 
 
 register.register_class('Dcc', StandaloneDcc)
