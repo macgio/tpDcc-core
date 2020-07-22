@@ -42,7 +42,7 @@ class DccClient(object):
             self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._client_socket.connect(('localhost', self._port))
             self._client_socket.setblocking(0)
-        except:
+        except Exception:
             traceback.print_exc()
             return False
 
@@ -52,7 +52,7 @@ class DccClient(object):
         try:
             self._client_socket.close()
             self.signals.dccDisconnected.emit()
-        except:
+        except Exception:
             traceback.print_exc()
             return False
 
@@ -68,7 +68,7 @@ class DccClient(object):
         try:
             msg_str = ''.join(message)
             self._client_socket.sendall(msg_str.encode())
-        except:
+        except Exception:
             traceback.print_exc()
             return None
 
@@ -84,7 +84,7 @@ class DccClient(object):
         while time.time() - start_time < self._timeout:
             try:
                 data = self._client_socket.recv(bytes_remaining)
-            except:
+            except Exception:
                 time.sleep(0.01)
                 continue
 

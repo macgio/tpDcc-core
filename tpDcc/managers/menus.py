@@ -286,5 +286,3 @@ class MenusManager(object):
 class MenusManagerSingleton(MenusManager, object):
     def __init__(self):
         MenusManager.__init__(self)
-
-

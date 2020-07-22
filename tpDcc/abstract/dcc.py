@@ -24,7 +24,7 @@ class AbstractDCC(object):
     SIDE_PATTERNS = {
         'center': ['C', 'c', 'Center', 'ct', 'center', 'middle', 'm'],
         'left': ['L', 'l', 'Left', 'left', 'lf'],
-        'right':  ['R', 'r', 'Right', 'right', 'rt']
+        'right': ['R', 'r', 'Right', 'right', 'rt']
     }
 
     @staticmethod

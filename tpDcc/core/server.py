@@ -151,7 +151,7 @@ class DccServer(QObject, object):
             self._process_command(cmd, data_dict, reply)
             if not reply['success']:
                 reply['cmd'] = cmd
-                if not 'msg' in reply.keys():
+                if 'msg' not in reply.keys():
                     reply['msg'] = 'Unknown Error'
 
         self._write(reply)
@@ -231,7 +231,7 @@ class DccServer(QObject, object):
         bultins_ = {'tp': tpDcc}
         for builtin in bultins_:
             try:
-                exec ('del(__builtin__.%s)' % builtin)
+                exec('del(__builtin__.%s)' % builtin)
             except Exception:
                 pass
             builtin_value = bultins_[builtin]
