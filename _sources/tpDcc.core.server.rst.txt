@@ -1,0 +1,7 @@
+tpDcc.core.server module
+========================
+
+.. automodule:: tpDcc.core.server
+   :members:
+   :undoc-members:
+   :show-inheritance:
