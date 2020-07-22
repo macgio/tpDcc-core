@@ -235,7 +235,7 @@ class DccServer(QObject, object):
             except Exception:
                 pass
             builtin_value = bultins_[builtin]
-            exec '__builtin__.%s = builtin_value' % builtin
+            exec('__builtin__.%s = builtin_value' % builtin)
 
         reply['success'] = True
 
