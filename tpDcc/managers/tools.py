@@ -59,6 +59,12 @@ class ToolsManager(plugin.PluginsManager, object):
             return False
 
         package_loader = pkg_loaders[0] if isinstance(pkg_loaders, (list, tuple)) else pkg_loaders
+        if not package_loader:
+            return False
+
+        if hasattr(package_loader, 'loader'):
+            if not package_loader.loader:
+                return False
 
         plugin_name = package_loader.filename if python.is_python2() else os.path.dirname(package_loader.loader.path)
         plugin_path = package_loader.fullname if python.is_python2() else package_loader.loader.name
