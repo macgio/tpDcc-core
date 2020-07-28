@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import json
 import socket
@@ -13,6 +14,9 @@ import tpDcc.config
 import tpDcc.libs.python.loader
 import tpDcc.libs.qt.loader
 from tpDcc.libs.python import python, path as path_utils
+
+if sys.version_info[0] == 2:
+    from socket import error as ConnectionRefusedError
 
 
 class DccClientSignals(QObject, object):
@@ -42,8 +46,11 @@ class DccClient(object):
             self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._client_socket.connect(('localhost', self._port))
             self._client_socket.setblocking(0)
+        except ConnectionRefusedError as exc:
+            tpDcc.logger.warning(exc)
+            return False
         except Exception:
-            traceback.print_exc()
+            tpDcc.logger.exception(traceback.format_exc())
             return False
 
         return True
@@ -68,8 +75,11 @@ class DccClient(object):
         try:
             msg_str = ''.join(message)
             self._client_socket.sendall(msg_str.encode())
+        except OSError as exc:
+            tpDcc.logger.debug(exc)
+            return None
         except Exception:
-            traceback.print_exc()
+            tpDcc.logger.exception(traceback.format_exc())
             return None
 
         return self.recv()
@@ -114,11 +124,11 @@ class DccClient(object):
 
     def is_valid_reply(self, reply_dict):
         if not reply_dict:
-            print('[ERROR] Invalid reply')
+            tpDcc.logger.debug('Invalid reply')
             return False
 
         if not reply_dict['success']:
-            print('[ERROR] {} failed: {}'.format(reply_dict['cmd'], reply_dict['msg']))
+            tpDcc.logger.error('{} failed: {}'.format(reply_dict['cmd'], reply_dict['msg']))
             return False
 
         return True
@@ -163,18 +173,18 @@ class DccClient(object):
             dcc_name = 'maya'
 
         if not dcc_name:
-            tpDcc.logger.warning('Exeutable DCC {} is not supported!'.format(dcc_executable))
+            tpDcc.logger.warning('Executable DCC {} is not supported!'.format(dcc_executable))
             return False
 
-        module_name = 'tpDcc.dccs.{}'.format(dcc_name)
+        module_name = 'tpDcc.dccs.{}.loader'.format(dcc_name)
         try:
             mod = importlib.import_module(module_name)
         except Exception:
             try:
-                print('FAILED IMPORT: {} -> {}'.format(str(module_name), str(traceback.format_exc())))
+                tpDcc.logger.error('FAILED IMPORT: {} -> {}'.format(str(module_name), str(traceback.format_exc())))
                 return
             except Exception:
-                print('FAILED IMPORT: {}'.format(module_name))
+                tpDcc.logger.error('FAILED IMPORT: {}'.format(module_name))
                 return
         if not mod:
             tpDcc.logger.warning('Impossible to import DCC specific module: {} ({})'.format(module_name, dcc_name))
