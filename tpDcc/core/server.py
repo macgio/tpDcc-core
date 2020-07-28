@@ -222,7 +222,22 @@ class DccServer(QObject, object):
             reply['success'] = False
             return
 
-        for module in self._modules_to_import:
+        modules_to_import = list()
+        clean_modules_to_import = list(set(self._modules_to_import))
+
+        # Order modules to import (tpDcc.core, tpDcc.dccs.X, etc)
+        for module in clean_modules_to_import:
+            if module.__name__ == 'tpDcc.loader' and module not in modules_to_import:
+                modules_to_import.append(module)
+                break
+        for module in clean_modules_to_import:
+            if module.__name__.startswith('tpDcc.dccs.') and module not in modules_to_import:
+                modules_to_import.append(module)
+        for module in clean_modules_to_import:
+            if module not in self._modules_to_import:
+                modules_to_import.append(module)
+
+        for module in modules_to_import:
             if hasattr(module, 'init'):
                 module.init()
 
