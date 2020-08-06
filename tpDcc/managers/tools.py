@@ -11,10 +11,7 @@ import os
 import inspect
 from collections import OrderedDict
 
-import appdirs
-
 import tpDcc as tp
-from tpDcc import register
 from tpDcc.core import plugin, tool
 from tpDcc.libs.python import decorators, python, path as path_utils
 from tpDcc.libs.qt.core import contexts
@@ -518,7 +515,7 @@ class ToolsManager(plugin.PluginsManager, object):
         # if dcc_loader:
         #     tool_config = dcc_config
 
-        settings_path = appdirs.user_data_dir(appname=tool_id)
+        settings_path = path_utils.get_user_data_dir(appname=tool_id)
         settings_file = path_utils.clean_path(os.path.expandvars(os.path.join(settings_path, 'settings.cfg')))
         tool_settings = settings.QtSettings(filename=settings_file)
         if not tool_settings.has_setting('theme'):

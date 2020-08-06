@@ -8,6 +8,7 @@ Initialization module for tpDcc
 from __future__ import print_function, division, absolute_import
 
 import os
+import sys
 import importlib
 import logging.config
 
@@ -19,6 +20,11 @@ from tpDcc.managers import menus as menus_manager, resources as resources_manage
 
 from tpDcc.libs.python import importer, loader as python_loader
 from tpDcc.libs.qt import loader as qt_loader
+
+# Update sys.path with externals path
+externals_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'externals')
+if os.path.isdir(externals_path) and externals_path not in sys.path:
+    sys.path.append(externals_path)
 
 # =================================================================================
 
