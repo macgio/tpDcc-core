@@ -119,7 +119,7 @@ def init(dev=False):
 
     # Get DCC
     dcc_mod = get_dcc_loader_module(logger=logger)
-    logger.info('Retrieved DCC MOD: {}'.format(dcc_mod))
+    logger.info('DCC module found: {}'.format(dcc_mod))
     if not dcc_mod:
         from tpDcc.dccs.standalone.core import dcc
         register.register_class('Dcc', dcc.StandaloneDcc)
