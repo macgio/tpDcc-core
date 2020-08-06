@@ -10,7 +10,6 @@ Subpackages
    tpDcc.abstract
    tpDcc.core
    tpDcc.dccs
-   tpDcc.externals
    tpDcc.libs
    tpDcc.managers
    tpDcc.tools
