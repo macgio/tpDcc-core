@@ -118,8 +118,8 @@ def init(dev=False):
     # importer.init_importer(package=PACKAGE, skip_modules=skip_modules)
 
     # Get DCC
-    dcc_mod = get_dcc_loader_module()
-    print('Retrieved DCC MOD: {}'.format(dcc_mod))
+    dcc_mod = get_dcc_loader_module(logger=logger)
+    logger.info('Retrieved DCC MOD: {}'.format(dcc_mod))
     if not dcc_mod:
         from tpDcc.dccs.standalone.core import dcc
         register.register_class('Dcc', dcc.StandaloneDcc)
@@ -140,7 +140,7 @@ def init(dev=False):
     # loader.init(do_reload=do_reload)
 
 
-def get_dcc_loader_module(package='tpDcc.dccs'):
+def get_dcc_loader_module(package='tpDcc.dccs', logger=None):
     """
     Checks DCC we are working on an initializes proper variables
     """
@@ -149,13 +149,21 @@ def get_dcc_loader_module(package='tpDcc.dccs'):
     for dcc_package, dcc_name in Dccs.packages.items():
         if dcc_package in main.__dict__:
             module_to_import = '{}.{}.loader'.format(package, dcc_name)
-            dcc_mod = importlib.import_module(module_to_import)
+            try:
+                dcc_mod = importlib.import_module(module_to_import)
+            except ImportError:
+                if logger:
+                    logger.warning('DCC module {} not found!'.format(module_to_import))
+                continue
             if dcc_mod:
                 break
     if not dcc_mod:
         try:
             import unreal
-            dcc_mod = importlib.import_module('{}.unreal.loader')
+            try:
+                dcc_mod = importlib.import_module('{}.unreal.loader')
+            except ImportError:
+                return None
         except Exception as exc:
             pass
 
