@@ -169,9 +169,16 @@ class DccClient(object):
             return False
 
         dcc_name = None
-        if dcc_executable.endswith('maya.exe'):
+        if 'maya' in dcc_executable:
             dcc_name = 'maya'
-
+        elif '3dsmax' in dcc_executable:
+            dcc_name = 'max'
+        elif 'houdini' in dcc_executable:
+            dcc_name = 'houdini'
+        elif 'nuke' in dcc_executable:
+            dcc_name = 'nuke'
+        elif 'unreal' in dcc_executable:
+            dcc_name = 'unreal'
         if not dcc_name:
             tpDcc.logger.warning('Executable DCC {} is not supported!'.format(dcc_executable))
             return False
