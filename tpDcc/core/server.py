@@ -1,6 +1,7 @@
 import sys
 import time
 import json
+import logging
 import traceback
 import importlib
 from collections import OrderedDict
@@ -20,12 +21,15 @@ class DccServer(QObject, object):
     PORT = 17344
     HEADER_SIZE = 10
 
-    def __init__(self, parent):
+    def __init__(self, parent, client=None, update_paths=True):
         parent = parent or tp.Dcc.get_main_window()
         super(DccServer, self).__init__(parent)
 
+        self._socket = None
         self._port = self.__class__.PORT
+        self._do_update_paths = update_paths
         self._modules_to_import = list()
+        self._client = client
 
         self._init()
 
@@ -72,6 +76,9 @@ class DccServer(QObject, object):
     # =================================================================================================================
 
     def _init(self):
+        if self._client:
+            return
+
         self._server = QTcpServer(self)
         self._server.newConnection.connect(self._on_established_connection)
 
@@ -118,10 +125,13 @@ class DccServer(QObject, object):
 
     def _write(self, reply_dict):
         json_reply = json.dumps(reply_dict)
-        if self._socket.state() == QTcpSocket.ConnectedState:
+
+        if self._socket and self._socket.state() == QTcpSocket.ConnectedState:
             header = '{0}'.format(len(json_reply.encode())).zfill(DccServer.HEADER_SIZE)
             data = QByteArray('{}{}'.format(header, json_reply).encode())
             self._socket.write(data)
+
+        return json_reply
 
     def _write_error(self, error_msg):
         reply = {
@@ -155,9 +165,14 @@ class DccServer(QObject, object):
                 if 'msg' not in reply.keys():
                     reply['msg'] = 'Unknown Error'
 
-        self._write(reply)
+        return self._write(reply)
 
     def _update_paths(self, data, reply):
+
+        if not self._do_update_paths:
+            reply['success'] = True
+            reply['exe'] = sys.executable
+            return
 
         paths_data = data.get('paths', dict())
         if not paths_data:
@@ -192,6 +207,11 @@ class DccServer(QObject, object):
         reply['exe'] = sys.executable
 
     def _update_dcc_paths(self, data, reply):
+
+        if not self._do_update_paths:
+            reply['success'] = True
+            return
+
         paths_data = data.get('paths', dict())
         if not paths_data:
             reply['success'] = False
@@ -242,6 +262,10 @@ class DccServer(QObject, object):
             if hasattr(module, 'init'):
                 module.init()
 
+        reply['success'] = True
+
+    def _get_dcc_info(self, data, reply):
+
         import tpDcc
 
         bultins_ = {'tp': tpDcc}
@@ -252,10 +276,6 @@ class DccServer(QObject, object):
                 pass
             builtin_value = bultins_[builtin]
             exec('__builtin__.%s = builtin_value' % builtin)
-
-        reply['success'] = True
-
-    def _get_dcc_info(self, data, reply):
 
         # NOTE: tp is import dynamically
         dcc_name = tp.Dcc.get_name()

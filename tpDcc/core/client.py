@@ -30,14 +30,18 @@ class DccClient(object):
 
     signals = DccClientSignals()
 
-    def __init__(self, timeout=5):
+    def __init__(self, timeout=10):
         self._timeout = timeout
         self._port = self.__class__.PORT
         self._discard_count = 0
+        self._server = None
 
     # =================================================================================================================
     # BASE
     # =================================================================================================================
+
+    def set_server(self, server):
+        self._server = server
 
     def connect(self, port=-1):
         if port > 0:
@@ -68,21 +72,29 @@ class DccClient(object):
     def send(self, cmd_dict):
         json_cmd = json.dumps(cmd_dict)
 
-        message = list()
-        message.append('{0:10d}'.format(len(json_cmd.encode())))    # header (10 bytes)
-        message.append(json_cmd)
+        # If we use execute the tool inside DCC we execute client/server in same process. We can just launch the
+        # function in the server
+        if self._server:
+            reply_json = self._server._process_data(cmd_dict)
+            if not reply_json:
+                return {'success': False}
+            return json.loads(reply_json)
+        else:
+            message = list()
+            message.append('{0:10d}'.format(len(json_cmd.encode())))    # header (10 bytes)
+            message.append(json_cmd)
 
-        try:
-            msg_str = ''.join(message)
-            self._client_socket.sendall(msg_str.encode())
-        except OSError as exc:
-            tpDcc.logger.debug(exc)
-            return None
-        except Exception:
-            tpDcc.logger.exception(traceback.format_exc())
-            return None
+            try:
+                msg_str = ''.join(message)
+                self._client_socket.sendall(msg_str.encode())
+            except OSError as exc:
+                tpDcc.logger.debug(exc)
+                return None
+            except Exception:
+                tpDcc.logger.exception(traceback.format_exc())
+                return None
 
-        return self.recv()
+            return self.recv()
 
     def recv(self):
         total_data = list()
@@ -94,8 +106,9 @@ class DccClient(object):
         while time.time() - start_time < self._timeout:
             try:
                 data = self._client_socket.recv(bytes_remaining)
-            except Exception:
+            except Exception as exc:
                 time.sleep(0.01)
+                print(exc)
                 continue
 
             if data:
