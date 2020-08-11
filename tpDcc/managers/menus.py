@@ -9,7 +9,7 @@ from functools import partial
 
 import tpDcc as tp
 import tpDcc.register
-from tpDcc.libs.python import decorators
+from tpDcc.libs.python import decorators, python
 from tpDcc.libs.qt.core import menu
 
 
@@ -75,14 +75,28 @@ class MenusManager(object):
 
         return main_menu
 
-    def create_menus(self, package_name):
+    def create_menus(self, package_name, dev=False):
         """
         Loops through all loaded plugins and creates a menu/action for each one.
         Function that should be implemented in specific DCC Menu Managers to create proper menu
         """
 
         self.remove_previous_menus(package_name=package_name)
-        self.create_main_menu(package_name=package_name)
+
+        main_menu = self.create_main_menu(package_name=package_name)
+        if not main_menu:
+            tpDcc.logger.warning('Impossible to create main menu for "{}"'.format(package_name))
+            return False
+
+        toolset_menus = tpDcc.ToolsetsMgr().toolset_menu(package_name=package_name)
+        for toolset_menu in toolset_menus:
+            for i in iter(toolset_menu):
+                if python.is_string(i) and i == 'separator':
+                    main_menu.addSeparator()
+                    continue
+                self._menu_creator(main_menu, i, package_name=package_name, dev=dev)
+
+        return True
 
     def get_tools_menus(self):
         """
@@ -165,13 +179,13 @@ class MenusManager(object):
         for i in iter(data['children']):
             action_type = i.get('type', 'command')
             only_dev = i.get('only_dev', False)
-            if only_dev and not self._project.is_dev():
+            if only_dev and not dev:
                 continue
             if action_type == 'separator':
-                self._menu.addSeparator()
+                menu.addSeparator()
                 continue
             elif action_type == 'group':
-                sep = self._menu.addSeparator()
+                sep = menu.addSeparator()
                 sep.setText(i['label'])
                 continue
             elif action_type == 'menu':
@@ -182,7 +196,7 @@ class MenusManager(object):
     def _add_action(self, item_info, parent):
 
         item_type = item_info.get('type', 'tool')
-        if item_type == 'tool':
+        if item_type == 'tool' or item_type == 'toolset':
             self._add_tool_action(item_info, parent)
         else:
             self._add_menu_item_action(item_info, parent)
@@ -201,7 +215,7 @@ class MenusManager(object):
             return
         menu_item_language = item_info.get('language', 'python')
 
-        menu_item_icon_name = menu_item_ui.get('icon', 'artella')
+        menu_item_icon_name = menu_item_ui.get('icon', 'tpDcc')
         menu_item_icon = tp.ResourcesMgr().icon(menu_item_icon_name)
         menu_item_label = menu_item_ui.get('label', 'No_label')
         is_checkable = menu_item_ui.get('is_checkable', False)
@@ -232,11 +246,16 @@ class MenusManager(object):
             tp.logger.warning('Menu : Failed to find Tool: {}, type {}'.format(tool_id, tool_type))
             return
 
-        tool_icon = None
-        tool_icon_name = tool_data['config'].data.get('icon', None)
-        if tool_icon_name:
-            tool_icon = tp.ResourcesMgr().icon(tool_icon_name)
         tool_menu_ui_data = tool_data['config'].data.get('menu_ui', {})
+        tool_icon_name = tool_menu_ui_data.get('icon', '')
+        if not tool_icon_name:
+            tool_icon_name = tool_data['config'].data.get('icon', None)
+        if not tool_icon_name:
+            tool_icon_name = 'tpDcc'
+        tool_icon = tp.ResourcesMgr().icon(tool_icon_name)
+        if not tool_icon or tool_icon.isNull():
+            tool_icon = tp.ResourcesMgr().icon('tpDcc')
+
         label = tool_menu_ui_data.get('label', 'No_label')
         tagged_action = menu.SearchableTaggedAction(label=label, icon=tool_icon, parent=self._parent)
         is_checkable = tool_menu_ui_data.get('is_checkable', False)
@@ -249,7 +268,7 @@ class MenusManager(object):
         else:
             tagged_action.triggered.connect(partial(self._launch_tool_by_id, tool_id))
 
-        icon = tool_menu_ui_data.get('icon', None)
+        icon = tool_menu_ui_data.get('icon', 'tpDcc')
         if icon:
             pass
 
