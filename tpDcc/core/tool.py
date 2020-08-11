@@ -318,6 +318,8 @@ class DccTool(plugin.Plugin, object):
                 tb = traceback.format_exception(exc_type, exc_value, exc_tb)
             self._stats.finish(tb)
 
+        return tool_data
+
     def _on_tool_closed(self, tool):
         """
         Internal callback function that is called when a tool is closed

@@ -34,6 +34,7 @@ class ToolsManager(plugin.PluginsManager, object):
         self._layout = dict()
         self._loaded_tools = dict()
         self._tools_to_load = OrderedDict()
+        self._hub_tools = list()
 
     # ============================================================================================================
     # BASE
@@ -548,8 +549,16 @@ class ToolsManager(plugin.PluginsManager, object):
         if not tool_inst:
             return None
 
-        self.close_tool(tool_id)
+        hub = kwargs.pop('hub', False)
+        if hub and tool_id != 'tpDcc-tools-hub':
+            hub_ui = self.get_last_focused_hub_ui(include_minimized=False)
+            if hub_ui:
+                hub_ui.toggle_toolset(tool_id)
+                return tool_inst
+            else:
+                tp.logger.warning('No HubUI tool opened. Opening tool using standard method ...')
 
+        self.close_tool(tool_id)
         with contexts.application():
             self._launch_tool(tool_inst, tool_id, *args, **kwargs)
             return tool_inst
@@ -574,7 +583,7 @@ class ToolsManager(plugin.PluginsManager, object):
         tool_to_close = self._loaded_tools[tool_id].attacher
         if not closed_tool and tool_to_close:
             tool_to_close.fade_close() if hasattr(tool_to_close, 'fade_close') else tool_to_close.close()
-        if force:
+        if force and tool_to_close:
             tool_to_close.setParent(None)
             tool_to_close.deleteLater()
         self._loaded_tools.pop(tool_id)
@@ -599,12 +608,64 @@ class ToolsManager(plugin.PluginsManager, object):
         :return: DccTool or None, executed tool instance
         """
 
-        self.close_tool(tool_id)
-        tool_inst._launch(*args, **kwargs)
-        self._loaded_tools[tool_id] = tool_inst
+        if tool_id == 'tpDcc-tools-hub':
+            tool_data = tool_inst._launch(*args, **kwargs)
+            tool_ui = tool_data['tool']
+            self._hub_tools.append(tool_ui)
+        else:
+            self.close_tool(tool_id)
+            tool_inst._launch(*args, **kwargs)
+            self._loaded_tools[tool_id] = tool_inst
+
         tp.logger.debug('Execution time: {}'.format(tool_inst.stats.execution_time))
 
         return tool_inst
+
+    # ============================================================================================================
+    # HUB
+    # ============================================================================================================
+
+    def close_hub_ui(self, hub_ui_inst):
+        if hub_ui_inst in self._hub_tools:
+            self._hub_tools.remove(hub_ui_inst)
+            tp.logger.debug('Close tpDcc Hub UI: {}'.format(hub_ui_inst))
+
+    def get_hub_uis(self):
+        return self._hub_tools
+
+    def get_last_focused_hub_ui(self, include_minimized=True):
+        """
+        Returns last focused Hub UI
+        :param include_minimized: bool, Whether or not take into consideration Hub UIs that are minimized
+        :return: HubUI
+        """
+
+        hub_ui_found = None
+        max_time = 0
+
+        all_hub_uis = self.get_hub_uis()
+        for ui in all_hub_uis:
+            if ui.isVisible() and ui.last_focused_time > max_time:
+                if (not include_minimized and not ui.isMinimized()) or include_minimized:
+                    hub_ui_found = ui
+                    max_time = ui.last_focused_time
+
+        return hub_ui_found
+
+    def get_last_opened_hub_ui(self):
+        """
+        Returns last opened Hub UI
+        :return: HubUI
+        """
+
+        hub_ui_found = None
+
+        all_hub_uis = self.get_hub_uis()
+        for ui in all_hub_uis:
+            if ui.isVisible():
+                hub_ui_found = ui
+
+        return hub_ui_found
 
     # ============================================================================================================
     # CONFIGS
