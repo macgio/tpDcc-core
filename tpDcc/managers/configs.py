@@ -8,12 +8,16 @@ Module that contains implementation for preferences manager
 from __future__ import print_function, division, absolute_import
 
 import os
+import logging
+import traceback
 
 import metayaml
 
 import tpDcc as tp
 from tpDcc.core import config
 from tpDcc.libs.python import decorators, folder
+
+LOGGER = logging.getLogger('tpDcc-core')
 
 
 class ConfigsManager(object):
@@ -233,7 +237,13 @@ class ConfigsManager(object):
 
         # We read the last configuration found: dcc_version > dcc > base
         config_path = module_configs[-1]
-        config_data = metayaml.read(module_configs, config_dict)
+
+        config_data = dict()
+        try:
+            config_data = metayaml.read(module_configs, config_dict)
+        except Exception:
+            LOGGER.error('Error while reading configuration files: {} | {}'.format(
+                module_configs, traceback.format_exc()))
         if not config_data:
             raise RuntimeError('Configuration file "{}" is empty!'.format(config_path))
 
