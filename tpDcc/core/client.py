@@ -3,7 +3,7 @@ import sys
 import time
 import json
 import socket
-import importlib
+import pkgutil
 import traceback
 from collections import OrderedDict
 
@@ -44,6 +44,9 @@ class DccClient(object):
         self._server = server
 
     def connect(self, port=-1):
+        if self._server:
+            return True
+
         if port > 0:
             self._port = port
         try:
@@ -198,7 +201,7 @@ class DccClient(object):
 
         module_name = 'tpDcc.dccs.{}.loader'.format(dcc_name)
         try:
-            mod = importlib.import_module(module_name)
+            mod = pkgutil.get_loader(module_name)
         except Exception:
             try:
                 tpDcc.logger.error('FAILED IMPORT: {} -> {}'.format(str(module_name), str(traceback.format_exc())))
@@ -214,7 +217,7 @@ class DccClient(object):
             'cmd': 'update_dcc_paths',
             'paths': OrderedDict({
                 'tpDcc.dccs.{}'.format(dcc_name): path_utils.clean_path(
-                    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(mod.__file__)))))
+                    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(mod.filename)))))
             })
         }
 

@@ -21,7 +21,7 @@ class DccServer(QObject, object):
     PORT = 17344
     HEADER_SIZE = 10
 
-    def __init__(self, parent, client=None, update_paths=True):
+    def __init__(self, parent=None, client=None, update_paths=True):
         parent = parent or tp.Dcc.get_main_window()
         super(DccServer, self).__init__(parent)
 
