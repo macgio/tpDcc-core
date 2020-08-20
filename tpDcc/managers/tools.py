@@ -484,17 +484,17 @@ class ToolsManager(plugin.PluginsManager, object):
         pkg_name = pkg_loader.filename if python.is_python2() else os.path.dirname(pkg_loader.loader.path)
         pkg_path = pkg_loader.fullname if python.is_python2() else pkg_loader.loader.name
 
-        if tool_config:
-            skip_modules = ['{}.{}'.format(pkg_path, mod) for mod in
-                            tool_config.data.get('skip_modules', list())]
-        else:
-            skip_modules = list()
-        importer.init_importer(pkg_path, skip_modules=skip_modules)
-
-        if dcc_loader:
-            dcc_skip_modules = ['{}.{}'.format(pkg_path, mod) for mod in
-                                dcc_config.data.get('skip_modules', list())]
-            importer.init_importer(pkg_path, skip_modules=dcc_skip_modules)
+        # if tool_config:
+        #     skip_modules = ['{}.{}'.format(pkg_path, mod) for mod in
+        #                     tool_config.data.get('skip_modules', list())]
+        # else:
+        #     skip_modules = list()
+        # importer.init_importer(pkg_path, skip_modules=skip_modules)
+        #
+        # if dcc_loader:
+        #     dcc_skip_modules = ['{}.{}'.format(pkg_path, mod) for mod in
+        #                         dcc_config.data.get('skip_modules', list())]
+        #     importer.init_importer(pkg_path, skip_modules=dcc_skip_modules)
 
         tool_found = None
         for sub_module in pkgutil.walk_packages([self._plugins[package_name][tool_to_run]['plugin_package_path']]):
