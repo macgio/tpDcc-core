@@ -8,5 +8,5 @@ PySide;python_version < '2.7' and sys_platform == 'darwin'
 PySide2;python_version >= '2.7'  and sys_platform == 'darwin'
 Qt.py==1.2.6
 metayaml==0.26
-tpDcc-config==0.0.7
-tpDcc-libs-python==0.0.11
+tpDcc-config
+tpDcc-libs-python
