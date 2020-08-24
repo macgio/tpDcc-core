@@ -117,7 +117,7 @@ class ToolsManager(plugin.PluginsManager, object):
                             'Impossible to register plugin "{}" because its name is not defined!'.format(
                                 plugin_config_name))
                         continue
-                    if root_pkg_name and plugin_id in self._plugins[root_pkg_name]:
+                    if root_pkg_name and root_pkg_name in self._plugins and plugin_id in self._plugins[root_pkg_name]:
                         tp.logger.warning(
                             'Impossible to register plugin "{}" because its ID "{}" its already defined!'.format(
                                 plugin_config_name, plugin_id))
