@@ -9,16 +9,18 @@ from __future__ import print_function, division, absolute_import
 
 from collections import OrderedDict
 
+from Qt.QtWidgets import QDialogButtonBox
+
 from tpDcc.libs.python import decorators
 
 
 class AbstractDCC(object):
 
     class DialogResult(object):
-        Yes = 'Yes'
-        No = 'No'
-        Cancel = 'No'
-        Close = 'No'
+        Yes = QDialogButtonBox.Yes
+        No = QDialogButtonBox.No
+        Cancel = QDialogButtonBox.Cancel
+        Close = QDialogButtonBox.Close
 
     TYPE_FILTERS = OrderedDict()
     SIDE_PATTERNS = {
