@@ -10,6 +10,7 @@ from __future__ import print_function, division, absolute_import
 import tpDcc
 from tpDcc import register
 from tpDcc.abstract import dcc as abstract_dcc
+from tpDcc.libs.python import python
 
 from Qt.QtWidgets import *
 
@@ -331,9 +332,38 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
 
         from tpDcc.libs.qt.widgets import messagebox
 
-        buttons = button or QDialogButtonBox.Yes | QDialogButtonBox.No
+        new_buttons = None
+        if button:
+            if python.is_string(button):
+                if button == 'Yes':
+                    new_buttons = QDialogButtonBox.Yes
+                elif button == 'No':
+                    new_buttons = QDialogButtonBox.No
+            elif isinstance(button, (tuple, list)):
+                for i, btn in enumerate(button):
+                    if i == 0:
+                        if btn == 'Yes':
+                            new_buttons = QDialogButtonBox.Yes
+                        elif btn == 'No':
+                            new_buttons = QDialogButtonBox.No
+                    else:
+                        if btn == 'Yes':
+                            new_buttons = new_buttons | QDialogButtonBox.Yes
+                        elif btn == 'No':
+                            new_buttons = new_buttons | QDialogButtonBox.No
+        if new_buttons:
+            buttons = new_buttons
+        else:
+            buttons = button or QDialogButtonBox.Yes | QDialogButtonBox.No
+
         if cancel_button:
-            buttons = buttons | QDialogButtonBox.Cancel
+            if python.is_string(cancel_button):
+                if cancel_button == 'No':
+                    buttons = buttons | QDialogButtonBox.No
+                elif cancel_button == 'Cancel':
+                    buttons = buttons | QDialogButtonBox.Cancel
+            else:
+                buttons = buttons | QDialogButtonBox.Cancel
 
         return messagebox.MessageBox.question(None, title=title, text=message, buttons=buttons)
 
