@@ -52,9 +52,10 @@ class DccCallbacks(object):
 class Dccs(object):
     Unknown = 'unknown'
     Standalone = 'standalone'
-    Houdini = 'houdini'
     Maya = 'maya'
     Max = 'max'
+    MotionBuilder = 'mobu'
+    Houdini = 'houdini'
     Nuke = 'nuke'
     Unreal = 'unreal'
 
@@ -65,8 +66,10 @@ class Dccs(object):
     packages = {
         'cmds': Maya,
         'MaxPlus': Max,
+        'pyfbsdk': MotionBuilder,
         'hou': Houdini,
-        'nuke': Nuke
+        'nuke': Nuke,
+        'unreal': Unreal
     }
 
 
@@ -246,17 +249,6 @@ def is_standalone():
     return tpDcc.Dcc.get_name() == Dccs.Standalone
 
 
-def is_nuke():
-    """
-    Checks if Nuke is available or not
-    :return: bool
-    """
-
-    import tpDcc
-
-    return tpDcc.Dcc.get_name() == Dccs.Nuke
-
-
 def is_maya():
     """
     Checks if Maya is available or not
@@ -277,6 +269,17 @@ def is_max():
     import tpDcc
 
     return tpDcc.Dcc.get_name() == Dccs.Max
+
+
+def is_mobu():
+    """
+    Checks if MotionBuilder is available or not
+    :return: bool
+    """
+
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.MotionBuilder
 
 
 def is_houdini():
@@ -301,6 +304,17 @@ def is_unreal():
     return tpDcc.Dcc.get_name() == Dccs.Unreal
 
 
+def is_nuke():
+    """
+    Checks if Nuke is available or not
+    :return: bool
+    """
+
+    import tpDcc
+
+    return tpDcc.Dcc.get_name() == Dccs.Nuke
+
+
 def callbacks():
     """
     Return a full list of callbacks based on DccCallbacks dictionary
@@ -319,10 +333,10 @@ def callbacks():
 # =================================================================================
 
 def register_classes():
-    register.register_class('Dcc', abstract_dcc.AbstractDCC(), is_unique=False)
-    register.register_class('Menu', abstract_menu.AbstractMenu, is_unique=False)
-    register.register_class('Shelf', abstract_shelf.AbstractShelf, is_unique=False)
-    register.register_class('ProgressBar', abstract_progressbar.AbstractProgressBar, is_unique=False)
+    register.register_class('Dcc', abstract_dcc.AbstractDCC(), is_unique=True)
+    register.register_class('Menu', abstract_menu.AbstractMenu, is_unique=True)
+    register.register_class('Shelf', abstract_shelf.AbstractShelf, is_unique=True)
+    register.register_class('ProgressBar', abstract_progressbar.AbstractProgressBar, is_unique=True)
     register.register_class('Dccs', Dccs)
     register.register_class('DccCallbacks', DccCallbacks)
     register.register_class('callbacks', callbacks)
