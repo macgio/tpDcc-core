@@ -51,6 +51,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_allowed_characters():
+        """
+        Returns regular expression of allowed characters in current DCC
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function get_allowed_characters() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_dpi(value=1):
         """
         Returns current DPI used by DCC
@@ -129,6 +139,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function get_main_menubar() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def parent_widget_to_dcc_window(widget):
+        """
+        Parents given widget to main DCC window
+        :param widget: QWidget
+        """
+
+        raise NotImplementedError('abstract DCC function parent_widget_to_dcc_window() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
