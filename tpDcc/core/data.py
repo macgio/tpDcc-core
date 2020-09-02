@@ -138,6 +138,13 @@ class FileData(Data, object):
     def __init__(self, name=None, path=None):
         super(FileData, self).__init__(name=name)
 
+        if self._name:
+            data_extension = self.get_data_extension()
+            if not data_extension.startswith('.'):
+                data_extension = '.{}'.format(data_extension)
+            if self._name.endswith(data_extension):
+                self._name = self._name.replace(data_extension, '')
+
         self.extension = self.get_data_extension()
         self.directory = path
         self.settings = settings.JSONSettings()
