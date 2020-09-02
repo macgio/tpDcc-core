@@ -28,6 +28,9 @@ class AbstractDCC(object):
         'left': ['L', 'l', 'Left', 'left', 'lf'],
         'right': ['R', 'r', 'Right', 'right', 'rt']
     }
+    SIDE_LABELS = list()
+    TYPE_LABELS = list()
+    ROTATION_AXES = list()
 
     @staticmethod
     @decorators.abstractmethod
@@ -432,7 +435,18 @@ class AbstractDCC(object):
         :return:
         """
 
-        raise NotImplementedError('abstract DCC function node_bounding_box() not implemented!')
+        raise NotImplementedError('abstract DCC function node_world_bounding_box() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_rotation_axis(node, rotation_axis):
+        """
+        Sets the rotation axis used by the given node
+        :param node: str
+        :param rotation_axis: str or int
+        """
+
+        raise NotImplementedError('abstract DCC function set_rotation_axis() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -574,6 +588,118 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC node_world_space_pivot() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def mirror_transform(create_if_missing=False, transforms=None, left_to_right=True, **kwargs):
+        """
+        Mirrors the position of all transforms
+        :param create_if_missing:
+        :param transforms:
+        :param left_to_right:
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC mirror_transform() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def orient_joints(joints_to_orient=None, **kwargs):
+        """
+        Orients joints
+        :param joints_to_orient: list(str) or None
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC orient_joints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def zero_orient_joint(joints_to_zero_orient):
+        """
+        Zeroes the orientation of the given joints
+        :param joints_to_zero_orient: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC zero_orient_joint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def start_joint_tool():
+        """
+        Starts the DCC tool used to create new joints/bones
+        """
+
+        raise NotImplementedError('abstract DCC start_joint_tool() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def insert_joints(count, root_joint=None):
+        """
+        Inserts the given number of joints between the root joint and its direct child
+        """
+
+        raise NotImplementedError('abstract DCC insert_joints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_joint_local_rotation_axis_visibility(flag, joints_to_apply=None):
+        """
+        Sets the visibility of selected joints local rotation axis
+        :param flag: bool
+        :param joints_to_apply: list(str) or None
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC set_joint_local_rotation_axis_visibility() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_joint_display_size():
+        """
+        Returns current DCC joint display size
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC get_joint_display_size() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_joint_display_size(value):
+        """
+        Returns current DCC joint display size
+        :param value: float
+        """
+
+        raise NotImplementedError('abstract DCC set_joint_display_size() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def toggle_xray_joints():
+        """
+        Toggles XRay joints functionality (joints are rendered in front of the geometry)
+        """
+
+        raise NotImplementedError('abstract DCC toggle_xray_joints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def toggle_xray():
+        """
+        Toggles XRay functionality (model is displayed with transparency)
+        """
+
+        raise NotImplementedError('abstract DCC toggle_xray() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def toggle_xray_on_selection():
+        """
+        Toggles XRay functionality (model is displayed with transparency) on selected geometry
+        """
+
+        raise NotImplementedError('abstract DCC toggle_xray_on_selection() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -916,6 +1042,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function node_parent_namespace() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def assign_node_namespace(node, node_namespace, force_create=True, **kwargs):
+        """
+        Assigns a namespace to given node
+        :param node: str
+        :param node_namespace: str
+        :param force_create: bool
+        """
+
+        raise NotImplementedError('abstract DCC function assign_node_namespace() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -4327,6 +4465,104 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_side_labelling(node):
+        """
+        Returns side labelling of the given node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_side_labelling() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_side_labelling(node, side_label):
+        """
+        Sets side labelling of the given node
+        :param node: str
+        :param side_label: str
+        """
+
+        raise NotImplementedError('abstract DCC set_side_labelling() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_type_labelling(node):
+        """
+        Returns type labelling of the given node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_type_labelling() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_type_labelling(node, type_label):
+        """
+        Sets type labelling of the given node
+        :param node: str
+        :param type_label: str
+        """
+
+        raise NotImplementedError('abstract DCC set_type_labelling() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_other_type_labelling(node):
+        """
+        Returns other type labelling of the given node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_other_type_labelling() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_other_type_labelling(node, other_type_label):
+        """
+        Sets other type labelling of the given node
+        :param node: str
+        :param other_type_label: str
+        """
+
+        raise NotImplementedError('abstract DCC set_other_type_labelling() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_draw_label_labelling(node):
+        """
+        Returns draw label labelling of the given node
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_draw_label_labelling() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_draw_label_labelling(node, draw_type_label):
+        """
+        Sets draw label labelling of the given node
+        :param node: str
+        :param draw_type_label: str
+        """
+
+        raise NotImplementedError('abstract DCC set_draw_label_labelling() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_up_axis_name():
+        """
+        Returns the name of the current DCC up axis
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC get_up_axis_name() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def deferred_function(fn, *args, **kwargs):
         """
         Calls given function with given arguments in a deferred way
@@ -4540,6 +4776,15 @@ class AbstractDCC(object):
     def get_undo_decorator():
         """
         Returns undo decorator for current DCC
+        """
+
+        return decorators.empty_decorator
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_repeat_last_decorator(command_name=None):
+        """
+        Returns repeat last decorator for current DCC
         """
 
         return decorators.empty_decorator
