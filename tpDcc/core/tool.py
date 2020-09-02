@@ -220,14 +220,7 @@ class DccTool(plugin.Plugin, object):
         tool_kwargs['collapsable'] = False
         tool_kwargs['show_item_icon'] = False
         toolset_inst = toolset_class(**tool_kwargs)
-        toolset_inst.client = toolset_inst.setup_client()
-        toolset_inst.pre_content_setup()
-        toolset_contents = toolset_inst.contents()
-        for toolset_widget in toolset_contents:
-            toolset_inst.add_stacked_widget(toolset_widget)
-        toolset_inst.post_content_setup()
-        toolset_inst.update_display_button()
-        toolset_inst.expand()
+        toolset_inst.initialize()
 
         if not attacher_class:
             attacher_class = tp.Window
