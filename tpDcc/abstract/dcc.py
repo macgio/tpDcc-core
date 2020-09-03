@@ -4563,6 +4563,24 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_undo_decorator():
+        """
+        Returns undo decorator for current DCC
+        """
+
+        raise NotImplementedError('abstract DCC get_undo_decorator() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_repeat_last_decorator(command_name=None):
+        """
+        Returns repeat last decorator for current DCC
+        """
+
+        raise NotImplementedError('abstract DCC get_repeat_last_decorator() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def deferred_function(fn, *args, **kwargs):
         """
         Calls given function with given arguments in a deferred way
@@ -4571,7 +4589,7 @@ class AbstractDCC(object):
         :param kwargs: dict
         """
 
-        return fn(*args, **kwargs)
+        raise NotImplementedError('abstract DCC deferred_function() not implemented!')
 
     # ================================================================================================================
 
@@ -4770,21 +4788,3 @@ class AbstractDCC(object):
         from tpDcc.abstract import progressbar
 
         return progressbar.AbstractProgressBar
-
-    @staticmethod
-    @decorators.abstractmethod
-    def get_undo_decorator():
-        """
-        Returns undo decorator for current DCC
-        """
-
-        return decorators.empty_decorator
-
-    @staticmethod
-    @decorators.abstractmethod
-    def get_repeat_last_decorator(command_name=None):
-        """
-        Returns repeat last decorator for current DCC
-        """
-
-        return decorators.empty_decorator

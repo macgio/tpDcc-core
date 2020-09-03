@@ -10,7 +10,7 @@ from __future__ import print_function, division, absolute_import
 import tpDcc
 from tpDcc import register
 from tpDcc.abstract import dcc as abstract_dcc
-from tpDcc.libs.python import python
+from tpDcc.libs.python import python, decorators
 
 from Qt.QtWidgets import *
 
@@ -405,6 +405,33 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
 
         # TODO: We can use Qt to retrieve system fonts
         return []
+
+    @staticmethod
+    def get_undo_decorator():
+        """
+        Returns undo decorator for current DCC
+        """
+
+        return decorators.empty_decorator
+
+    @staticmethod
+    def get_repeat_last_decorator(command_name=None):
+        """
+        Returns repeat last decorator for current DCC
+        """
+
+        return decorators.empty_decorator
+
+    @staticmethod
+    def deferred_function(fn, *args, **kwargs):
+        """
+        Calls given function with given arguments in a deferred way
+        :param fn:
+        :param args: list
+        :param kwargs: dict
+        """
+
+        return fn(*args, **kwargs)
 
 
 register.register_class('Dcc', StandaloneDcc)
