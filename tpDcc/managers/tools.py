@@ -89,7 +89,7 @@ class ToolsManager(plugin.PluginsManager, object):
             try:
                 mod = importer.find_module(sub_module_name).load_module(sub_module_name)
             except Exception as exc:
-                tp.logger.error('Impossible to register plugin: "{}"'.format(plugin_path), exc_info=True)
+                # tp.logger.error('Impossible to register plugin: "{}"'.format(plugin_path), exc_info=True)
                 continue
 
             if qname.endswith('__version__') and hasattr(mod, '__version__'):

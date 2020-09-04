@@ -420,7 +420,7 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
         Returns repeat last decorator for current DCC
         """
 
-        return decorators.empty_decorator
+        return decorators.empty_decorator(command_name)
 
     @staticmethod
     def deferred_function(fn, *args, **kwargs):

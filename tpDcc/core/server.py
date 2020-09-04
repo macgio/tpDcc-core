@@ -1,11 +1,14 @@
 import sys
 import time
 import json
-import logging
 import traceback
 import importlib
 from collections import OrderedDict
-import __builtin__      # Do not remove
+
+try:
+    import __builtin__      # Do not remove
+except ImportError:
+    import builtins as __builtin__
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *

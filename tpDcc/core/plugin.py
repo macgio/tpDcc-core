@@ -224,7 +224,7 @@ class PluginsManager(object):
             try:
                 sub_module_obj = modules.import_module(module_path)
             except Exception as exc:
-                tp.logger.error('Error while importing module: {} | {}'.format(module_path, traceback.format_exc()))
+                # tp.logger.error('Error while importing module: {} | {}'.format(module_path, traceback.format_exc()))
                 continue
             if not sub_module_obj:
                 return
