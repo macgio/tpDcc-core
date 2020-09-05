@@ -1977,6 +1977,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def unlock_translate_attributes(node):
+        """
+        Unlocks all translate transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function unlock_translate_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def hide_rotate_attributes(node):
         """
         Hides all rotate transform attributes of the given node
@@ -1994,6 +2004,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function lock_rotate_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def unlock_rotate_attributes(node):
+        """
+        Unlocks all rotate transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function unlock_rotate_attributes() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -2017,6 +2037,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def unlock_scale_attributes(node):
+        """
+        Unlocks all scale transform attributes of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function unlock_scale_attributes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def hide_visibility_attribute(node):
         """
         Hides visibility attribute of the given node
@@ -2026,6 +2056,7 @@ class AbstractDCC(object):
         raise NotImplementedError('abstract DCC function hide_visibility_attribute() not implemented!')
 
     @staticmethod
+    @decorators.abstractmethod
     def lock_visibility_attribute(node):
         """
         Locks visibility attribute of the given node
@@ -2033,6 +2064,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function lock_visibility_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def unlock_visibility_attribute(node):
+        """
+        Unlocks visibility attribute of the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function unlock_visibility_attribute() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
