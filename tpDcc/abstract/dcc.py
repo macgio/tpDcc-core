@@ -604,6 +604,20 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def mirror_joint(joint, mirror_plane='YZ', mirror_behavior=True, search_replace=None):
+        """
+        Mirrors given joint and its hierarchy
+        :param joint: str
+        :param mirror_plane: str
+        :param mirror_behavior: bool
+        :param search_replace: list(str)
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC mirror_joint() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def orient_joints(joints_to_orient=None, **kwargs):
         """
         Orients joints
@@ -3228,10 +3242,10 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def match_translation(source_node, target_node):
+    def match_translation(match_to, target_node):
         """
         Match translation of the given node to the translation of the target node
-        :param source_node: str
+        :param match_to: str
         :param target_node: str
         """
 
@@ -3239,10 +3253,10 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def match_rotation(source_node, target_node):
+    def match_rotation(match_to, target_node):
         """
         Match rotation of the given node to the rotation of the target node
-        :param source_node: str
+        :param match_to: str
         :param target_node: str
         """
 
@@ -3250,10 +3264,10 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def match_scale(source_node, target_node):
+    def match_scale(match_to, target_node):
         """
         Match scale of the given node to the rotation of the target node
-        :param source_node: str
+        :param match_to: str
         :param target_node: str
         """
 
@@ -3261,10 +3275,10 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def match_translation_rotation(source_node, target_node):
+    def match_translation_rotation(match_to, target_node):
         """
         Match translation and rotation of the target node to the translation and rotation of the source node
-        :param source_node: str
+        :param match_to: str
         :param target_node: str
         """
 
@@ -3272,10 +3286,10 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def match_translation_to_rotate_pivot(source_node, target_node):
+    def match_translation_to_rotate_pivot(match_to, target_node):
         """
         Matches target translation to the source transform rotate pivot
-        :param source_node: str
+        :param match_to: str
         :param target_node: str
         :return:
         """
@@ -3284,10 +3298,10 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def match_transform(source_node, target_node):
+    def match_transform(match_to, target_node):
         """
         Match the transform (translation, rotation and scale) of the given node to the rotation of the target node
-        :param source_node: str
+        :param match_to: str
         :param target_node: str
         """
 
