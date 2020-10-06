@@ -248,7 +248,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def create_empty_group(name, parent=None):
+    def create_empty_group(name='grp', parent=None):
         """
         Creates a new empty group node
         :param name: str
@@ -770,7 +770,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def select_object(node, replace_selection=True, **kwargs):
+    def select_node(node, replace_selection=True, **kwargs):
         """
         Selects given object in the current scene
         :param replace_selection: bool
@@ -778,6 +778,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function select_object() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def select_nodes_by_rgb_color(node_rgb_color, nodes_to_select=None):
+        """
+        Selects all nodes with the given color
+        :param node_rgb_color: list(float, float, float)
+        :param nodes_to_select: list(str), list of nodes to select.
+        If not given, all scene nodes will be taken into account
+        """
+
+        raise NotImplementedError('abstract DCC function select_nodes_by_color() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -793,7 +805,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def deselect_object(node):
+    def deselect_node(node):
         """
         Deselects given node from current selection
         :param node: str
@@ -812,13 +824,14 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def duplicate_object(node, name='', only_parent=False):
+    def duplicate_object(node, name='', only_parent=False, return_roots_only=False):
         """
         Duplicates given object in current scene
         :param node: str
         :param name: str
         :param only_parent: bool, If True, only given node will be duplicated (ignoring its children)
-        :return: str
+        :param return_roots_only: bool, If True, only the root nodes of the new hierarchy will be returned
+        :return: list(str)
         """
 
         raise NotImplementedError('abstract DCC function duplicate_object() not implemented!')
@@ -1086,10 +1099,23 @@ class AbstractDCC(object):
         """
         Returns color of the given node
         :param node: str
+        :param node: str
         :return:
         """
 
         raise NotImplementedError('abstract DCC function node_color() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_rgb_color(node, linear=True):
+        """
+        Returns color of the given node
+        :param node: str
+        :param linear: bool, Whether or not the RGB should be in linear space (matches viewport color)
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC function node_rgb_color() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -2326,6 +2352,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def disconnect_attribute(node, attribute_name):
+        """
+        Disconnects source attribute to given target attribute
+        :param node: str
+        :param attribute_name: str
+        """
+
+        raise NotImplementedError('abstract DCC function disconnect_attribute() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def connect_multiply(source_node, source_attribute, target_node, target_attribute, value=0.1, multiply_name=None):
         """
         Connects source attribute into target attribute with a multiply node inbetween
@@ -2646,6 +2683,16 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def set_workspace(workspace_path):
+        """
+        Sets current workspace to the given path
+        :param workspace: str
+        """
+
+        raise NotImplementedError('abstract DCC function set_workspace() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def scene_name():
         """
         Returns the name of the current scene
@@ -2673,6 +2720,15 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function save_current_scene() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def force_rename_to_save_scene():
+        """
+        Forces current scene to be renamed before it can be saved
+        """
+
+        raise NotImplementedError('abstract DCC function force_rename_to_save_scene() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -3669,6 +3725,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def delete_constraints(node, constraint_type=None):
+        """
+        Deletes all constraints applied to the given node
+        :param node: str
+        :param constraint_type: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC delete_constraints() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_selection_groups(name=None):
         """
         Returns all selection groups (sets) in current DCC scene
@@ -4608,6 +4676,28 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def get_joint_radius(node):
+        """
+        Returns given joint radius
+        :param node: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC get_joint_radius() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_joint_radius(node, radius_value):
+        """
+        Sets given joint radius
+        :param node: str
+        :param radius_value: float
+        """
+
+        raise NotImplementedError('abstract DCC set_joint_radius() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def get_up_axis_name():
         """
         Returns the name of the current DCC up axis
@@ -4618,21 +4708,21 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def get_undo_decorator():
+    def undo_decorator():
         """
         Returns undo decorator for current DCC
         """
 
-        raise NotImplementedError('abstract DCC get_undo_decorator() not implemented!')
+        raise NotImplementedError('abstract DCC undo_decorator() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
-    def get_repeat_last_decorator(command_name=None):
+    def repeat_last_decorator(command_name=None):
         """
         Returns repeat last decorator for current DCC
         """
 
-        raise NotImplementedError('abstract DCC get_repeat_last_decorator() not implemented!')
+        raise NotImplementedError('abstract DCC repeat_last_decorator() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -4645,6 +4735,15 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC deferred_function() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def suspend_refresh_decorator():
+        """
+        Returns suspend refresh decorator for current DCC
+        """
+
+        raise NotImplementedError('abstract DCC suspend_refresh_decorator() not implemented!')
 
     # ================================================================================================================
 

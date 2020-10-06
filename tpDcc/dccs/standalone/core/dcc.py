@@ -219,7 +219,7 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
         return False
 
     @staticmethod
-    def select_object(node, replace_selection=True, **kwargs):
+    def select_node(node, replace_selection=True, **kwargs):
         """
         Selects given object in the current scene
         :param replace_selection: bool
@@ -240,7 +240,7 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
         return False
 
     @staticmethod
-    def deselect_object(node):
+    def deselect_node(node):
         """
         Deselects given node from current selection
         :param node: str
@@ -257,13 +257,14 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
         return False
 
     @staticmethod
-    def duplicate_object(node, name='', only_parent=False):
+    def duplicate_object(node, name='', only_parent=False, return_roots_only=False):
         """
         Duplicates given object in current scene
         :param node: str
         :param name: str
         :param only_parent: bool, If True, only given node will be duplicated (ignoring its children)
-        :return: str
+        :param return_roots_only: bool, If True, only the root nodes of the new hierarchy will be returned
+        :return: list(str)
         """
 
         return False
@@ -407,7 +408,7 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
         return []
 
     @staticmethod
-    def get_undo_decorator():
+    def undo_decorator():
         """
         Returns undo decorator for current DCC
         """
@@ -415,7 +416,7 @@ class StandaloneDcc(abstract_dcc.AbstractDCC, object):
         return decorators.empty_decorator
 
     @staticmethod
-    def get_repeat_last_decorator(command_name=None):
+    def repeat_last_decorator(command_name=None):
         """
         Returns repeat last decorator for current DCC
         """

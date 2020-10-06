@@ -179,7 +179,8 @@ class ToolsManager(plugin.PluginsManager, object):
         if os.path.isdir(resources_path):
             tp.ResourcesMgr().register_resource(resources_path, key='tools')
         else:
-            tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
+            pass
+            # tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
 
         # Register DCC specific resources
         if dcc_loader and dcc_config:
@@ -190,7 +191,8 @@ class ToolsManager(plugin.PluginsManager, object):
             if os.path.isdir(resources_path):
                 tp.ResourcesMgr().register_resource(resources_path, key='plugins')
             else:
-                tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
+                pass
+                # tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
 
         # Create tool loggers directory
         default_logger_dir = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs', 'tools'))

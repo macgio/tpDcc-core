@@ -44,7 +44,7 @@ class DccServer(QObject, object):
         node = data.get('node', None)
         add_to_selection = data.get('add_to_selection', False)
         if node:
-            tp.Dcc.select_object(node, replace_selection=not add_to_selection)
+            tp.Dcc.select_node(node, replace_selection=not add_to_selection)
         reply['success'] = True
 
     def selected_nodes(self, data, reply):
