@@ -139,14 +139,21 @@ class MenusManager(object):
 
         for child_widget in self._parent.menuBar().children():
             child_name = child_widget.objectName()
-            for pkg_name, menu in self._menus.items():
+            for pkg_name, menus_data in self._menus.items():
                 if package_name and pkg_name != package_name:
                     continue
-                if child_name == menu.objectName():
-                    child_widget.deleteLater()
-                    self._menus.pop(package_name)
-                    deleted_menus.append(child_name)
+                for menu_name, menu_wigdet in menus_data.items():
+                    if child_name == menu_wigdet.objectName():
+                        child_action = child_widget.menuAction()
+                        self._parent.menuBar().removeAction(child_action)
+                        child_action.deleteLater()
+                        child_widget.deleteLater()
+                        self._menus.pop(package_name)
+                        deleted_menus.append(child_name)
             if child_name == object_menu_name and child_name not in deleted_menus:
+                child_action = child_widget.menuAction()
+                self._parent.menuBar().removeAction(child_action)
+                child_action.deleteLater()
                 child_widget.deleteLater()
 
     def _menu_creator(self, parent_menu, data, package_name, dev=False):
