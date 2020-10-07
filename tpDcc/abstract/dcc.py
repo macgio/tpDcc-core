@@ -30,7 +30,11 @@ class AbstractDCC(object):
     }
     SIDE_LABELS = list()
     TYPE_LABELS = list()
+    AXES = list()
     ROTATION_AXES = list()
+    TRANSLATION_ATTR_NAME = None
+    ROTATION_ATTR_NAME = None
+    SCALE_ATTR_NAME = None
 
     @staticmethod
     @decorators.abstractmethod
@@ -580,6 +584,18 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def scale_transform_shapes(node, scale_value, **kwargs):
+        """
+        Scales given node by given scale value
+        :param node: str
+        :param scale_value: float
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC scale_transform_shapes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_world_space_pivot(node):
         """
         Returns node pivot in world space
@@ -821,6 +837,21 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function clear_selection() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def duplicate_object(node, name='', only_parent=False, return_roots_only=False, rename_children=False):
+        """
+        Duplicates given object in current scene
+        :param node: str
+        :param name: str
+        :param only_parent: bool, If True, only given node will be duplicated (ignoring its children)
+        :param return_roots_only: bool, If True, only the root nodes of the new hierarchy will be returned
+        :param rename_children: bool, Whether or not children nodes are renamed
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function duplicate_object() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -1458,6 +1489,17 @@ class AbstractDCC(object):
         raise NotImplementedError('abstract DCC function shape_transform() not implemented!')
 
     @staticmethod
+    def parent_shapes_to_transforms(shapes_list, transforms_list):
+        """
+        Parents given shapes into given transforms
+        :param shapes_list: list(str)
+        :param transforms_list: list(str)
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC function parent_shapes_to_transforms() not implemented!')
+
+    @staticmethod
     @decorators.abstractmethod
     def rename_shapes(node):
         """
@@ -1466,6 +1508,42 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function rename_shapes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def combine_shapes(target_node, nodes_to_combine_shapes_of, delete_after_combine=True):
+        """
+        Combines all shapes of the given node
+        :param target_node: str
+        :param nodes_to_combine_shapes_of: str
+        :param delete_after_combine: bool, Whether or not combined shapes should be deleted after
+        :return: str, combined shape
+        """
+
+        raise NotImplementedError('abstract DCC function combine_shapes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def scale_shapes(target_node, scale_value, relative=False):
+        """
+        Scales given shapes
+        :param target_node: str
+        :param scale_value: float
+        :return: relative, bool
+        """
+
+        raise NotImplementedError('abstract DCC function scale_shapes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_bounding_box_size(node):
+        """
+        Returns the bounding box size of the given node
+        :param node: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC function node_bounding_box_size() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -2363,6 +2441,26 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def enable_overrides(node):
+        """
+        Enables overrides in the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function enable_overrides() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def disable_overrides(node):
+        """
+        Disables in the given node
+        :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function disable_overrides() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def connect_multiply(source_node, source_attribute, target_node, target_attribute, value=0.1, multiply_name=None):
         """
         Connects source attribute into target attribute with a multiply node inbetween
@@ -2957,7 +3055,7 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def set_key_frame(node, attribute_name, **kwargs):
+    def set_keyframe(node, attribute_name=None, **kwargs):
         """
         Sets keyframe in given attribute in given node
         :param node: str
@@ -2966,7 +3064,7 @@ class AbstractDCC(object):
         :return:
         """
 
-        raise NotImplementedError('abstract DCC function set_key_frame() not implemented!')
+        raise NotImplementedError('abstract DCC function set_keyframe() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -3866,10 +3964,13 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
-    def freeze_transforms(node, **kwargs):
+    def freeze_transforms(node, translate=True, rotate=True, scale=True, **kwargs):
         """
         Freezes the transformations of the given node and its children
         :param node: str
+        :param translate: bool
+        :param rotate: bool
+        :param scale: str
         """
 
         raise NotImplementedError('abstract DCC freeze_transforms() not implemented!')
@@ -4168,6 +4269,85 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_is_curve(node):
+        """
+        Returns whether or not given node is a valid curve node
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC node_is_curve() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_curve_shapes(node):
+        """
+        Returns all shapes of the given curve
+        :param node: str
+        :return: list(str)
+        """
+
+        raise NotImplementedError('abstract DCC get_curve_shapes() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_curve_degree(curve_node):
+        """
+        Returns given curve degree
+        :param curve_node: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC get_curve_degree() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_curve_spans(curve_node):
+        """
+        Returns given curve degree
+        :param curve_node: str
+        :return: float
+        """
+
+        raise NotImplementedError('abstract DCC get_curve_spans() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_curve_form(curve_node):
+        """
+        Returns given curve form
+        :param curve_node: str
+        :return: int
+        """
+
+        raise NotImplementedError('abstract DCC get_curve_form() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_curve_cv_position_in_world_space(curve_node, cv_index):
+        """
+        Returns world space position of the given CV index in given curve node
+        :param curve_node: str
+        :param cv_index: int
+        :return: list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC get_curve_cv_in_world_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def get_curve_cv_position_in_object_space(curve_node, cv_index):
+        """
+        Returns object space position of the given CV index in given curve node
+        :param curve_node: str
+        :param cv_index: int
+        :return: list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC get_curve_cv_position_in_object_space() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def rebuild_curve(curve, spans, **kwargs):
         """
         Rebuilds curve with given parameters
@@ -4178,6 +4358,18 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC rebuild_curve() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def scale_curve(curve_node, scale_value, **kwargs):
+        """
+        Scales given curve by given scale value
+        :param curve_node: str
+        :param scale_value: float
+        :param kwargs:
+        """
+
+        raise NotImplementedError('abstract DCC scale_curve() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -4575,6 +4767,17 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC get_dcc_control_colors() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_control_color(control_node, color=None):
+        """
+        Sets the color of the given control node
+        :param control_node: str
+        :param color: int or list(float, float, float)
+        """
+
+        raise NotImplementedError('abstract DCC set_control_color() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod

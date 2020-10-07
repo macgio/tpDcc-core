@@ -48,7 +48,8 @@ class DccServer(QObject, object):
         reply['success'] = True
 
     def selected_nodes(self, data, reply):
-        selected_nodes = tp.Dcc.selected_nodes()
+        full_path = data.get('full_path', True)
+        selected_nodes = tp.Dcc.selected_nodes(full_path=full_path)
         reply['success'] = True
         reply['result'] = selected_nodes
 
