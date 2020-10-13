@@ -1,0 +1,334 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Module that contains manager to handle libs
+"""
+
+from __future__ import print_function, division, absolute_import
+
+__author__ = "Tomas Poveda"
+__license__ = "MIT"
+__maintainer__ = "Tomas Poveda"
+__email__ = "tpovedatd@gmail.com"
+
+import os
+import inspect
+from collections import OrderedDict
+
+import tpDcc as tp
+from tpDcc.core import library
+from tpDcc.managers import plugins
+from tpDcc.libs.python import python, decorators, path as path_utils
+
+import pkgutil
+if python.is_python2():
+    import pkgutil as loader
+else:
+    import importlib.util
+    import importlib as loader
+
+
+class LibsManager(plugins.PluginsManager, object):
+    def __init__(self):
+        super(LibsManager, self).__init__(interface=library.DccLibrary)
+
+        self._libs_to_load = OrderedDict()
+
+    def load_plugin(self, pkg_name, pkg_loaders, environment, root_pkg_name=None, config_dict=None, load=True):
+        """
+        Implements load_plugin function
+        Registers a plugin instance to the manager
+        :param pkg_name: str
+        :param pkg_loaders: plugin instance to register
+        :param environment:
+        :param root_pkg_name:
+        :param config_dict:
+        :param load:
+        :return: Plugin
+        """
+
+        if not pkg_loaders:
+            return False
+
+        package_loader = pkg_loaders[0] if isinstance(pkg_loaders, (list, tuple)) else pkg_loaders
+        if not package_loader:
+            return False
+
+        if hasattr(package_loader, 'loader'):
+            if not package_loader.loader:
+                return False
+
+        plugin_path = package_loader.filename if python.is_python2() else os.path.dirname(package_loader.loader.path)
+        plugin_name = package_loader.fullname if python.is_python2() else package_loader.loader.name
+
+        if not config_dict:
+            config_dict = dict()
+
+        config_dict.update({
+            'join': os.path.join,
+            'user': os.path.expanduser('~'),
+            'filename': plugin_path,
+            'fullname': plugin_name,
+            'root': path_utils.clean_path(plugin_path)
+        })
+
+        if pkg_name not in self._plugins:
+            self._plugins[pkg_name] = dict()
+
+        libs_found = list()
+        version_found = None
+        init_fn = None
+        packages_to_walk = [plugin_path] if python.is_python2() else [os.path.dirname(plugin_path)]
+        for sub_module in pkgutil.walk_packages(packages_to_walk):
+            importer, sub_module_name, _ = sub_module
+            qname = '{}.{}'.format(plugin_name, sub_module_name)
+            try:
+                mod = importer.find_module(sub_module_name).load_module(sub_module_name)
+            except Exception as exc:
+                # tp.logger.error('Impossible to register plugin: "{}"'.format(plugin_path), exc_info=True)
+                continue
+
+            if qname.endswith('__version__') and hasattr(mod, '__version__'):
+                if version_found:
+                    tp.logger.warning('Already found version: "{}" for "{}"'.format(version_found, plugin_name))
+                else:
+                    version_found = getattr(mod, 'get_version')
+
+            if not init_fn and qname.endswith('loader') and hasattr(mod, 'init') and callable(mod.init):
+                init_fn = mod.init
+
+            mod.LOADED = load
+
+            for cname, obj in inspect.getmembers(mod, inspect.isclass):
+                for interface in self._interfaces:
+                    if issubclass(obj, interface):
+                        lib_config_dict = obj.config_dict(file_name=plugin_path) or dict()
+                        if not lib_config_dict:
+                            continue
+                        lib_id = lib_config_dict.get('id', None)
+                        tool_config_name = lib_config_dict.get('name', None)
+                        if not lib_id:
+                            tp.logger.warning(
+                                'Impossible to register library "{}" because its ID is not defined!'.format(lib_id))
+                            continue
+                        if not tool_config_name:
+                            tp.logger.warning(
+                                'Impossible to register library "{}" because its name is not defined!'.format(
+                                    tool_config_name))
+                            continue
+                        if root_pkg_name and root_pkg_name in self._plugins and lib_id in self._plugins[
+                            root_pkg_name]:
+                            tp.logger.warning(
+                                'Impossible to register library "{}" because its ID "{}" its already defined!'.format(
+                                    tool_config_name, lib_id))
+                            continue
+
+                        if not version_found:
+                            version_found = '0.0.0'
+                        obj.VERSION = version_found
+                        obj.FILE_NAME = plugin_path
+                        obj.FULL_NAME = plugin_name
+
+                        libs_found.append((qname, version_found, obj))
+                        version_found = True
+                        break
+
+        if not libs_found:
+            tp.logger.warning('No libraries found in module "{}". Skipping ...'.format(plugin_path))
+            return False
+        if len(libs_found) > 1:
+            tp.logger.warning(
+                'Multiple libraries found ({}) in module "{}". Loading first one. {} ...'.format(
+                    len(libs_found), plugin_path, libs_found[-1]))
+            lib_found = libs_found[-1]
+        else:
+            lib_found = libs_found[0]
+        lib_loader = loader.find_loader(lib_found[0])
+
+        # Check if DCC specific implementation for plugin exists
+        dcc_path = '{}.dccs.{}'.format(plugin_name, tp.Dcc.get_name())
+        dcc_loader = None
+        dcc_config = None
+        try:
+            dcc_loader = loader.find_loader(dcc_path)
+        except ImportError:
+            pass
+
+        lib_config_dict = lib_found[2].config_dict(file_name=plugin_path) or dict()
+        lib_id = lib_config_dict['id']
+        _tool_name = lib_config_dict['name']
+
+        tool_config_name = plugin_name.replace('.', '-')
+        lib_config = tp.ConfigsMgr().get_config(
+            config_name=tool_config_name, package_name=pkg_name, root_package_name=root_pkg_name,
+            environment=environment, config_dict=config_dict, extra_data=lib_config_dict)
+
+        if dcc_loader:
+            dcc_path = dcc_loader.fullname
+            dcc_config = tp.ConfigsMgr().get_config(
+                config_name=dcc_path.replace('.', '-'), package_name=pkg_name,
+                environment=environment, config_dict=config_dict)
+            if not dcc_config.get_path():
+                dcc_config = None
+
+        # Register resources
+        def_resources_path = os.path.join(plugin_path, 'resources')
+        # resources_path = plugin_config.data.get('resources_path', def_resources_path)
+        resources_path = lib_config_dict.get('resources_path', None)
+        if not resources_path or not os.path.isdir(resources_path):
+            resources_path = def_resources_path
+        if os.path.isdir(resources_path):
+            tp.ResourcesMgr().register_resource(resources_path, key='tools')
+        else:
+            pass
+            # tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
+
+        # Register DCC specific resources
+        if dcc_loader and dcc_config:
+            def_resources_path = os.path.join(dcc_loader.filename, 'resources')
+            resources_path = dcc_config.data.get('resources_path', def_resources_path)
+            if not resources_path or not os.path.isdir(resources_path):
+                resources_path = def_resources_path
+            if os.path.isdir(resources_path):
+                tp.ResourcesMgr().register_resource(resources_path, key='plugins')
+            else:
+                pass
+                # tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
+
+        # Create tool loggers directory
+        default_logger_dir = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs', 'tools'))
+        default_logging_config = os.path.join(plugin_path, '__logging__.ini')
+        logger_dir = lib_config_dict.get('logger_dir', default_logger_dir)
+        if not os.path.isdir(logger_dir):
+            os.makedirs(logger_dir)
+        logging_file = lib_config_dict.get('logging_file', default_logging_config)
+
+        lib_package = plugin_name
+        lib_package_path = plugin_path
+        dcc_package = None
+        dcc_package_path = None
+        if dcc_loader:
+            dcc_package = dcc_loader.fullname if python.is_python2() else dcc_loader.loader.path
+            dcc_package_path = dcc_loader.filename if python.is_python2() else dcc_loader.loader.name
+
+        self._plugins[pkg_name][lib_id] = {
+            'name': _tool_name,
+            'package_name': pkg_name,
+            'loader': package_loader,
+            'config': lib_config,
+            'config_dict': lib_config_dict,
+            'plugin_loader': lib_loader,
+            'plugin_package': lib_package,
+            'plugin_package_path': lib_package_path,
+            'version': lib_found[1] if lib_found[1] is not None else "0.0.0",
+            'dcc_loader': dcc_loader,
+            'dcc_package': dcc_package,
+            'dcc_package_path': dcc_package_path,
+            'dcc_config': dcc_config,
+            'logging_file': logging_file,
+            'plugin_instance': None
+        }
+
+        if init_fn:
+            try:
+                dev = True if environment == 'development' else False
+                init_fn(dev=dev)
+                tp.logger.info('Library "{}" registered and initialized successfully!'.format(plugin_name))
+            except Exception as exc:
+                tp.logger.warning(
+                    'Library "{}" registered successfully but its initialization failed: {}'.format(plugin_name, exc))
+        else:
+            tp.logger.info('Library "{}" registered successfully!'.format(plugin_name))
+
+        return True
+
+    def get_library_data_from_id(self, plugin_id, package_name=None):
+        """
+        Returns registered plugin data from its id
+        :param plugin_id: str
+        :param package_name: str
+        :return: dict
+        """
+
+        if not plugin_id:
+            return None
+
+        if not package_name:
+            package_name = plugin_id.replace('.', '-').split('-')[0]
+
+        if package_name and package_name not in self._plugins:
+            tp.logger.error('Impossible to retrieve data from id: {} package "{}" not registered!'.format(
+                plugin_id, package_name))
+            return None
+
+        return self._plugins[package_name][plugin_id] if plugin_id in self._plugins[package_name] else None
+
+    def register_package_libs(self, pkg_name, root_pkg_name=None, libs_to_register=None, dev=True, config_dict=None):
+        """
+        Registers  all libraries available in given package
+        """
+
+        environment = 'development' if dev else 'production'
+
+        if not libs_to_register:
+            return
+        libs_to_register = python.force_list(libs_to_register)
+
+        if config_dict is None:
+            config_dict = dict()
+
+        libs_path = '{}.libs.{}'
+        for lib_name in libs_to_register:
+            pkg_path = libs_path.format(pkg_name, lib_name)
+            if python.is_python2():
+                pkg_loader = loader.find_loader(pkg_path)
+            else:
+                pkg_loader = importlib.util.find_spec(pkg_path)
+            if not pkg_loader:
+                # if tool_name in self._tools_to_load:
+                #     self._tools_to_load.pop(tool_name)
+                continue
+            else:
+                lib_data = {
+                    'loaders': pkg_loader,
+                    'pkg_name': pkg_name,
+                    'root_pkg_name': root_pkg_name,
+                    'environment': environment,
+                    'config_dict': config_dict
+                }
+                self._libs_to_load[lib_name] = lib_data
+
+        return self._libs_to_load
+
+    def load_registered_libs(self, package_name):
+        """
+        Load all tools that were already registered
+        :return:
+        """
+        if not self._libs_to_load:
+            tp.logger.warning('No tools to register found!')
+            return
+
+        for tool_name, lib_data in self._libs_to_load.items():
+            pkg_name = lib_data['pkg_name']
+            if pkg_name != package_name:
+                continue
+            root_pkg_name = lib_data['root_pkg_name']
+            pkg_loaders = lib_data['loaders']
+            environment = lib_data['environment']
+            config_dict = lib_data['config_dict']
+
+            self.load_plugin(
+                pkg_name=pkg_name, root_pkg_name=root_pkg_name, pkg_loaders=pkg_loaders, environment=environment,
+                load=True, config_dict=config_dict)
+
+
+@decorators.Singleton
+class LibsManagerSingleton(LibsManager, object):
+    """
+    Singleton class that holds libraries manager instance
+    """
+
+    def __init__(self, ):
+        LibsManager.__init__(self)

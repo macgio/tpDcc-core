@@ -13,9 +13,11 @@ import logging.config
 
 from tpDcc import register
 from tpDcc.abstract import dcc as abstract_dcc, menu as abstract_menu, shelf as abstract_shelf
-from tpDcc.abstract import progressbar as abstract_progressbar
+from tpDcc.abstract import progressbar as abstract_progressbar, scenewrapper as abstract_scenewrapper
+from tpDcc.abstract import scene as abstract_scene, sceneobject as abstract_sceneobject
 from tpDcc.managers import callbacks as callbacks_manager, configs as configs_manager, logs as logs_manager
-from tpDcc.managers import menus as menus_manager, resources as resources_manager, tools as tools_manager
+from tpDcc.managers import menus as menus_manager, resources as resources_manager
+from tpDcc.managers import libs as libs_manager, tools as tools_manager
 
 from tpDcc.libs.python import importer, loader as python_loader
 from tpDcc.libs.qt import loader as qt_loader
@@ -192,7 +194,12 @@ def init_managers(dev=True):
             'tpDcc-core configuration file not found! Make sure that you have tpDcc-config package installed!')
         return None
 
+    libs_to_load = core_config.get('libs', list())
     tools_to_load = core_config.get('tools', list())
+
+    # Libs
+    tpDcc.LibsMgr().register_package_libs(pkg_name=PACKAGE, libs_to_register=libs_to_load, dev=dev)
+    tpDcc.LibsMgr().load_registered_libs(PACKAGE)
 
     # Tools
     tpDcc.ToolsMgr().register_package_tools(pkg_name=PACKAGE, tools_to_register=tools_to_load, dev=dev)
@@ -334,6 +341,9 @@ def callbacks():
 
 def register_classes():
     register.register_class('Dcc', abstract_dcc.AbstractDCC(), is_unique=True)
+    register.register_class('SceneWrapper', abstract_scenewrapper.AbstractSceneWrapper)
+    register.register_class('Scene', abstract_scene.AbstractScene)
+    register.register_class('SceneObject', abstract_sceneobject.AbstractSceneObject)
     register.register_class('Menu', abstract_menu.AbstractMenu, is_unique=True)
     register.register_class('Shelf', abstract_shelf.AbstractShelf, is_unique=True)
     register.register_class('ProgressBar', abstract_progressbar.AbstractProgressBar, is_unique=True)
@@ -353,6 +363,7 @@ def register_classes():
     register.register_class('LogsMgr', logs_manager.LogsManagerSingleton)
     register.register_class('MenusMgr', menus_manager.MenusManagerSingleton)
     register.register_class('ResourcesMgr', resources_manager.ResourcesManagerSingleton)
+    register.register_class('LibsMgr', libs_manager.LibsManagerSingleton)
     register.register_class('ToolsMgr', tools_manager.ToolsManagerSingleton)
 
 
