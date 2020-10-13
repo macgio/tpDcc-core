@@ -153,7 +153,7 @@ class DccTool(plugin.Plugin, object):
         :return: str
         """
 
-        return '{}::{}'.format(self.NAME, str(self.ID))
+        return '::{}'.format(self.ID)
 
     def frameless_window_toggle(self):
         """
