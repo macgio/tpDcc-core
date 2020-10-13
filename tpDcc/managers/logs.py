@@ -17,28 +17,31 @@ class LogsManager(object):
     def __init__(self):
         super(LogsManager, self).__init__()
 
-    def get_logger(self, tool_id=None):
+    def get_logger(self, plugin_id=None):
         """
         Returns logger associated with given tool
-        :param tool_id: str
+        :param plugin_id: str
         :return:
         """
 
-        if not tool_id:
+        if not plugin_id:
             return logging.getLogger('tpDcc-core')
 
-        tool_data = tpDcc.ToolsMgr().get_plugin_data_from_id(tool_id)
-        if not tool_data:
+        if '-tools-' in plugin_id:
+            plugin_data = tpDcc.ToolsMgr().get_tool_data_from_id(plugin_id)
+        elif '-libs-' in plugin_id:
+            plugin_data = tpDcc.LibsMgr().get_library_data_from_id(plugin_id)
+        if not plugin_data:
             # LOGGER.warning('No logger found for tool with id: {}'.format(tool_id))
             return logging.getLogger('tpDcc-core')
 
-        logging_file = tool_data.get('logging_file', None)
+        logging_file = plugin_data.get('logging_file', None)
         if not logging_file:
             return logging.getLogger('tpDcc-core')
 
         logging.config.fileConfig(logging_file, disable_existing_loggers=False)
         # tool_logger_level_env = '{}_LOG_LEVEL'.format(pkg_loader.fullname.replace('.', '_').upper())
-        return logging.getLogger(tool_id)
+        return logging.getLogger(plugin_id)
 
 
 @decorators.Singleton

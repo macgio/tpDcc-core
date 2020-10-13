@@ -248,9 +248,13 @@ class MenusManager(object):
         tool_id = item_info.get('id', None)
         tool_type = item_info.get('type', 'tool')
 
-        tool_data = tp.ToolsMgr().get_plugin_data_from_id(tool_id)
+        tool_data = tp.ToolsMgr().get_tool_data_from_id(tool_id)
         if tool_data is None:
             tp.logger.warning('Menu : Failed to find Tool: {}, type {}'.format(tool_id, tool_type))
+            return
+
+        tool_config = tool_data['config']
+        if not tool_config:
             return
 
         tool_menu_ui_data = tool_data['config'].data.get('menu_ui', {})
