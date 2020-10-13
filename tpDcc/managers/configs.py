@@ -136,6 +136,26 @@ class ConfigsManager(object):
 
         return new_config
 
+    def get_tool_config(self, library_id, package_name=None):
+        tool_data = tp.LibsMgr().get_tool_data_from_id(library_id, package_name=package_name)
+        if not tool_data:
+            return None
+
+        if 'dcc_config' in tool_data and tool_data['dcc_config']:
+            return tool_data['dcc_config']
+
+        return tool_data.get('config', None)
+
+    def get_library_config(self, library_id, package_name=None):
+        library_data = tp.LibsMgr().get_library_data_from_id(library_id, package_name=package_name)
+        if not library_data:
+            return None
+
+        if 'dcc_config' in library_data and library_data['dcc_config']:
+            return library_data['dcc_config']
+
+        return library_data.get('config', None)
+
     def _get_all_package_configs(self, package_name, root_package_name=None, environment=None, skip_non_existent=True):
         """
         Internal function that returns a list with all configuration files of given package
