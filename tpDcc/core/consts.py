@@ -7,6 +7,8 @@ Module that contains constant definitions for tpDcc
 
 from __future__ import print_function, division, absolute_import
 
+from Qt.QtWidgets import QDialogButtonBox
+
 from tpDcc.libs.python import python
 
 if python.is_python2():
@@ -31,7 +33,7 @@ SET_PROJECT_IMAGE_TOOLTIP = 'Set the Image used for the Project'
 
 
 # =================== TYPES
-class PointerTypes(Enum):
+class WrapperTypes(Enum):
     Shape = 0
     Transform = 1
     Pointer = 2
@@ -81,3 +83,17 @@ class MaterialAttributeTypes(Enum):
 
 class MaterialTypes(Enum):
     Standard = 0
+
+
+class DialogResult(object):
+    Yes = QDialogButtonBox.Yes
+    No = QDialogButtonBox.No
+    Cancel = QDialogButtonBox.Cancel
+    Close = QDialogButtonBox.Close
+
+
+SIDE_PATTERNS = {
+    'center': ['C', 'c', 'Center', 'ct', 'center', 'middle', 'm'],
+    'left': ['L', 'l', 'Left', 'left', 'lf'],
+    'right': ['R', 'r', 'Right', 'right', 'rt']
+}

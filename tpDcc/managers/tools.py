@@ -12,7 +12,8 @@ import inspect
 from collections import OrderedDict
 
 import tpDcc as tp
-from tpDcc.core import plugin, tool
+from tpDcc.core import tool
+from tpDcc.managers import plugins
 from tpDcc.libs.python import decorators, python, path as path_utils
 from tpDcc.libs.qt.core import contexts
 
@@ -24,12 +25,9 @@ else:
     import importlib as loader
 
 
-class ToolsManager(plugin.PluginsManager, object):
-
-    INTERFACE = tool.DccTool
-
+class ToolsManager(plugins.PluginsManager, object):
     def __init__(self):
-        super(ToolsManager, self).__init__()
+        super(ToolsManager, self).__init__(interface=tool.DccTool)
 
         self._layout = dict()
         self._loaded_tools = dict()
@@ -64,8 +62,8 @@ class ToolsManager(plugin.PluginsManager, object):
             if not package_loader.loader:
                 return False
 
-        plugin_name = package_loader.filename if python.is_python2() else os.path.dirname(package_loader.loader.path)
-        plugin_path = package_loader.fullname if python.is_python2() else package_loader.loader.name
+        plugin_path = package_loader.filename if python.is_python2() else os.path.dirname(package_loader.loader.path)
+        plugin_name = package_loader.fullname if python.is_python2() else package_loader.loader.name
 
         if not config_dict:
             config_dict = dict()
@@ -73,19 +71,20 @@ class ToolsManager(plugin.PluginsManager, object):
         config_dict.update({
             'join': os.path.join,
             'user': os.path.expanduser('~'),
-            'filename': plugin_name,
-            'fullname': plugin_path
+            'filename': plugin_path,
+            'fullname': plugin_name,
+            'root': path_utils.clean_path(plugin_path)
         })
 
         if pkg_name not in self._plugins:
             self._plugins[pkg_name] = dict()
 
-        plugins_found = list()
+        tools_found = list()
         version_found = None
-        packages_to_walk = [plugin_name] if python.is_python2() else [os.path.dirname(plugin_name)]
+        packages_to_walk = [plugin_path] if python.is_python2() else [os.path.dirname(plugin_path)]
         for sub_module in pkgutil.walk_packages(packages_to_walk):
             importer, sub_module_name, _ = sub_module
-            qname = '{}.{}'.format(plugin_path, sub_module_name)
+            qname = '{}.{}'.format(plugin_name, sub_module_name)
             try:
                 mod = importer.find_module(sub_module_name).load_module(sub_module_name)
             except Exception as exc:
@@ -94,59 +93,60 @@ class ToolsManager(plugin.PluginsManager, object):
 
             if qname.endswith('__version__') and hasattr(mod, '__version__'):
                 if version_found:
-                    tp.logger.warning('Already found version: "{}" for "{}"'.format(version_found, plugin_path))
+                    tp.logger.warning('Already found version: "{}" for "{}"'.format(version_found, plugin_name))
                 else:
                     version_found = getattr(mod, '__version__')
 
             mod.LOADED = load
 
             for cname, obj in inspect.getmembers(mod, inspect.isclass):
-                if issubclass(obj, self.INTERFACE):
-                    plugin_config_dict = obj.config_dict(file_name=plugin_name) or dict()
-                    if not plugin_config_dict:
-                        continue
-                    plugin_id = plugin_config_dict.get('id', None)
-                    plugin_config_name = plugin_config_dict.get('name', None)
-                    plugin_icon = plugin_config_dict.get('icon', None)
-                    if not plugin_id:
-                        tp.logger.warning(
-                            'Impossible to register plugin "{}" because its ID is not defined!'.format(plugin_id))
-                        continue
-                    if not plugin_config_name:
-                        tp.logger.warning(
-                            'Impossible to register plugin "{}" because its name is not defined!'.format(
-                                plugin_config_name))
-                        continue
-                    if root_pkg_name and root_pkg_name in self._plugins and plugin_id in self._plugins[root_pkg_name]:
-                        tp.logger.warning(
-                            'Impossible to register plugin "{}" because its ID "{}" its already defined!'.format(
-                                plugin_config_name, plugin_id))
-                        continue
+                for interface in self._interfaces:
+                    if issubclass(obj, interface):
+                        tool_config_dict = obj.config_dict(file_name=plugin_path) or dict()
+                        if not tool_config_dict:
+                            continue
+                        tool_id = tool_config_dict.get('id', None)
+                        tool_config_name = tool_config_dict.get('name', None)
+                        tool_icon = tool_config_dict.get('icon', None)
+                        if not tool_id:
+                            tp.logger.warning(
+                                'Impossible to register tool "{}" because its ID is not defined!'.format(tool_id))
+                            continue
+                        if not tool_config_name:
+                            tp.logger.warning(
+                                'Impossible to register tool "{}" because its name is not defined!'.format(
+                                    tool_config_name))
+                            continue
+                        if root_pkg_name and root_pkg_name in self._plugins and tool_id in self._plugins[root_pkg_name]:
+                            tp.logger.warning(
+                                'Impossible to register tool "{}" because its ID "{}" its already defined!'.format(
+                                    tool_config_name, tool_id))
+                            continue
 
-                    if not version_found:
-                        version_found = '0.0.0'
-                    obj.VERSION = version_found
-                    obj.FILE_NAME = plugin_name
-                    obj.FULL_NAME = plugin_path
+                        if not version_found:
+                            version_found = '0.0.0'
+                        obj.VERSION = version_found
+                        obj.FILE_NAME = plugin_path
+                        obj.FULL_NAME = plugin_name
 
-                    plugins_found.append((qname, version_found, obj))
-                    version_found = True
-                    break
+                        tools_found.append((qname, version_found, obj))
+                        version_found = True
+                        break
 
-        if not plugins_found:
-            tp.logger.warning('No plugins found in module "{}". Skipping ...'.format(plugin_name))
+        if not tools_found:
+            tp.logger.warning('No tools found in module "{}". Skipping ...'.format(plugin_path))
             return False
-        if len(plugins_found) > 1:
+        if len(tools_found) > 1:
             tp.logger.warning(
-                'Multiple plugins found ({}) in module "{}". Loading first one. {} ...'.format(
-                    len(plugins_found), plugin_name, plugins_found[-1]))
-            plugin_found = plugins_found[-1]
+                'Multiple tools found ({}) in module "{}". Loading first one. {} ...'.format(
+                    len(tools_found), plugin_path, tools_found[-1]))
+            tool_found = tools_found[-1]
         else:
-            plugin_found = plugins_found[0]
-        plugin_loader = loader.find_loader(plugin_found[0])
+            tool_found = tools_found[0]
+        tool_loader = loader.find_loader(tool_found[0])
 
         # Check if DCC specific implementation for plugin exists
-        dcc_path = '{}.dccs.{}'.format(plugin_path, tp.Dcc.get_name())
+        dcc_path = '{}.dccs.{}'.format(plugin_name, tp.Dcc.get_name())
         dcc_loader = None
         dcc_config = None
         try:
@@ -154,26 +154,28 @@ class ToolsManager(plugin.PluginsManager, object):
         except ImportError:
             pass
 
-        plugin_config_dict = plugin_found[2].config_dict(file_name=plugin_name) or dict()
-        plugin_id = plugin_config_dict['id']
-        _plugin_name = plugin_config_dict['name']
-        plugin_icon = plugin_config_dict['icon']
+        tool_config_dict = tool_found[2].config_dict(file_name=plugin_path) or dict()
+        tool_id = tool_config_dict['id']
+        _tool_name = tool_config_dict['name']
+        tool_icon = tool_config_dict['icon']
 
-        plugin_config_name = plugin_path.replace('.', '-')
-        plugin_config = tp.ConfigsMgr().get_config(
-            config_name=plugin_config_name, package_name=pkg_name, root_package_name=root_pkg_name,
-            environment=environment, config_dict=config_dict, extra_data=plugin_config_dict)
+        tool_config_name = plugin_name.replace('.', '-')
+        tool_config = tp.ConfigsMgr().get_config(
+            config_name=tool_config_name, package_name=pkg_name, root_package_name=root_pkg_name,
+            environment=environment, config_dict=config_dict, extra_data=tool_config_dict)
 
         if dcc_loader:
             dcc_path = dcc_loader.fullname
             dcc_config = tp.ConfigsMgr().get_config(
                 config_name=dcc_path.replace('.', '-'), package_name=pkg_name,
                 environment=environment, config_dict=config_dict)
+            if not dcc_config.get_path():
+                dcc_config = None
 
         # Register resources
-        def_resources_path = os.path.join(plugin_name, 'resources')
+        def_resources_path = os.path.join(plugin_path, 'resources')
         # resources_path = plugin_config.data.get('resources_path', def_resources_path)
-        resources_path = plugin_config_dict.get('resources_path', None)
+        resources_path = tool_config_dict.get('resources_path', None)
         if not resources_path or not os.path.isdir(resources_path):
             resources_path = def_resources_path
         if os.path.isdir(resources_path):
@@ -196,31 +198,31 @@ class ToolsManager(plugin.PluginsManager, object):
 
         # Create tool loggers directory
         default_logger_dir = os.path.normpath(os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs', 'tools'))
-        default_logging_config = os.path.join(plugin_name, '__logging__.ini')
-        logger_dir = plugin_config_dict.get('logger_dir', default_logger_dir)
+        default_logging_config = os.path.join(plugin_path, '__logging__.ini')
+        logger_dir = tool_config_dict.get('logger_dir', default_logger_dir)
         if not os.path.isdir(logger_dir):
             os.makedirs(logger_dir)
-        logging_file = plugin_config_dict.get('logging_file', default_logging_config)
+        logging_file = tool_config_dict.get('logging_file', default_logging_config)
 
-        plugin_package = plugin_path
-        plugin_package_path = plugin_name
+        tool_package = plugin_name
+        tool_package_path = plugin_path
         dcc_package = None
         dcc_package_path = None
         if dcc_loader:
             dcc_package = dcc_loader.fullname if python.is_python2() else dcc_loader.loader.path
             dcc_package_path = dcc_loader.filename if python.is_python2() else dcc_loader.loader.name
 
-        self._plugins[pkg_name][plugin_id] = {
-            'name': _plugin_name,
-            'icon': plugin_icon,
+        self._plugins[pkg_name][tool_id] = {
+            'name': _tool_name,
+            'icon': tool_icon,
             'package_name': pkg_name,
             'loader': package_loader,
-            'config': plugin_config,
-            'config_dict': plugin_config_dict,
-            'plugin_loader': plugin_loader,
-            'plugin_package': plugin_package,
-            'plugin_package_path': plugin_package_path,
-            'version': plugin_found[1] if plugin_found[1] is not None else "0.0.0",
+            'config': tool_config,
+            'config_dict': tool_config_dict,
+            'plugin_loader': tool_loader,
+            'plugin_package': tool_package,
+            'plugin_package_path': tool_package_path,
+            'version': tool_found[1] if tool_found[1] is not None else "0.0.0",
             'dcc_loader': dcc_loader,
             'dcc_package': dcc_package,
             'dcc_package_path': dcc_package_path,
@@ -229,11 +231,11 @@ class ToolsManager(plugin.PluginsManager, object):
             'plugin_instance': None
         }
 
-        tp.logger.info('Plugin "{}" registered successfully!'.format(plugin_path))
+        tp.logger.info('Tool "{}" registered successfully!'.format(plugin_name))
 
         return True
 
-    def get_plugin_data_from_id(self, plugin_id, package_name=None):
+    def get_tool_data_from_id(self, plugin_id, package_name=None):
         """
         Returns registered plugin data from its id
         :param plugin_id: str
@@ -248,7 +250,8 @@ class ToolsManager(plugin.PluginsManager, object):
             package_name = plugin_id.replace('.', '-').split('-')[0]
 
         if package_name and package_name not in self._plugins:
-            tp.logger.error('Impossible to retrieve data from id: package "{}" not registered!'.format(package_name))
+            tp.logger.error('Impossible to retrieve data from id: {} package "{}" not registered!'.format(
+                plugin_id, package_name))
             return None
 
         return self._plugins[package_name][plugin_id] if plugin_id in self._plugins[package_name] else None
@@ -307,7 +310,7 @@ class ToolsManager(plugin.PluginsManager, object):
 
     def register_package_tools(self, pkg_name, root_pkg_name=None, tools_to_register=None, dev=True, config_dict=None):
         """
-        Loads all tools available in given package
+        Registers all tools available in given package
         """
 
         environment = 'development' if dev else 'production'
