@@ -9,32 +9,44 @@ from __future__ import print_function, division, absolute_import
 
 from collections import OrderedDict
 
-from Qt.QtWidgets import QDialogButtonBox
-
+from tpDcc.core import consts
 from tpDcc.libs.python import decorators
 
 
 class AbstractDCC(object):
 
-    class DialogResult(object):
-        Yes = QDialogButtonBox.Yes
-        No = QDialogButtonBox.No
-        Cancel = QDialogButtonBox.Cancel
-        Close = QDialogButtonBox.Close
+    # Dictionary that provides a mapping between tpDcc object types and  Dcc specific object types
+    OBJECT_TYPES = OrderedDict()
 
-    TYPE_FILTERS = OrderedDict()
-    SIDE_PATTERNS = {
-        'center': ['C', 'c', 'Center', 'ct', 'center', 'middle', 'm'],
-        'left': ['L', 'l', 'Left', 'left', 'lf'],
-        'right': ['R', 'r', 'Right', 'right', 'rt']
-    }
-    SIDE_LABELS = list()
-    TYPE_LABELS = list()
-    AXES = list()
-    ROTATION_AXES = list()
-    TRANSLATION_ATTR_NAME = None
-    ROTATION_ATTR_NAME = None
-    SCALE_ATTR_NAME = None
+    def __init__(self):
+
+        # Dictionary that provides a mapping between Dcc object types and tpDcc object types
+        self.DCC_TO_ABSTRACT_TYPES = OrderedDict()
+        for abstract_type, dcc_type in self.OBJECT_TYPES.items():
+            if isinstance(dcc_type[0], (tuple, list)):
+                for item in dcc_type[0]:
+                    self.DCC_TO_ABSTRACT_TYPES[item] = abstract_type
+            else:
+                self.DCC_TO_ABSTRACT_TYPES[dcc_type[0]] = abstract_type
+
+        # Dictionary that provides a mapping between Dcc string based object type and tpDcc object types
+        self.DCC_TO_ABSTRACT_STR_TYPES = OrderedDict()
+        for abstract_type, dcc_type in self.OBJECT_TYPES.items():
+            if isinstance(dcc_type[1], (tuple, list)):
+                for item in dcc_type[1]:
+                    self.DCC_TO_ABSTRACT_TYPES[item] = abstract_type
+            else:
+                self.DCC_TO_ABSTRACT_TYPES[dcc_type[1]] = abstract_type
+
+    def node_tpdcc_type(self, node, as_string=False):
+        """
+        Returns the DCC object type as a string given a specific tpDcc object type
+        :param node: str
+        :param as_string: bool
+        :return: str
+        """
+
+        return consts.ObjectTypes.Generic
 
     @staticmethod
     @decorators.abstractmethod
@@ -117,6 +129,16 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function is_batch() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def root_node():
+        """
+        Returns DCC scene root node
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function root_node() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -366,6 +388,26 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def node_is_root(node):
+        """
+        Returns whether or not given node is a DCC scene root node
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_empty() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_is_selected(node):
+        """
+        Returns whether or not given node is currently selected
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_selected() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_is_transform(node):
         """
         Returns whether or not given node is a transform node
@@ -387,6 +429,7 @@ class AbstractDCC(object):
         raise NotImplementedError('abstract DCC function node_is_joint() not implemented!')
 
     @staticmethod
+    @decorators.abstractmethod
     def node_is_locator(node):
         """
         Returns whether or not given node is a locator node
@@ -395,6 +438,182 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function node_is_locator() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_is_box_mode(node):
+        """
+        Returns whether or not given node is being displayed as box
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_box_mode() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_is_frozen(node):
+        """
+        Returns whether or not given node is frozen
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_frozen() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def node_is_hidden(node):
+        """
+        Returns whether or not given node is hidden
+        :param node: str
+        :return: bool
+        """
+
+        raise NotImplementedError('abstract DCC function node_is_hidden() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_normal_display(node, flag):
+        """
+        Sets whether or not given node is displayed in normal mode
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_normal_display() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_template_display(node, flag):
+        """
+        Sets whether or not given node is displayed in template mode
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_template_display() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_reference_display(node, flag):
+        """
+        Sets whether or not given node is displayed in reference mode
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_reference_display() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_renderable(node, flag):
+        """
+        Sets whether or not given node is renderable
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_renderable() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_cast_shadows(node, flag):
+        """
+        Sets whether or not given node can cast shadows
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_cast_shadows() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_receive_shadows(node, flag):
+        """
+        Sets whether or not given node can receive shadows
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_receive_shadows() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_light_interaction(node, flag):
+        """
+        Sets whether or not given node can interact with lights
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_light_interaction() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_has_motion_blur(node, flag):
+        """
+        Sets whether or not given node can have motion blur
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_has_motion_blur() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_is_visible_to_cameras(node, flag):
+        """
+        Sets whether or not given node is visible by cameras
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_is_visible_to_cameras() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_smooth_shading(node, flag):
+        """
+        Sets whether or not given node has smooth shading
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_smooth_shading() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_is_visible_in_reflections(node, flag):
+        """
+        Sets whether or not given node is visible in reflections
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_is_visible_in_reflections() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_is_visible_in_refractions(node, flag):
+        """
+        Sets whether or not given node is visible in refractions
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_is_visible_in_refractions() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def set_node_double_sided(node, flag):
+        """
+        Sets whether or not given node polygons can be renderer in both back and front directions
+        :param node: str
+        :param flag: bool
+        """
+
+        raise NotImplementedError('abstract DCC function set_node_double_sided() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -935,6 +1154,30 @@ class AbstractDCC(object):
         """
 
         raise NotImplementedError('abstract DCC function filter_nodes_by_selected_components() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def find_node_by_name(node_name):
+        """
+        Returns node by its given node.
+        This function makes sure that the returned node is an existing node
+        :param node_name: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function find_node_by_name() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def find_node_by_id(unique_id):
+        """
+        Returns node by its given id.
+        This function makes sure that the returned node is an existing node
+        :param unique_id: str
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC function find_node_by_id() not implemented!')
 
     @staticmethod
     @decorators.abstractmethod
@@ -2455,6 +2698,17 @@ class AbstractDCC(object):
         """
         Disables in the given node
         :param node: str
+        """
+
+        raise NotImplementedError('abstract DCC function disable_overrides() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def disable_transforms_inheritance(node, lock=False):
+        """
+        Disables transforms inheritance from given node
+        :param node: str
+        :param lock: bool
         """
 
         raise NotImplementedError('abstract DCC function disable_overrides() not implemented!')
@@ -4269,6 +4523,36 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def create_nurbs_plane(name='plane', width=1.0, length=1.0, patches_u=1, patches_v=1, **kwargs):
+        """
+        Creates a new NURBS plane
+        :param name: str
+        :param width: float
+        :param length: float
+        :param patches_u: int
+        :param patches_v: int
+        :param kwargs:
+        :return:
+        """
+
+        raise NotImplementedError('abstract DCC create_nurbs_plane() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
+    def create_lambert_material(name='lambert', color=None, transparency=1.0, **kwargs):
+        """
+        Creates a new lambert material
+        :param name: str
+        :param color: tuple(float, float, float)
+        :param transparency: float
+        :param kwargs:
+        :return: str
+        """
+
+        raise NotImplementedError('abstract DCC create_nurbs_plane() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def node_is_curve(node):
         """
         Returns whether or not given node is a valid curve node
@@ -4984,65 +5268,6 @@ class AbstractDCC(object):
     # ================================================================================================================
 
     @classmethod
-    def name_is_center(cls, side, patterns=None):
-        """
-        Returns whether given side is a valid center side or not
-        :param side: str
-        :param patterns: list<str>
-        :return: bool
-        """
-
-        if not patterns:
-            patterns = cls.SIDE_PATTERNS['center']
-
-        side = str(side)
-        for pattern in patterns:
-            return side.startswith('{}_'.format(pattern)) or side.endswith(
-                '_{}'.format(pattern)) or '_{}_'.format(pattern) in side
-
-        return False
-
-    @classmethod
-    def name_is_left(cls, side, patterns=None):
-        """
-        Returns whether given side is a valid left side or not
-        :param side: str
-        :param patterns: list<str>
-        :return: bool
-        """
-
-        if not patterns:
-            patterns = cls.SIDE_PATTERNS['left']
-
-        side = str(side)
-        for pattern in patterns:
-            if side.startswith('{}_'.format(pattern)) or side.endswith(
-                    '_{}'.format(pattern)) or '_{}_'.format(pattern) in side or side == pattern:
-                return True
-
-        return False
-
-    @classmethod
-    def name_is_right(cls, side, patterns=None):
-        """
-        Returns whether given side is a valid right side or not
-        :param side: str
-        :param patterns: list<str>
-        :return: bool
-        """
-
-        if not patterns:
-            patterns = cls.SIDE_PATTERNS['right']
-
-        side = str(side)
-        for pattern in patterns:
-            if side.startswith('{}_'.format(pattern)) or side.endswith(
-                    '_{}'.format(pattern)) or '_{}_'.format(pattern) in side or side == pattern:
-                return True
-
-        return False
-
-    @classmethod
     def get_mirror_name(cls, name, center_patterns=None, left_patterns=None, right_patterns=None):
         """
         Returns mirrored name of the given name
@@ -5054,11 +5279,11 @@ class AbstractDCC(object):
             return name
 
         if cls.name_is_left(name, patterns=left_patterns):
-            from_side = cls.SIDE_PATTERNS['left']
-            to_side = cls.SIDE_PATTERNS['right']
+            from_side = consts.SIDE_PATTERNS['left']
+            to_side = consts.SIDE_PATTERNS['right']
         elif cls.name_is_left(name, patterns=right_patterns):
-            from_side = cls.SIDE_PATTERNS['right']
-            to_side = cls.SIDE_PATTERNS['left']
+            from_side = consts.SIDE_PATTERNS['right']
+            to_side = consts.SIDE_PATTERNS['left']
         else:
             return name
 
@@ -5110,6 +5335,65 @@ class AbstractDCC(object):
                 return [227, 172, 121]
 
     @staticmethod
+    def name_is_center(side, patterns=None):
+        """
+        Returns whether given side is a valid center side or not
+        :param side: str
+        :param patterns: list<str>
+        :return: bool
+        """
+
+        if not patterns:
+            patterns = consts.SIDE_PATTERNS['center']
+
+        side = str(side)
+        for pattern in patterns:
+            return side.startswith('{}_'.format(pattern)) or side.endswith(
+                '_{}'.format(pattern)) or '_{}_'.format(pattern) in side
+
+        return False
+
+    @staticmethod
+    def name_is_left(side, patterns=None):
+        """
+        Returns whether given side is a valid left side or not
+        :param side: str
+        :param patterns: list<str>
+        :return: bool
+        """
+
+        if not patterns:
+            patterns = consts.SIDE_PATTERNS['left']
+
+        side = str(side)
+        for pattern in patterns:
+            if side.startswith('{}_'.format(pattern)) or side.endswith(
+                    '_{}'.format(pattern)) or '_{}_'.format(pattern) in side or side == pattern:
+                return True
+
+        return False
+
+    @staticmethod
+    def name_is_right(side, patterns=None):
+        """
+        Returns whether given side is a valid right side or not
+        :param side: str
+        :param patterns: list<str>
+        :return: bool
+        """
+
+        if not patterns:
+            patterns = consts.SIDE_PATTERNS['right']
+
+        side = str(side)
+        for pattern in patterns:
+            if side.startswith('{}_'.format(pattern)) or side.endswith(
+                    '_{}'.format(pattern)) or '_{}_'.format(pattern) in side or side == pattern:
+                return True
+
+        return False
+
+    @staticmethod
     def get_dockable_window_class():
         """
         Returns class that should be used to instance an ew dockable DCC window
@@ -5145,3 +5429,39 @@ class AbstractDCC(object):
         from tpDcc.abstract import progressbar
 
         return progressbar.AbstractProgressBar
+
+    @staticmethod
+    def get_dialog_result_yes():
+        """
+        Returns output when a DCC dialog result is accepted
+        :return:
+        """
+
+        return consts.DialogResult.Yes
+
+    @staticmethod
+    def get_dialog_result_no():
+        """
+        Returns output when a DCC dialog result is rejected
+        :return:
+        """
+
+        return consts.DialogResult.No
+
+    @staticmethod
+    def get_dialog_result_cancel():
+        """
+        Returns output when a DCC dialog result is cancelled
+        :return:
+        """
+
+        return consts.DialogResult.Cancel
+
+    @staticmethod
+    def get_dialog_result_close():
+        """
+        Returns output when a DCC dialog result is close
+        :return:
+        """
+
+        return consts.DialogResult.Close
