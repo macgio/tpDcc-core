@@ -572,11 +572,14 @@ class ToolsManager(plugins.PluginsManager, object):
                     closed_tool = True
 
         tool_to_close = self._loaded_tools[tool_id].attacher
-        if not closed_tool and tool_to_close:
-            tool_to_close.fade_close() if hasattr(tool_to_close, 'fade_close') else tool_to_close.close()
-        if force and tool_to_close:
-            tool_to_close.setParent(None)
-            tool_to_close.deleteLater()
+        try:
+            if not closed_tool and tool_to_close:
+                tool_to_close.fade_close() if hasattr(tool_to_close, 'fade_close') else tool_to_close.close()
+            if force and tool_to_close:
+                tool_to_close.setParent(None)
+                tool_to_close.deleteLater()
+        except RuntimeError:
+            pass
         self._loaded_tools.pop(tool_id)
 
         return True
