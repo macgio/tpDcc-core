@@ -1119,6 +1119,17 @@ class AbstractDCC(object):
 
     @staticmethod
     @decorators.abstractmethod
+    def selected_nodes_in_order(full_path=True, **kwargs):
+        """
+        Returns a list of selected nodes in order of selection
+        :param full_path: bool
+        :return: list<str>
+        """
+
+        raise NotImplementedError('abstract DCC function selected_nodes_in_order() not implemented!')
+
+    @staticmethod
+    @decorators.abstractmethod
     def selected_nodes_of_type(node_type, full_path=True):
         """
         Returns a list of selected nodes of given type
