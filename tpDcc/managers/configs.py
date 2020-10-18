@@ -136,6 +136,24 @@ class ConfigsManager(object):
 
         return new_config
 
+    def get_config_from_path(self, config_path, environment=None, parser_class=None, extra_data=None):
+        if not config_path or not os.path.isfile(config_path):
+            return None
+
+        if extra_data is None:
+            extra_data = dict()
+
+        if not parser_class:
+            parser_class = config.YAMLConfigurationParser
+
+        config_name = os.path.basename(config_path)
+        config_directory = os.path.dirname(config_path)
+        config_data = {'path': config_directory}
+
+        new_config = config.DccConfig(config_name=config_name, environment=environment, data=extra_data)
+
+        return new_config
+
     def get_tool_config(self, library_id, package_name=None):
         tool_data = tp.LibsMgr().get_tool_data_from_id(library_id, package_name=package_name)
         if not tool_data:
