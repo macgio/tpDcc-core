@@ -7,8 +7,11 @@ Module that contains base classes to handle options
 
 from __future__ import print_function, division, absolute_import
 
-import tpDcc as tp
+import logging
+
 from tpDcc.libs.python import settings, python
+
+LOGGER = logging.getLogger('tpDcc-core')
 
 
 class OptionObject(object):
@@ -126,6 +129,7 @@ class OptionObject(object):
         Returns option by name and group
         :param name: str, name of the option we want to retrieve
         :param group: variant, str || None, group of the option (optional)
+        :param default:
         :return: variant
         """
 
@@ -136,18 +140,18 @@ class OptionObject(object):
             if default is not None:
                 return default
             else:
-                tp.logger.warning(
+                LOGGER.warning(
                     'Impossible to access option with proper format from {}'.format(self._option_settings.directory))
                 if self.has_option(name, group):
                     if group:
-                        tp.logger.warning('Could not find option: "{}" in group: "{}"'.format(name, group))
+                        LOGGER.warning('Could not find option: "{}" in group: "{}"'.format(name, group))
                     else:
-                        tp.logger.warning('Could not find option: {}'.format(name))
+                        LOGGER.warning('Could not find option: {}'.format(name))
                 return value
 
         value = self._format_option_value(value)
 
-        tp.logger.debug('Accessed Option - Option: "{}" | Group: "{}" | Value: "{}"'.format(name, group, value))
+        LOGGER.debug('Accessed Option - Option: "{}" | Group: "{}" | Value: "{}"'.format(name, group, value))
 
         return value
 
@@ -166,7 +170,7 @@ class OptionObject(object):
             if key.endswith(name):
                 if return_first:
                     value = self._format_option_value(options_dict[key])
-                    tp.logger.debug('Accessed - Option: {}, value: {}'.format(name, options_dict[key]))
+                    LOGGER.debug('Accessed - Option: {}, value: {}'.format(name, options_dict[key]))
                     return value
                 found[name] = options_dict[key]
 
@@ -256,7 +260,7 @@ class OptionObject(object):
                 if value.find(',') > -1:
                     new_value = value.split(',')
 
-        tp.logger.debug('Formatted value: {}'.format(new_value))
+        LOGGER.debug('Formatted value: {}'.format(new_value))
 
         return new_value
 

@@ -1,6 +1,7 @@
 import sys
 import time
 import json
+import inspect
 import traceback
 import importlib
 from collections import OrderedDict
@@ -10,13 +11,10 @@ try:
 except ImportError:
     import builtins as __builtin__
 
-from Qt.QtCore import *
-from Qt.QtWidgets import *
-from Qt.QtNetwork import *
+from Qt.QtCore import QObject, QByteArray
+from Qt.QtNetwork import QTcpServer, QHostAddress, QTcpSocket
 
-# We use to have autocompletion in PyCharm
-if False:
-    import tpDcc as tp
+from tpDcc import dcc
 
 
 class DccServer(QObject, object):
@@ -25,7 +23,7 @@ class DccServer(QObject, object):
     HEADER_SIZE = 10
 
     def __init__(self, parent=None, client=None, update_paths=True):
-        parent = parent or tp.Dcc.get_main_window()
+        parent = parent or dcc.get_main_window()
         super(DccServer, self).__init__(parent)
 
         self._socket = None
@@ -33,6 +31,14 @@ class DccServer(QObject, object):
         self._do_update_paths = update_paths
         self._modules_to_import = list()
         self._client = client
+        self._server_functions = dict()
+
+        server_functions = inspect.getmembers(self, predicate=inspect.ismethod) or list()
+        for server_function_list in server_functions:
+            server_function_name = server_function_list[0]
+            if server_function_name in ['__init__'] or server_function_name.startswith('_'):
+                continue
+            self._server_functions[server_function_name] = server_function_list[1]
 
         self._init()
 
@@ -44,35 +50,35 @@ class DccServer(QObject, object):
         node = data.get('node', None)
         add_to_selection = data.get('add_to_selection', False)
         if node:
-            tp.Dcc.select_node(node, replace_selection=not add_to_selection)
+            dcc.select_node(node, replace_selection=not add_to_selection)
         reply['success'] = True
 
     def selected_nodes(self, data, reply):
         full_path = data.get('full_path', True)
-        selected_nodes = tp.Dcc.selected_nodes(full_path=full_path)
+        selected_nodes = dcc.selected_nodes(full_path=full_path)
         reply['success'] = True
         reply['result'] = selected_nodes
 
     def clear_selection(self, data, reply):
-        tp.Dcc.clear_selection()
+        dcc.clear_selection()
         reply['success'] = True
 
     def get_control_colors(self, data, reply):
-        control_colors = tp.Dcc.get_control_colors() or list()
+        control_colors = dcc.get_control_colors() or list()
         reply['success'] = True
         reply['result'] = control_colors
 
     def get_fonts(self, data, reply):
-        all_fonts = tp.Dcc.get_all_fonts() or list()
+        all_fonts = dcc.get_all_fonts() or list()
         reply['success'] = True
         reply['result'] = all_fonts
 
     def enable_undo(self, data, reply):
-        tp.Dcc.enable_undo()
+        dcc.enable_undo()
         reply['success'] = True
 
     def disable_undo(self, data, reply):
-        tp.Dcc.disable_undo()
+        dcc.disable_undo()
         reply['success'] = True
 
     # =================================================================================================================
@@ -148,7 +154,9 @@ class DccServer(QObject, object):
 
     def _process_data(self, data_dict):
         reply = {
-            'success': False
+            'success': False,
+            'msg': '',
+            'result': None
         }
 
         cmd = data_dict['cmd']
@@ -281,29 +289,17 @@ class DccServer(QObject, object):
             builtin_value = bultins_[builtin]
             exec('__builtin__.%s = builtin_value' % builtin)
 
-        # NOTE: tp is import dynamically
-        dcc_name = tp.Dcc.get_name()
-        dcc_version = tp.Dcc.get_version_name()
+        # NOTE: tp is imported dynamically
+        dcc_name = dcc.get_name()
+        dcc_version = dcc.get_version_name()
 
         reply['success'] = True
         reply['name'] = dcc_name
         reply['version'] = dcc_version
 
     def _process_command(self, command_name, data_dict, reply_dict):
-        if command_name == 'select_node':
-            self.select_node(data_dict, reply_dict)
-        elif command_name == 'selected_nodes':
-            self.selected_nodes(data_dict, reply_dict)
-        elif command_name == 'clear_selection':
-            self.clear_selection(data_dict, reply_dict)
-        elif command_name == 'enable_undo':
-            self.enable_undo(data_dict, reply_dict)
-        elif command_name == 'disable_undo':
-            self.disable_undo(data_dict, reply_dict)
-        elif command_name == 'get_control_colors':
-            self.get_control_colors(data_dict, reply_dict)
-        elif command_name == 'get_fonts':
-            self.get_fonts(data_dict, reply_dict)
+        if command_name in self._server_functions:
+            self._server_functions[command_name](data_dict, reply_dict)
         else:
             reply_dict['msg'] = 'Invalid command ({})'.format(command_name)
 
@@ -363,6 +359,8 @@ class ExampleServer(DccServer, object):
 
 
 if __name__ == '__main__':
+    from Qt.QtWidgets import QApplication, QDialog, QPlainTextEdit
+
     app = QApplication(sys.argv)
     window = QDialog()
     window.setWindowTitle('Example Base')

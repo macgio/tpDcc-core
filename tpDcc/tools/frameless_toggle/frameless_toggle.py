@@ -1,3 +1,12 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Module that contains frameless toggle tool
+"""
+
+from __future__ import print_function, division, absolute_import
+
 from tpDcc.core import tool
 
 

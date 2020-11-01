@@ -8,12 +8,13 @@ Module that contains implementation for DCC tools
 from __future__ import print_function, division, absolute_import
 
 import os
+import logging
 import inspect
 from collections import OrderedDict
 
-import tpDcc as tp
+from tpDcc import dcc
 from tpDcc.core import tool
-from tpDcc.managers import plugins
+from tpDcc.managers import plugins, configs, resources
 from tpDcc.libs.python import decorators, python, path as path_utils
 from tpDcc.libs.qt.core import contexts
 
@@ -24,7 +25,10 @@ else:
     import importlib.util
     import importlib as loader
 
+LOGGER = logging.getLogger('tpDcc-core')
 
+
+@decorators.add_metaclass(decorators.Singleton)
 class ToolsManager(plugins.PluginsManager, object):
     def __init__(self):
         super(ToolsManager, self).__init__(interface=tool.DccTool)
@@ -87,13 +91,13 @@ class ToolsManager(plugins.PluginsManager, object):
             qname = '{}.{}'.format(plugin_name, sub_module_name)
             try:
                 mod = importer.find_module(sub_module_name).load_module(sub_module_name)
-            except Exception as exc:
-                # tp.logger.error('Impossible to register plugin: "{}"'.format(plugin_path), exc_info=True)
+            except Exception:
+                # LOGGER.exception('Impossible to register plugin: "{}"'.format(plugin_path))
                 continue
 
             if qname.endswith('__version__') and hasattr(mod, '__version__'):
                 if version_found:
-                    tp.logger.warning('Already found version: "{}" for "{}"'.format(version_found, plugin_name))
+                    LOGGER.warning('Already found version: "{}" for "{}"'.format(version_found, plugin_name))
                 else:
                     version_found = getattr(mod, '__version__')
 
@@ -107,18 +111,18 @@ class ToolsManager(plugins.PluginsManager, object):
                             continue
                         tool_id = tool_config_dict.get('id', None)
                         tool_config_name = tool_config_dict.get('name', None)
-                        tool_icon = tool_config_dict.get('icon', None)
+                        # tool_icon = tool_config_dict.get('icon', None)
                         if not tool_id:
-                            tp.logger.warning(
+                            LOGGER.warning(
                                 'Impossible to register tool "{}" because its ID is not defined!'.format(tool_id))
                             continue
                         if not tool_config_name:
-                            tp.logger.warning(
+                            LOGGER.warning(
                                 'Impossible to register tool "{}" because its name is not defined!'.format(
                                     tool_config_name))
                             continue
                         if root_pkg_name and root_pkg_name in self._plugins and tool_id in self._plugins[root_pkg_name]:
-                            tp.logger.warning(
+                            LOGGER.warning(
                                 'Impossible to register tool "{}" because its ID "{}" its already defined!'.format(
                                     tool_config_name, tool_id))
                             continue
@@ -134,10 +138,10 @@ class ToolsManager(plugins.PluginsManager, object):
                         break
 
         if not tools_found:
-            tp.logger.warning('No tools found in module "{}". Skipping ...'.format(plugin_path))
+            LOGGER.warning('No tools found in module "{}". Skipping ...'.format(plugin_path))
             return False
         if len(tools_found) > 1:
-            tp.logger.warning(
+            LOGGER.warning(
                 'Multiple tools found ({}) in module "{}". Loading first one. {} ...'.format(
                     len(tools_found), plugin_path, tools_found[-1]))
             tool_found = tools_found[-1]
@@ -146,7 +150,7 @@ class ToolsManager(plugins.PluginsManager, object):
         tool_loader = loader.find_loader(tool_found[0])
 
         # Check if DCC specific implementation for plugin exists
-        dcc_path = '{}.dccs.{}'.format(plugin_name, tp.Dcc.get_name())
+        dcc_path = '{}.dccs.{}'.format(plugin_name, dcc.get_name())
         dcc_loader = None
         dcc_config = None
         try:
@@ -160,13 +164,13 @@ class ToolsManager(plugins.PluginsManager, object):
         tool_icon = tool_config_dict['icon']
 
         tool_config_name = plugin_name.replace('.', '-')
-        tool_config = tp.ConfigsMgr().get_config(
+        tool_config = configs.get_config(
             config_name=tool_config_name, package_name=pkg_name, root_package_name=root_pkg_name,
             environment=environment, config_dict=config_dict, extra_data=tool_config_dict)
 
         if dcc_loader:
             dcc_path = dcc_loader.fullname
-            dcc_config = tp.ConfigsMgr().get_config(
+            dcc_config = configs.get_config(
                 config_name=dcc_path.replace('.', '-'), package_name=pkg_name,
                 environment=environment, config_dict=config_dict)
             if not dcc_config.get_path():
@@ -179,7 +183,7 @@ class ToolsManager(plugins.PluginsManager, object):
         if not resources_path or not os.path.isdir(resources_path):
             resources_path = def_resources_path
         if os.path.isdir(resources_path):
-            tp.ResourcesMgr().register_resource(resources_path, key='tools')
+            resources.register_resource(resources_path, key='tools')
         else:
             pass
             # tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
@@ -191,7 +195,7 @@ class ToolsManager(plugins.PluginsManager, object):
             if not resources_path or not os.path.isdir(resources_path):
                 resources_path = def_resources_path
             if os.path.isdir(resources_path):
-                tp.ResourcesMgr().register_resource(resources_path, key='plugins')
+                resources.register_resource(resources_path, key='plugins')
             else:
                 pass
                 # tp.logger.debug('No resources directory found for plugin "{}" ...'.format(_plugin_name))
@@ -231,7 +235,7 @@ class ToolsManager(plugins.PluginsManager, object):
             'plugin_instance': None
         }
 
-        tp.logger.info('Tool "{}" registered successfully!'.format(plugin_name))
+        LOGGER.info('Tool "{}" registered successfully!'.format(plugin_name))
 
         return True
 
@@ -250,59 +254,30 @@ class ToolsManager(plugins.PluginsManager, object):
             package_name = plugin_id.replace('.', '-').split('-')[0]
 
         if package_name and package_name not in self._plugins:
-            tp.logger.error('Impossible to retrieve data from id: {} package "{}" not registered!'.format(
+            LOGGER.error('Impossible to retrieve data from id: {} package "{}" not registered!'.format(
                 plugin_id, package_name))
             return None
 
         return self._plugins[package_name][plugin_id] if plugin_id in self._plugins[package_name] else None
 
-    def get_plugin_data_from_plugin_instance(self, plugin, as_dict=False, package_name=None):
-        """
-        Returns registered plugin data from a plugin object
-        :return: dict
-        """
-
-        plugin_data = super(ToolsManager, self).get_plugin_data_from_plugin_instance(
-            plugin=plugin, as_dict=as_dict, package_name=package_name)
-        if plugin_data:
-            return plugin_data
-
-        if not plugin or not hasattr(plugin, 'config'):
-            return None
-
-        if not package_name:
-            package_name = plugin.PACKAGE
-        if not package_name:
-            tp.logger.error('Impossible to retrieve data from plugin with undefined package!')
-            return None
-
-        if package_name not in self._plugins:
-            tp.logger.error(
-                'Impossible to retrieve data from instance: package "{}" not registered!'.format(package_name))
-            return None
-
-        plugin_id = plugin.config.data.get('id', None)
-        if plugin_id and plugin_id in self._plugins:
-            if as_dict:
-                return {
-                    plugin_id: self._plugins[package_name][plugin_id]
-                }
-            else:
-                return self._plugins[package_name][plugin_id]
-
-        return None
-
     def cleanup(self):
-        tp.logger.info('Cleaning tools ...')
+        """
+        Cleanup all loaded tools
+        :return:
+        """
+
+        from tpDcc.managers import menus
+
+        LOGGER.info('Cleaning tools ...')
         for plug_name, plug in self._plugins.items():
             plug.cleanup()
-            tp.logger.info('Shutting down tool: {}'.format(plug.ID))
-            plugin_id = plug.keys()[0]
+            LOGGER.info('Shutting down tool: {}'.format(plug.ID))
+            # plugin_id = plug.keys()[0]
             self._plugins.pop(plug_name)
 
         self._plugins = dict()
         for package_name in self._plugins.keys():
-            tp.MenusMgr().remove_previous_menus(package_name=package_name)
+            menus.remove_previous_menus(package_name=package_name)
 
     # ============================================================================================================
     # TOOLS
@@ -351,7 +326,7 @@ class ToolsManager(plugins.PluginsManager, object):
         :return:
         """
         if not self._tools_to_load:
-            tp.logger.warning('No tools to register found!')
+            LOGGER.warning('No tools to register found!')
             return
 
         for tool_name, tool_data in self._tools_to_load.items():
@@ -378,8 +353,7 @@ class ToolsManager(plugins.PluginsManager, object):
             return None
 
         if package_name and package_name not in self._plugins:
-            tp.logger.error(
-                'Impossible to retrieve data from instance: package "{}" not registered!'.format(package_name))
+            LOGGER.error('Impossible to retrieve data from instance: package "{}" not registered!'.format(package_name))
             return None
 
         if package_name:
@@ -400,12 +374,11 @@ class ToolsManager(plugins.PluginsManager, object):
         """
 
         if not package_name:
-            tp.logger.error('Impossible to retrieve data from plugin with undefined package!')
+            LOGGER.error('Impossible to retrieve data from plugin with undefined package!')
             return None
 
         if package_name not in self._plugins:
-            tp.logger.error(
-                'Impossible to retrieve data from instance: package "{}" not registered!'.format(package_name))
+            LOGGER.error('Impossible to retrieve data from instance: package "{}" not registered!'.format(package_name))
             return None
 
         package_tools = self.get_registered_tools(package_name=package_name)
@@ -416,17 +389,18 @@ class ToolsManager(plugins.PluginsManager, object):
         """
         Returns tool instance by given plugin instance
         :param plugin:
+        :param package_name: str
         :return:
         """
 
         if not package_name:
             package_name = plugin.PACKAGE
         if not package_name:
-            tp.logger.error('Impossible to retrieve data from plugin with undefined package!')
+            LOGGER.error('Impossible to retrieve data from plugin with undefined package!')
             return None
 
         if package_name not in self._plugins:
-            tp.logger.error(
+            LOGGER.error(
                 'Impossible to retrieve data from instance: package "{}" not registered!'.format(package_name))
             return None
 
@@ -452,7 +426,7 @@ class ToolsManager(plugins.PluginsManager, object):
             package_name = tool_id.replace('.', '-').split('-')[0]
 
         if package_name not in self._plugins:
-            tp.logger.warning('Impossible to load tool by id: package "{}" is not registered!'.format(package_name))
+            LOGGER.warning('Impossible to load tool by id: package "{}" is not registered!'.format(package_name))
             return None
 
         if tool_id in self._plugins[package_name]:
@@ -475,7 +449,7 @@ class ToolsManager(plugins.PluginsManager, object):
                     break
 
         if not tool_to_run or tool_to_run not in self._plugins[package_name]:
-            tp.logger.warning('Tool "{}" is not registered!'.format(tool_id))
+            LOGGER.warning('Tool "{}" is not registered!'.format(tool_id))
             return None
 
         tool_loader = self._plugins[package_name][tool_to_run]['loader']
@@ -501,7 +475,7 @@ class ToolsManager(plugins.PluginsManager, object):
                 break
 
         if not tool_found:
-            tp.logger.error("Error while launching tool: {}".format(tool_fullname))
+            LOGGER.error("Error while launching tool: {}".format(tool_fullname))
             return None
 
         # if dcc_loader:
@@ -520,7 +494,8 @@ class ToolsManager(plugins.PluginsManager, object):
         tool_inst.AUTHOR = tool_inst.config_dict().get('creator', None)
         tool_inst.PACKAGE = package_name
 
-        self._plugins[package_name][plugin_id]['tool_instance'] = tool_inst
+        self._plugins[package_name][tool_id]['tool_instance'] = tool_inst
+        # self._plugins[package_name][plugin_id]['tool_instance'] = tool_inst
 
         return tool_inst
 
@@ -547,7 +522,7 @@ class ToolsManager(plugins.PluginsManager, object):
                 hub_ui.toggle_toolset(tool_id)
                 return tool_inst
             else:
-                tp.logger.warning('No HubUI tool opened. Opening tool using standard method ...')
+                LOGGER.warning('No HubUI tool opened. Opening tool using standard method ...')
 
         self.close_tool(tool_id)
         with contexts.application():
@@ -564,7 +539,7 @@ class ToolsManager(plugins.PluginsManager, object):
             return False
 
         closed_tool = False
-        parent = tp.Dcc.get_main_window()
+        parent = dcc.get_main_window()
         if parent:
             for child in parent.children():
                 if child.objectName() == tool_id:
@@ -611,7 +586,7 @@ class ToolsManager(plugins.PluginsManager, object):
             tool_inst._launch(*args, **kwargs)
             self._loaded_tools[tool_id] = tool_inst
 
-        tp.logger.debug('Execution time: {}'.format(tool_inst.stats.execution_time))
+        LOGGER.debug('Execution time: {}'.format(tool_inst.stats.execution_time))
 
         return tool_inst
 
@@ -622,7 +597,7 @@ class ToolsManager(plugins.PluginsManager, object):
     def close_hub_ui(self, hub_ui_inst):
         if hub_ui_inst in self._hub_tools:
             self._hub_tools.remove(hub_ui_inst)
-            tp.logger.debug('Close tpDcc Hub UI: {}'.format(hub_ui_inst))
+            LOGGER.debug('Close tpDcc Hub UI: {}'.format(hub_ui_inst))
 
     def get_hub_uis(self):
         return self._hub_tools
@@ -677,13 +652,13 @@ class ToolsManager(plugins.PluginsManager, object):
             package_name = tool_id.replace('.', '-').split('-')[0]
 
         if package_name not in self._plugins:
-            tp.logger.warning(
+            LOGGER.warning(
                 'Impossible to retrieve tool config for "{}" in package "{}"! Package not registered.'.format(
                     tool_id, package_name))
             return None
 
         if tool_id not in self._plugins[package_name]:
-            tp.logger.warning(
+            LOGGER.warning(
                 'Impossible to retrieve tool config for "{}" in package "{}"! Tool not found'.format(
                     tool_id, package_name))
             return None
@@ -709,14 +684,4 @@ class ToolsManager(plugins.PluginsManager, object):
             return None
 
         theme_name = found_tool.settings.get('theme', 'default')
-        return tp.ResourcesMgr().theme(theme_name)
-
-
-@decorators.Singleton
-class ToolsManagerSingleton(ToolsManager, object):
-    """
-    Singleton class that holds preferences manager instance
-    """
-
-    def __init__(self, ):
-        ToolsManager.__init__(self)
+        return resources.theme(theme_name)

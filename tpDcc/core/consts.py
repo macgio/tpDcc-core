@@ -16,6 +16,9 @@ if python.is_python2():
 else:
     from enum import Enum
 
+# =======~============ GENERAL
+TPDCC_DCCS_NAMESPACE = 'tpDcc.dccs'
+
 # =================== PROJECTS
 PROJECTS_NAME = 'project.json'
 CODE_FOLDER = '__code__'

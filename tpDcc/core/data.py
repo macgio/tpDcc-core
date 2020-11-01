@@ -13,9 +13,10 @@ import uuid
 import logging
 from collections import OrderedDict
 
+from tpDcc.dcc import dialog
 from tpDcc.libs.python import decorators, path, fileio, folder, settings
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('tpDcc-core')
 
 
 class DataTypes(object):
@@ -336,8 +337,6 @@ class CustomData(FileData, object):
         :param force: bool, True to force save if the file already exists (overwrite)
         """
 
-        from tpDcc.libs.qt.core import dialog
-
         if not file_path or not os.path.isfile(file_path):
             file_path_dialog = dialog.SaveFileDialog(parent=self, use_app_browser=False)
             file_path_dialog.set_filters(self.file_filter)
@@ -356,8 +355,6 @@ class CustomData(FileData, object):
         Override for custom import functionality
         :param file_path: str, file path of file to load
         """
-
-        from tpDcc.libs.qt.core import dialog
 
         if not file_path:
             file_path_dialog = dialog.OpenFileDialog(parent=self, use_app_browser=False)

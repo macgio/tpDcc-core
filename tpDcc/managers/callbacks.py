@@ -8,10 +8,12 @@ Module that contains base callbackManager class
 from __future__ import print_function, division, absolute_import
 
 import sys
+import logging
 
-import tpDcc
-from tpDcc import register
+from tpDcc import dcc
 from tpDcc.abstract import callback
+
+LOGGER = logging.getLogger('tpDcc-core')
 
 
 class CallbacksManager(object):
@@ -48,27 +50,27 @@ class CallbacksManager(object):
             elif n_type == 'filter':
                 callback_type = callback.FilterCallback
             else:
-                tpDcc.logger.warning('Callback Type "{}" is not valid! Using Simplecallback instead ...'.format(n_type))
+                LOGGER.warning('Callback Type "{}" is not valid! Using Simplecallback instead ...'.format(n_type))
                 callback_type = callback.SimpleCallback
 
             # We extract callback types from the specific registered callbacks module
             if not hasattr(tpDcc, 'Callbacks'):
-                tpDcc.logger.warning('DCC {} has no callbacks registered!'.format(tpDcc.Dcc.get_name()))
+                LOGGER.warning('DCC {} has no callbacks registered!'.format(dcc.get_name()))
                 return
 
             callback_class = getattr(tpDcc.Callbacks, '{}Callback'.format(callback_name), None)
             if not callback_class:
                 callback_class = default_callbacks.get(callback_name, callback.ICallback)
-                tpDcc.logger.warning(
+                LOGGER.warning(
                     'Dcc {} does not provides an ICallback for {}Callback. Using {} instead'.format(
-                        tpDcc.Dcc.get_name(), callback_name, callback_class.__name__))
+                        dcc.get_name(), callback_name, callback_class.__name__))
 
             new_callback = getattr(tpDcc, callback_name, None)
             if new_callback:
                 new_callback.cleanup()
-            register.register_class(callback_name, callback_type(callback_class, shutdown_type), skip_store=True)
+            # register.register_class(callback_name, callback_type(callback_class, shutdown_type), skip_store=True)
 
-            tpDcc.logger.debug('Creating Callback "{}" of type "{}" ...'.format(callback_name, callback_class))
+            LOGGER.debug('Creating Callback "{}" of type "{}" ...'.format(callback_name, callback_class))
 
         cls._initialized = True
 
@@ -120,7 +122,6 @@ class CallbacksManager(object):
     def cleanup(cls):
         """
         Cleanup all module callbacks
-        :param owner: class, If given, only
         :return:
         """
 

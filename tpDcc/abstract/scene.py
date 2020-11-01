@@ -7,7 +7,7 @@ Module that contains DCC scene abstract class implementation
 
 from __future__ import print_function, division, absolute_import
 
-import tpDcc as tp
+from tpDcc import dcc
 from tpDcc.libs.python import decorators, python
 
 
@@ -105,7 +105,7 @@ class AbstractScene(object):
         if not dcc_root:
             return None
 
-        return tp.Dcc.SceneObject(self, dcc_root)
+        return dcc.SceneObject(self, dcc_root)
 
     def remove_objects(self, objects):
         """
@@ -171,7 +171,7 @@ class AbstractScene(object):
         :return: variant
         """
 
-        return tp.Dcc.root_node()
+        return dcc.root_node()
 
     def _remove_dcc_objects(self, dcc_native_objects):
         """
@@ -180,7 +180,7 @@ class AbstractScene(object):
         :return: bool, True if the operation is successful; False otherwise
         """
 
-        return tp.Dcc.delete_object(dcc_native_objects)
+        return dcc.delete_node(dcc_native_objects)
 
     def _find_dcc_object_by_name(self, name):
         """
@@ -189,7 +189,7 @@ class AbstractScene(object):
         :return: variant
         """
 
-        return tp.Dcc.find_node_by_name(name)
+        return dcc.find_node_by_name(name)
 
     def _find_dcc_object_by_id(self, unique_id):
         """
@@ -198,4 +198,4 @@ class AbstractScene(object):
         :return: variant
         """
 
-        return tp.Dcc.find_node_by_id(unique_id)
+        return dcc.find_node_by_id(unique_id)

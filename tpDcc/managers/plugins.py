@@ -1,9 +1,22 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Module that contains implementation for DCC plugins
+"""
+
+from __future__ import print_function, division, absolute_import
+
 import os
 import inspect
+import logging
+import traceback
 
 import tpDcc as tp
 from tpDcc.core import plugin
 from tpDcc.libs.python import python, modules
+
+LOGGER = logging.getLogger('tpDcc-core')
 
 
 class PluginsManager(object):
@@ -47,6 +60,7 @@ class PluginsManager(object):
         Returns registered plugin from its name
         :param plugin_name: str
         :param as_dict: bool
+        :param package_name: str
         :return:
         """
 
@@ -69,28 +83,6 @@ class PluginsManager(object):
                     return self._plugins[package_name][plugin_id]
 
         return None
-
-    # def get_plugin_data_from_plugin_instance(self, plugin, as_dict=False, package_name=None):
-    #     """
-    #     Returns registered plugin data from a plugin object
-    #     :return: dict
-    #     """
-    #
-    #     if not package_name:
-    #         package_name = plugin.PACKAGE
-    #     if not package_name:
-    #         tp.logger.error('Impossible to retrieve data from plugin with undefined package!')
-    #         return None
-    #
-    #     if package_name not in self._plugins:
-    #         tp.logger.error(
-    #             'Impossible to retrieve data from instance: package "{}" not registered!'.format(package_name))
-    #         return None
-    #
-    #     if hasattr(plugin, 'ID'):
-    #         return self._plugins[package_name].get(plugin.ID, None)
-    #
-    #     return None
 
     def register_plugin(self, class_obj, package_name):
         """
@@ -130,8 +122,8 @@ class PluginsManager(object):
             module_path = modules.convert_to_dotted_path(os.path.normpath(sub_module))
             try:
                 sub_module_obj = modules.import_module(module_path, skip_errors=True)
-            except Exception as exc:
-                # tp.logger.error('Error while importing module: {} | {}'.format(module_path, traceback.format_exc()))
+            except Exception:
+                LOGGER.error('Error while importing module: {} | {}'.format(module_path, traceback.format_exc()))
                 continue
             if not sub_module_obj:
                 return

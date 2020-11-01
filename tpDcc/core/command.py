@@ -10,14 +10,17 @@ from __future__ import print_function, division, absolute_import
 import sys
 import time
 import inspect
+import logging
 import traceback
 from collections import deque
 from abc import ABCMeta, abstractproperty, abstractmethod
 
-import tpDcc as tp
+from tpDcc import dcc
 from tpDcc.core import exceptions
 from tpDcc.managers import plugins
 from tpDcc.libs.python import decorators, osplatform
+
+LOGGER = logging.getLogger('tpDcc-core')
 
 
 @decorators.add_metaclass(ABCMeta)
@@ -70,15 +73,6 @@ class DccCommand(object):
         """
 
         raise NotImplementedError('abstract command DCC property creator not implemented!')
-
-    @abstractproperty
-    def is_undoable(self):
-        """
-        Returns whether or not this command is enabled
-        :return: bol
-        """
-
-        return True
 
     @abstractproperty
     def is_undoable(self):
@@ -206,7 +200,7 @@ class CommandStats(object):
             'module': self._command.__class__.__module__,
             'filepath': inspect.getfile(self._command.__class__),
             'id': self._command.id,
-            'application': tp.Dcc.get_name()
+            'application': dcc.get_name()
         })
         self._info.update(osplatform.machine_info())
 
@@ -237,7 +231,7 @@ class MetaCommandRunner(type):
 
     def __call__(cls, *args, **kwargs):
         if cls._instance is None:
-            if tp.is_maya():
+            if dcc.is_maya():
                 from tpDcc.dccs.maya.core import command
                 cls._instance = type.__call__(command.MayaCommandRunner, *args, **kwargs)
             else:
@@ -294,7 +288,7 @@ class BaseCommandRunner(object):
         except Exception:
             exc_type, exc_value, exc_trace = sys.exc_info()
             trace = traceback.format_exception(exc_type, exc_value, exc_trace)
-            tp.logger.exception(trace)
+            LOGGER.exception(trace)
             raise
         finally:
             if not trace and command_to_run.is_undoable:
@@ -332,7 +326,7 @@ class BaseCommandRunner(object):
                 except Exception:
                     exc_type, exc_value, exc_trace = sys.exc_info()
                     trace = traceback.format_exception(exc_type, exc_value, exc_trace)
-                    tp.logger.exception(trace)
+                    LOGGER.exception(trace)
                 finally:
                     if not trace and command_to_redo.is_undoable:
                         self._undo_stack.append(command_to_redo)

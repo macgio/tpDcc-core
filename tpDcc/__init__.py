@@ -14,8 +14,4 @@ __email__ = "tpovedatd@gmail.com"
 
 from pkgutil import extend_path
 
-if False:
-    from tpDcc.abstract import dcc
-    Dcc = dcc.AbstractDCC()
-
 __path__ = extend_path(__path__, __name__)

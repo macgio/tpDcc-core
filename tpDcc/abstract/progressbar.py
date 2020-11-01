@@ -10,11 +10,6 @@ from tpDcc.libs.python import decorators
 
 class AbstractProgressBar(object):
 
-    inc_value = 0
-
-    def __init__(self, *args, **kwargs):
-        self.progress_ui = None
-
     @decorators.abstractmethod
     def set_count(self, count_number):
         pass
@@ -39,5 +34,6 @@ class AbstractProgressBar(object):
     def set_progress(self, value):
         pass
 
+    @decorators.abstractmethod
     def inc(self, inc=1):
-        self.__class__.inc_value += inc
+        pass

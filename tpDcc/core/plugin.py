@@ -10,10 +10,11 @@ from __future__ import print_function, division, absolute_import
 import time
 import inspect
 
-import tpDcc as tp
+from tpDcc import dcc
 
 
 class Plugin(object):
+
     """
     Base class for plugins
     """
@@ -78,7 +79,7 @@ class PluginStats(object):
             'module': self._plugin.__class__.__module__,
             'filepath': inspect.getfile(self._plugin.__class__),
             'id': self._id,
-            'application': tp.Dcc.get_name()
+            'application': dcc.get_name()
         })
 
     def start(self):

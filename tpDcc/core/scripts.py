@@ -8,10 +8,8 @@ Module that contains script data definitions for DCCs
 from __future__ import print_function, division, absolute_import
 
 
-from tpDcc.libs.python import path, fileio
-
-
 from tpDcc.core import data
+from tpDcc.libs.python import path, fileio
 
 
 class ScriptTypes(object):

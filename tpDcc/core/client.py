@@ -1,22 +1,34 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Module that contains DCC core client implementation
+"""
+
+from __future__ import print_function, division, absolute_import
+
 import os
 import sys
 import time
 import json
 import socket
 import pkgutil
+import logging
 import traceback
 from collections import OrderedDict
 
-from Qt.QtCore import *
+from Qt.QtCore import Signal, QObject
 
 import tpDcc.loader
 import tpDcc.config
-import tpDcc.libs.python.loader
+import tpDcc.libs.python
 import tpDcc.libs.qt.loader
 from tpDcc.libs.python import python, path as path_utils
 
 if sys.version_info[0] == 2:
     from socket import error as ConnectionRefusedError
+
+LOGGER = logging.getLogger('tpDcc-core')
 
 
 class DccClientSignals(QObject, object):
@@ -54,10 +66,10 @@ class DccClient(object):
             self._client_socket.connect(('localhost', self._port))
             self._client_socket.setblocking(0)
         except ConnectionRefusedError as exc:
-            tpDcc.logger.warning(exc)
+            LOGGER.warning(exc)
             return False
         except Exception:
-            tpDcc.logger.exception(traceback.format_exc())
+            LOGGER.exception(traceback.format_exc())
             return False
 
         return True
@@ -91,10 +103,10 @@ class DccClient(object):
                 msg_str = ''.join(message)
                 self._client_socket.sendall(msg_str.encode())
             except OSError as exc:
-                tpDcc.logger.debug(exc)
+                LOGGER.debug(exc)
                 return None
             except Exception:
-                tpDcc.logger.exception(traceback.format_exc())
+                LOGGER.exception(traceback.format_exc())
                 return None
 
             return self.recv()
@@ -140,11 +152,11 @@ class DccClient(object):
 
     def is_valid_reply(self, reply_dict):
         if not reply_dict:
-            tpDcc.logger.debug('Invalid reply')
+            LOGGER.debug('Invalid reply')
             return False
 
         if not reply_dict['success']:
-            tpDcc.logger.error('{} failed: {}'.format(reply_dict['cmd'], reply_dict['msg']))
+            LOGGER.error('{} failed: {}'.format(reply_dict['cmd'], reply_dict['msg']))
             return False
 
         return True
@@ -196,7 +208,7 @@ class DccClient(object):
         elif 'unreal' in dcc_executable:
             dcc_name = 'unreal'
         if not dcc_name:
-            tpDcc.logger.warning('Executable DCC {} is not supported!'.format(dcc_executable))
+            LOGGER.warning('Executable DCC {} is not supported!'.format(dcc_executable))
             return False
 
         module_name = 'tpDcc.dccs.{}.loader'.format(dcc_name)
@@ -204,13 +216,13 @@ class DccClient(object):
             mod = pkgutil.get_loader(module_name)
         except Exception:
             try:
-                tpDcc.logger.error('FAILED IMPORT: {} -> {}'.format(str(module_name), str(traceback.format_exc())))
+                LOGGER.error('FAILED IMPORT: {} -> {}'.format(str(module_name), str(traceback.format_exc())))
                 return
             except Exception:
-                tpDcc.logger.error('FAILED IMPORT: {}'.format(module_name))
+                LOGGER.error('FAILED IMPORT: {}'.format(module_name))
                 return
         if not mod:
-            tpDcc.logger.warning('Impossible to import DCC specific module: {} ({})'.format(module_name, dcc_name))
+            LOGGER.warning('Impossible to import DCC specific module: {} ({})'.format(module_name, dcc_name))
             return False
 
         cmd = {
@@ -347,9 +359,9 @@ class DccClient(object):
             'tpDcc.loader': path_utils.clean_path(os.path.dirname(os.path.dirname(tpDcc.loader.__file__))),
             'tpDcc.config': path_utils.clean_path(
                 os.path.dirname(os.path.dirname(os.path.dirname(tpDcc.config.__file__)))),
-            'tpDcc.libs.python.loader': path_utils.clean_path(
+            'tpDcc.libs.python': path_utils.clean_path(
                 os.path.dirname(
-                    os.path.dirname(os.path.dirname(os.path.dirname(tpDcc.libs.python.loader.__file__))))),
+                    os.path.dirname(os.path.dirname(os.path.dirname(tpDcc.libs.python.__file__))))),
             'tpDcc.libs.qt.loader': path_utils.clean_path(
                 os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(tpDcc.libs.qt.loader.__file__)))))
         }

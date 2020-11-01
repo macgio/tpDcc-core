@@ -11,14 +11,19 @@ import os
 import sys
 import copy
 import time
+import logging
 import traceback
 from functools import partial
 
-from Qt.QtCore import *
+from Qt.QtCore import Qt
 
-import tpDcc as tp
+from tpDcc import dcc
+from tpDcc.dcc import window
 from tpDcc.core import plugin
+from tpDcc.managers import resources
 from tpDcc.libs.python import decorators
+
+LOGGER = logging.getLogger('tpDcc-core')
 
 
 class DccTool(plugin.Plugin, object):
@@ -161,7 +166,9 @@ class DccTool(plugin.Plugin, object):
         :return:
         """
 
-        frameless_toggle = tp.ToolsMgr().get_tool_by_id('tpDcc-tools-frameless_toggle')
+        from tpDcc.managers import tools
+
+        frameless_toggle = tools.ToolsManager().get_tool_by_id('tpDcc-tools-frameless_toggle')
         if not frameless_toggle:
             return False
 
@@ -198,17 +205,19 @@ class DccTool(plugin.Plugin, object):
         :return:
         """
 
+        from tpDcc.libs.qt.managers import toolsets
+
         tool_config_dict = self.config_dict()
         tool_name = tool_config_dict.get('name', None)
         tool_id = tool_config_dict.get('id', None)
         tool_size = tool_config_dict.get('size', None)
         if not tool_name or not tool_id:
-            tp.logger.warning('Impossible to run tool "{}" with id: "{}"'.format(tool_name, tool_id))
+            LOGGER.warning('Impossible to run tool "{}" with id: "{}"'.format(tool_name, tool_id))
             return None
 
-        toolset_class = tp.ToolsetsMgr().toolset(tool_id)
+        toolset_class = toolsets.ToolsetsManager().toolset(tool_id)
         if not toolset_class:
-            tp.logger.warning('Impossible to run tool! No toolset found with id: "{}"'.format(tool_id))
+            LOGGER.warning('Impossible to run tool! No toolset found with id: "{}"'.format(tool_id))
             return None
         toolset_data_copy = copy.deepcopy(self._config.data)
         toolset_data_copy.update(toolset_class.CONFIG.data)
@@ -223,7 +232,7 @@ class DccTool(plugin.Plugin, object):
         toolset_inst.initialize()
 
         if not attacher_class:
-            attacher_class = tp.Window
+            attacher_class = window.Window
 
         self._attacher = attacher_class(
             id=tool_id, title=tool_name, config=toolset_class.CONFIG, settings=self.settings,
@@ -259,15 +268,15 @@ class DccTool(plugin.Plugin, object):
         try:
             self.cleanup()
         except RuntimeError:
-            tp.logger.error('Failed to cleanup plugin: {}'.format(self.ID), exc_info=True)
+            LOGGER.error('Failed to cleanup plugin: {}'.format(self.ID), exc_info=True)
         finally:
             try:
                 for widget in self._bootstrap:
                     widget.close()
             except RuntimeError:
-                tp.logger.error('Tool Widget already deleted: {}'.format(self._bootstrap), exc_info=True)
+                LOGGER.error('Tool Widget already deleted: {}'.format(self._bootstrap), exc_info=True)
             except Exception:
-                tp.logger.error('Failed to remove tool widget: {}'.format(self._bootstrap), exc_info=True)
+                LOGGER.error('Failed to remove tool widget: {}'.format(self._bootstrap), exc_info=True)
 
     def _launch(self, *args, **kwargs):
         """
@@ -293,10 +302,10 @@ class DccTool(plugin.Plugin, object):
                     #     uid = "{0} [{1}]".format(self.uiData["label"], str(uuid.uuid4()))
                     ui_label = self._config.get('name', default='')
                     ui_icon = self._config.get('icon', default='tpdcc')
-                    if tp.is_maya():
+                    if dcc.is_maya():
                         from tpDcc.dccs.maya.ui import window
                         bootstrap_widget = window.BootStrapWidget(
-                            tool_data['tool'], title=ui_label, icon=tp.ResourcesMgr().icon(ui_icon), uid=uid)
+                            tool_data['tool'], title=ui_label, icon=resources.icon(ui_icon), uid=uid)
                         tool_data['bootstrap'] = bootstrap_widget
                         tool_data['bootstrap'].show(
                             retain=False, dockable=True, tabToControl=('AttributeEditor', -1), floating=False)

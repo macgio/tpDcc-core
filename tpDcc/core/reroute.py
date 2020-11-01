@@ -2,17 +2,20 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains tpRigToolkit-lbs-controllib reroute decorator implementation
+Module that contains tpDcc reroute decorator implementation
 Decorator that reroutes the function call on runtime to specific DCC implementations of the given function
 """
 
 from __future__ import print_function, division, absolute_import
 
 import os
+import logging
 import importlib
 from functools import wraps
 
-import tpDcc as tp
+from tpDcc import dcc
+
+LOGGER = logging.getLogger('tpDcc-core')
 
 REROUTE_CACHE = dict()
 
@@ -24,7 +27,7 @@ def reroute_factory(module_path=None, module_name=None):
 
             global REROUTE_CACHE
 
-            current_dcc = os.getenv('REROUTE_DCC', tp.Dcc.get_name())
+            current_dcc = os.getenv('REROUTE_DCC', dcc.get_name())
             if not current_dcc:
                 return None
 
@@ -44,10 +47,10 @@ def reroute_factory(module_path=None, module_name=None):
                 try:
                     fn_mod = importlib.import_module(fn_mod_path)
                 except ImportError as exc:
-                    tp.logger.warning(
+                    LOGGER.warning(
                         '{} | Function {} not implemented: {}'.format(current_dcc, fn_path, exc))
                 except Exception as exc:
-                    tp.logger.warning(
+                    LOGGER.warning(
                         '{} | Error while rerouting function {}: {}'.format(current_dcc, fn_path, exc))
                 if fn_mod:
                     if hasattr(fn_mod, fn_name):

@@ -7,7 +7,7 @@ Module that contains DCC scene object abstract class implementation
 
 from __future__ import print_function, division, absolute_import
 
-import tpDcc as tp
+from tpDcc import dcc
 from tpDcc.abstract import scenewrapper
 from tpDcc.core import consts
 from tpDcc.libs.python import python
@@ -31,7 +31,7 @@ class AbstractSceneObject(scenewrapper.AbstractSceneWrapper, object):
                 if not sub_class._object_type == consts.ObjectTypes.Generic:
                     cls._sub_classes[sub_class._object_type] = sub_class
 
-        scene_object_type = tp.Dcc.node_tpdcc_type(native_dcc_object)
+        scene_object_type = dcc.node_tpdcc_type(native_dcc_object)
 
         if scene_object_type in cls._sub_classes:
             sub_class = cls._sub_classes[scene_object_type]
@@ -50,7 +50,7 @@ class AbstractSceneObject(scenewrapper.AbstractSceneWrapper, object):
         :return: bool
         """
 
-        return tp.Dcc.node_is_root(self._dcc_native_object)
+        return dcc.node_is_root(self._dcc_native_object)
 
     def is_deleted(self):
         """
@@ -58,7 +58,7 @@ class AbstractSceneObject(scenewrapper.AbstractSceneWrapper, object):
         :return: bool
         """
 
-        return not tp.Dcc.object_exists(self._dcc_native_object)
+        return not dcc.node_exists(self._dcc_native_object)
 
     def is_selected(self):
         """
@@ -66,7 +66,7 @@ class AbstractSceneObject(scenewrapper.AbstractSceneWrapper, object):
         :return: bool
         """
 
-        return tp.Dcc.node_is_selected(self._dcc_native_object)
+        return dcc.node_is_selected(self._dcc_native_object)
 
     def is_box_mode(self):
         """
@@ -74,7 +74,7 @@ class AbstractSceneObject(scenewrapper.AbstractSceneWrapper, object):
         :return: bool
         """
 
-        return tp.Dcc.node_is_box_mode(self._dcc_native_object)
+        return dcc.node_is_box_mode(self._dcc_native_object)
 
     def is_hidden(self):
         """
@@ -82,5 +82,5 @@ class AbstractSceneObject(scenewrapper.AbstractSceneWrapper, object):
         :return: bool
         """
 
-        return tp.Dcc.node_is_hidden(self._dcc_native_object)
+        return dcc.node_is_hidden(self._dcc_native_object)
 

@@ -7,7 +7,7 @@ Module that contains abstract definition of DCC nodes
 
 from __future__ import print_function, division, absolute_import
 
-import tpDcc
+from tpDcc import dcc
 from tpDcc.core import exceptions
 
 
@@ -16,11 +16,11 @@ class Node(object):
     @classmethod
     def ls(cls, objects=None, selection=False):
         if objects is None and not selection:
-            objects = tp.Dcc.all_scene_objects(full_path=False)
+            objects = dcc.all_scene_nodes(full_path=False)
         else:
             objects = objects or list()
             if selection:
-                objects.extend(tp.Dcc.selected_nodes(full_path=False) or [])
+                objects.extend(dcc.selected_nodes(full_path=False) or [])
 
         return [cls(name) for name in objects]
 
@@ -50,7 +50,7 @@ class Node(object):
         return self._short_name
 
     def to_short_name(self):
-        names = tp.Dcc.list_nodes(node_name=self.short_name())
+        names = dcc.list_nodes(node_name=self.short_name())
         if len(names) == 1:
             return Node(names[0])
         elif len(names) > 1:
@@ -68,13 +68,13 @@ class Node(object):
             self._name = self.name()[1:]
 
     def exists(self):
-        return tp.Dcc.object_exists(self.name())
+        return dcc.node_exists(self.name())
 
     def is_long(self):
         return '|' in self.name()
 
     def is_referenced(self):
-        return tp.Dcc.node_is_referenced(self.name())
+        return dcc.node_is_referenced(self.name())
 
     def set_mirror_axis(self, mirror_axis):
         """
@@ -142,8 +142,8 @@ def get_reference_paths(objects, without_copy_number=False):
 
     paths = list()
     for obj in objects:
-        if tp.Dcc.node_is_referenced(obj):
-            paths.append(tp.Dcc.node_reference_path(obj, without_copy_number=without_copy_number))
+        if dcc.node_is_referenced(obj):
+            paths.append(dcc.node_reference_path(obj, without_copy_number=without_copy_number))
 
     return list(set(paths))
 
@@ -160,9 +160,9 @@ def get_reference_data(objects):
     for path in paths:
         data.append({
             'filename': path,
-            'unresolved': tp.Dcc.node_reference_path(path, without_copy_number=True),
-            'namespace': tp.Dcc.node_namespace(path),
-            'node': tp.Dcc.node_is_referenced(path)
+            'unresolved': dcc.node_reference_path(path, without_copy_number=True),
+            'namespace': dcc.node_namespace(path),
+            'node': dcc.node_is_referenced(path)
         })
 
     return data
