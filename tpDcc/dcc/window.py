@@ -17,11 +17,18 @@ from tpDcc.libs.qt.widgets import window
 class _MetaWindow(type):
 
     def __call__(cls, *args, **kwargs):
+        as_class = kwargs.pop('as_class', False)
         if dcc.is_maya():
             from tpDcc.dccs.maya.ui import window as maya_window
-            return type.__call__(maya_window.MayaWindow, *args, **kwargs)
+            if as_class:
+                return maya_window.MayaWindow
+            else:
+                return type.__call__(maya_window.MayaWindow, *args, **kwargs)
         else:
-            return type.__call__(window.MainWindow, *args, **kwargs)
+            if as_class:
+                return window.MainWindow
+            else:
+                return type.__call__(window.MainWindow, *args, **kwargs)
 
 
 @decorators.add_metaclass(_MetaWindow)

@@ -8,7 +8,7 @@ Module that contains custom Dcc progress bar classes
 from __future__ import print_function, division, absolute_import
 
 from tpDcc import dcc
-from tpDcc.abstract import progressbar
+from tpDcc.abstract import progressbar as abstract_progressbar
 from tpDcc.libs.python import decorators
 
 
@@ -22,7 +22,7 @@ class _MetaProgressBar(type):
             return type.__call__(BaseProgressBar, *args, **kwargs)
 
 
-class BaseProgressBar(progressbar.AbstractProgressBar):
+class BaseProgressBar(abstract_progressbar.AbstractProgressBar):
 
     inc_value = 0
 
@@ -52,5 +52,5 @@ class BaseProgressBar(progressbar.AbstractProgressBar):
 
 
 @decorators.add_metaclass(_MetaProgressBar)
-class ProgressBar(progressbar.AbstractProgressBar, object):
+class ProgressBar(abstract_progressbar.AbstractProgressBar, object):
     pass

@@ -33,7 +33,9 @@ def init(dev=False):
     Initializes module
     :param dev: bool, Whether tpDcc-core is initialized in dev mode or not
     """
-
+    
+    if dev:
+        os.environ['TPDCC_DEV'] = str(dev)
     logger = create_logger(dev=dev)
 
     # Get DCC loader module
