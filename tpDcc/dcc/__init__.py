@@ -2561,6 +2561,7 @@ def clean_scene():
 # TRANSFORMS
 # =================================================================================================================
 
+@dcc.reroute
 @decorators.abstractmethod
 def get_up_axis_name():
     """
@@ -2911,6 +2912,18 @@ def duplicate_hierarchy(transforms, stop_at=None, force_only_these=None, replace
     :param replace_str: str, if given this string will be replace with the new_str
     :param new_str: str, if given replace_str will be replace with this string
     :return: list(str)
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def center_pivot(node):
+    """
+    Centers the pivot of the given node
+    :param node: str
+    :return:
     """
 
     pass
