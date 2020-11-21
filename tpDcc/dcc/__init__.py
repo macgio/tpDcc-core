@@ -12,6 +12,41 @@ from tpDcc.libs.python import decorators
 
 main = __import__('__main__')
 
+_CLIENTS = dict()
+
+
+def client(key=None):
+    """
+    Returns first current active DCC client
+    :return: DccClient
+    """
+
+    from tpDcc import dcc
+
+    if not _CLIENTS:
+        return dcc
+
+    # Clients are stored as a weak reference
+    client = None
+    if key:
+        client = _CLIENTS.get(key, None)()
+    if not client:
+        client = _CLIENTS[list(_CLIENTS.keys())[0]]()
+
+    return client
+
+
+def clients():
+    """
+    Returns all current active DCCs
+    :return: list(DccClient)
+    """
+
+    if not _CLIENTS:
+        return client()
+
+    return [found_client() for found_client in _CLIENTS]
+
 
 def is_standalone():
     """
@@ -2155,6 +2190,17 @@ def list_namespaces():
 
 @dcc.reroute
 @decorators.abstractmethod
+def list_namespaces_from_selection():
+    """
+    Returns all namespaces of current selected objects
+    :return: list(str)
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
 def namespace_separator():
     """
     Returns character used to separate namespace from the node name
@@ -2931,10 +2977,44 @@ def center_pivot(node):
 
 @dcc.reroute
 @decorators.abstractmethod
-def move_pivot_to_zero(node):
+def move_pivot_in_object_space(node, x, y, z):
     """
-    Moves pivot of given node to zero (0, 0, 0 in the world)
+    Moves the pivot of the given node by the given values in object_space
     :param node: str
+    :param x: float
+    :param y: float
+    :param z: float
+    :return: float
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def move_pivot_in_world_space(node, x, y, z):
+    """
+    Moves the pivot of the given node by the given values in world space
+    :param node: str
+    :param x: float
+    :param y: float
+    :param z: float
+    :return: float
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def move_pivot(node, x, y, z):
+    """
+    Moves the pivot of the given node by the given values
+    :param node: str
+    :param x: float
+    :param y: float
+    :param z: float
+    :return: float
     """
 
     pass
@@ -4672,7 +4752,7 @@ def lock_scale_and_visibility_attributes(node):
 
 @dcc.reroute
 @decorators.abstractmethod
-def hide_keyable_attributes(node):
+def hide_keyable_attributes(node, **kwargs):
     """
     Hides all node attributes that are keyable
     :param node: str
@@ -6026,6 +6106,16 @@ def disable_wait_cursor():
 def suspend_refresh_decorator():
     """
     Returns suspend refresh decorator for current DCC
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def restore_selection_decorator():
+    """
+    Selects again the objects that were selected before executing the decorated function
     """
 
     pass

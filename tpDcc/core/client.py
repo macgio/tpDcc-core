@@ -22,8 +22,9 @@ from Qt.QtCore import Signal, QObject
 import tpDcc.loader
 import tpDcc.config
 import tpDcc.libs.python
+import tpDcc.libs.resources
 import tpDcc.libs.qt.loader
-from tpDcc.libs.python import python, path as path_utils
+from tpDcc.libs.python import path as path_utils
 
 if sys.version_info[0] == 2:
     from socket import error as ConnectionRefusedError
@@ -47,16 +48,40 @@ class DccClient(object):
         self._port = self.__class__.PORT
         self._discard_count = 0
         self._server = None
+        self._connected = False
+
+    def __getattribute__(self, name):
+        try:
+            attr = super(DccClient, self).__getattribute__(name)
+        except AttributeError:
+            def new_fn(*args, **kwargs):
+                cmd = {
+                    'cmd': name,
+                }
+                cmd.update(kwargs)
+                reply_dict = self.send(cmd)
+                if not self.is_valid_reply(reply_dict):
+                    return False
+                return reply_dict['result']
+            return new_fn
+
+        return attr
+
+    # =================================================================================================================
+    # PROPERTIES
+    # =================================================================================================================
+
+    @property
+    def server(self):
+        return self._server
 
     # =================================================================================================================
     # BASE
     # =================================================================================================================
 
-    def set_server(self, server):
-        self._server = server
-
     def connect(self, port=-1):
         if self._server:
+            self._connected = True
             return True
 
         if port > 0:
@@ -64,13 +89,17 @@ class DccClient(object):
         try:
             self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._client_socket.connect(('localhost', self._port))
-            self._client_socket.setblocking(0)
+            # self._client_socket.setblocking(0)
         except ConnectionRefusedError as exc:
             LOGGER.warning(exc)
+            self._connected = False
             return False
         except Exception:
             LOGGER.exception(traceback.format_exc())
+            self._connected = False
             return False
+
+        self._connected = True
 
         return True
 
@@ -95,6 +124,9 @@ class DccClient(object):
                 return {'success': False}
             return json.loads(reply_json)
         else:
+            if not self._connected:
+                return None
+
             message = list()
             message.append('{0:10d}'.format(len(json_cmd.encode())))    # header (10 bytes)
             message.append(json_cmd)
@@ -229,7 +261,7 @@ class DccClient(object):
             'cmd': 'update_dcc_paths',
             'paths': OrderedDict({
                 'tpDcc.dccs.{}'.format(dcc_name): path_utils.clean_path(
-                    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(mod.filename)))))
+                    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(mod.get_filename())))))
             })
         }
 
@@ -264,12 +296,12 @@ class DccClient(object):
 
         return reply_dict['name'], reply_dict['version']
 
-    def select_node(self, node, add_to_selection=False):
+    def select_node(self, node, **kwargs):
         cmd = {
             'cmd': 'select_node',
-            'node': python.force_list(node),
-            'add_to_selection': add_to_selection
+            'node': node
         }
+        cmd.update(**kwargs)
 
         reply_dict = self.send(cmd)
 
@@ -278,9 +310,10 @@ class DccClient(object):
 
         return reply_dict['success']
 
-    def selected_nodes(self):
+    def selected_nodes(self, full_path=True):
         cmd = {
-            'cmd': 'selected_nodes'
+            'cmd': 'selected_nodes',
+            'full_path': full_path
         }
 
         reply_dict = self.send(cmd)
@@ -362,6 +395,9 @@ class DccClient(object):
             'tpDcc.libs.python': path_utils.clean_path(
                 os.path.dirname(
                     os.path.dirname(os.path.dirname(os.path.dirname(tpDcc.libs.python.__file__))))),
+            'tpDcc.libs.resources': path_utils.clean_path(
+                os.path.dirname(
+                    os.path.dirname(os.path.dirname(os.path.dirname(tpDcc.libs.resources.__file__))))),
             'tpDcc.libs.qt.loader': path_utils.clean_path(
                 os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(tpDcc.libs.qt.loader.__file__)))))
         }
