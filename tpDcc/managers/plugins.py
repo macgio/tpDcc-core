@@ -49,7 +49,7 @@ class PluginsManager(object):
             package_name = plugin_id.replace('.', '-').split('-')[0]
 
         if package_name and package_name not in self._plugins:
-            tp.logger.error('Impossible to retrieve data from id: {} package: "{}" not registered!'.format(
+            LOGGER.error('Impossible to retrieve data from id: {} package: "{}" not registered!'.format(
                 plugin_id, package_name))
             return None
 
@@ -68,7 +68,7 @@ class PluginsManager(object):
             return None
 
         if package_name and package_name not in self._plugins:
-            tp.logger.error(
+            LOGGER.error(
                 'Impossible to retrieve data from name: package "{}" not registered!'.format(package_name))
             return None
 
@@ -171,13 +171,13 @@ class PluginsManager(object):
             try:
                 imported_module = modules.import_module(modules.convert_to_dotted_path(os.path.normpath(module_path)))
             except Exception as exc:
-                tp.logger.error('Failed to import Plugin module: {} | {}!'.format(module_path, exc), exc_info=True)
+                LOGGER.error('Failed to import Plugin module: {} | {}!'.format(module_path, exc), exc_info=True)
                 return None
         elif modules.is_dotted_module_path(module_path):
             try:
                 imported_module = modules.import_module(os.path.normpath(module_path))
             except Exception as exc:
-                tp.logger.error('Failed to import Plugin module: {} | {}!'.format(module_path, exc), exc_info=True)
+                LOGGER.error('Failed to import Plugin module: {} | {}!'.format(module_path, exc), exc_info=True)
                 return None
         if imported_module:
             self.register_plugin_by_module(imported_module, package_name=package_name)

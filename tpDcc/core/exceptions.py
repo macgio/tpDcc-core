@@ -12,11 +12,11 @@ class DccError(Exception):
     pass
 
 
-class NoMatchFoundError(DccError):
+class NoObjectFoundError(DccError):
     pass
 
 
-class NoObjectFoundError(DccError):
+class MoreThanOneObjectFoundError(DccError):
     pass
 
 

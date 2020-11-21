@@ -35,7 +35,7 @@ def register_resource(resources_path, key=None):
     :return:
     """
 
-    from tpDcc.libs.qt.core import resource
+    from tpDcc.libs.resources.core import resource
 
     if resources_path in _RESOURCES:
         return
@@ -188,7 +188,7 @@ def icon(*args, **kwargs):
     """
 
     if not _RESOURCES:
-        return None
+        return QIcon()
 
     return get(resource_type=ResourceTypes.ICON, *args, **kwargs) or QIcon()
 

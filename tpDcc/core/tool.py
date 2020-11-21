@@ -11,11 +11,10 @@ import os
 import sys
 import copy
 import time
+import weakref
 import logging
 import traceback
 from functools import partial
-
-from Qt.QtCore import Qt
 
 from tpDcc import dcc
 from tpDcc.dcc import window
@@ -237,8 +236,9 @@ class DccTool(plugin.Plugin, object):
         self._attacher = attacher_class(
             id=tool_id, title=tool_name, config=toolset_class.CONFIG, settings=self.settings,
             show_on_initialize=True, frameless=frameless_active, dockable=True, toolset=toolset_inst)
-        self._attacher.main_layout.setAlignment(Qt.AlignTop)
+
         toolset_inst.set_attacher(self._attacher)
+
         self._attacher.setWindowIcon(toolset_inst.get_icon())
         self._attacher.setWindowTitle('{} - {}'.format(self._attacher.windowTitle(), self.VERSION))
         if tool_size:

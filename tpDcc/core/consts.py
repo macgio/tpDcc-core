@@ -9,13 +9,6 @@ from __future__ import print_function, division, absolute_import
 
 from Qt.QtWidgets import QDialogButtonBox
 
-from tpDcc.libs.python import python
-
-if python.is_python2():
-    from tpDcc.libs.python.enum import Enum
-else:
-    from enum import Enum
-
 # =======~============ GENERAL
 TPDCC_DCCS_NAMESPACE = 'tpDcc.dccs'
 
@@ -36,13 +29,13 @@ SET_PROJECT_IMAGE_TOOLTIP = 'Set the Image used for the Project'
 
 
 # =================== TYPES
-class WrapperTypes(Enum):
+class WrapperTypes(object):
     Shape = 0
     Transform = 1
     Pointer = 2
 
 
-class ObjectTypes(Enum):
+class ObjectTypes(object):
     Generic = 0
     Sphere = 1
     Box = 2
@@ -64,7 +57,7 @@ class ObjectTypes(Enum):
     Biped = 18
 
 
-class UnitSystem(Enum):
+class UnitSystem(object):
     Inches = 0
     Feet = 1
     Millimeters = 2
@@ -75,7 +68,7 @@ class UnitSystem(Enum):
     Miles = 7
 
 
-class MaterialAttributeTypes(Enum):
+class MaterialAttributeTypes(object):
     Int = 0
     Float = 1
     String = 2
@@ -84,7 +77,7 @@ class MaterialAttributeTypes(Enum):
     Bool = 5
 
 
-class MaterialTypes(Enum):
+class MaterialTypes(object):
     Standard = 0
 
 

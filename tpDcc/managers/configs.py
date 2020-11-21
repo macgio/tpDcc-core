@@ -11,7 +11,11 @@ import os
 import logging
 import traceback
 
-import metayaml
+# To avoid errors when initializing Dcc server
+try:
+    import metayaml
+except ImportError:
+    pass
 
 from tpDcc import dcc
 from tpDcc.core import config
