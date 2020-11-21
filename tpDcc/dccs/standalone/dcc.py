@@ -314,18 +314,18 @@ def get_main_menubar():
 #     """
 #
 #     return False
-#
-#
-# def selected_nodes(full_path=True, **kwargs):
-#     """
-#     Returns a list of selected nodes
-#     :param full_path: bool
-#     :return: list<str>
-#     """
-#
-#     return list()
-#
-#
+
+
+def selected_nodes(full_path=True, **kwargs):
+    """
+    Returns a list of selected nodes
+    :param full_path: bool
+    :return: list<str>
+    """
+
+    return list()
+
+
 # def selected_nodes_of_type(node_type, full_path=True):
 #     """
 #     Returns a list of selected nodes of given type
@@ -453,3 +453,11 @@ def repeat_last_decorator(command_name=None):
     """
 
     return decorators.empty_decorator(command_name)
+
+
+def restore_selection_decorator():
+    """
+    Returns decorators that selects again the objects that were selected before executing the decorated function
+    """
+
+    return decorators.empty_decorator
