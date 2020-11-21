@@ -21,7 +21,7 @@ from collections import OrderedDict
 from tpDcc import dcc
 from tpDcc.core import library
 from tpDcc.managers import plugins, resources
-from tpDcc.libs.python import python, decorators, path as path_utils
+from tpDcc.libs.python import python, decorators, settings, modules, path as path_utils
 
 import pkgutil
 if python.is_python2():
@@ -86,26 +86,29 @@ class LibsManager(plugins.PluginsManager, object):
         libs_found = list()
         version_found = None
         init_fn = None
-        packages_to_walk = [plugin_path] if python.is_python2() else [os.path.dirname(plugin_path)]
-        for sub_module in pkgutil.walk_packages(packages_to_walk):
-            importer, sub_module_name, _ = sub_module
-            qname = '{}.{}'.format(plugin_name, sub_module_name)
+        mods_found = list()
+        # packages_to_walk = [plugin_path] if python.is_python2() else [os.path.dirname(plugin_path)]
+        for module_path in modules.iterate_modules(plugin_path, skip_inits=False, recursive=False):
+            module_dot_path = modules.convert_to_dotted_path(module_path)
             try:
-                mod = importer.find_module(sub_module_name).load_module(sub_module_name)
+                mod = modules.import_module(module_dot_path)
+                if not mod:
+                    continue
             except Exception:
                 continue
-
-            if qname.endswith('__version__') and hasattr(mod, '__version__'):
+            if module_dot_path.endswith('__version__') and hasattr(mod, 'get_version') and callable(mod.get_version):
                 if version_found:
                     LOGGER.warning('Already found version: "{}" for "{}"'.format(version_found, plugin_name))
                 else:
-                    version_found = getattr(mod, 'get_version')
+                    version_found = getattr(mod, 'get_version')()
 
-            if not init_fn and qname.endswith('loader') and hasattr(mod, 'init') and callable(mod.init):
+            if not init_fn and module_dot_path.endswith('loader') and hasattr(mod, 'init') and callable(mod.init):
                 init_fn = mod.init
 
             mod.LOADED = load
+            mods_found.append(mod)
 
+        for mod in mods_found:
             for cname, obj in inspect.getmembers(mod, inspect.isclass):
                 for interface in self._interfaces:
                     if issubclass(obj, interface):
@@ -135,7 +138,7 @@ class LibsManager(plugins.PluginsManager, object):
                         obj.FILE_NAME = plugin_path
                         obj.FULL_NAME = plugin_name
 
-                        libs_found.append((qname, version_found, obj))
+                        libs_found.append((module_path, version_found, obj))
                         version_found = True
                         break
 
@@ -149,7 +152,8 @@ class LibsManager(plugins.PluginsManager, object):
             lib_found = libs_found[-1]
         else:
             lib_found = libs_found[0]
-        lib_loader = loader.find_loader(lib_found[0])
+        lib_loader = modules.convert_to_dotted_path(lib_found[0])
+        lib_loader = loader.find_loader(lib_loader)
 
         # Check if DCC specific implementation for plugin exists
         dcc_path = '{}.dccs.{}'.format(plugin_name, dcc.get_name())
@@ -249,26 +253,49 @@ class LibsManager(plugins.PluginsManager, object):
 
         return True
 
-    def get_library_data_from_id(self, plugin_id, package_name=None):
+    def get_library_settings_file_path(self, library_id):
+        """
+        Returns the path where library settings file is located
+        :param library_id:
+        :return: str
+        """
+
+        settings_path = path_utils.get_user_data_dir(appname=library_id)
+        settings_file = path_utils.clean_path(os.path.expandvars(os.path.join(settings_path, 'settings.cfg')))
+
+        return settings_file
+
+    def get_library_settings_file(self, library_id):
+        """
+        Returns the settings file of the given library
+        :param library_id: str
+        :return: settings.JSonSettings
+        """
+
+        settings_file = self.get_library_settings_file_path(library_id)
+
+        return settings.JSONSettings(filename=settings_file)
+
+    def get_library_data_from_id(self, library_id, package_name=None):
         """
         Returns registered plugin data from its id
-        :param plugin_id: str
+        :param library_id: str
         :param package_name: str
         :return: dict
         """
 
-        if not plugin_id:
+        if not library_id:
             return None
 
         if not package_name:
-            package_name = plugin_id.replace('.', '-').split('-')[0]
+            package_name = library_id.replace('.', '-').split('-')[0]
 
         if package_name and package_name not in self._plugins:
             LOGGER.error('Impossible to retrieve data from id: {} package "{}" not registered!'.format(
-                plugin_id, package_name))
+                library_id, package_name))
             return None
 
-        return self._plugins[package_name][plugin_id] if plugin_id in self._plugins[package_name] else None
+        return self._plugins[package_name][library_id] if library_id in self._plugins[package_name] else None
 
     def register_package_libs(self, pkg_name, root_pkg_name=None, libs_to_register=None, dev=True, config_dict=None):
         """
