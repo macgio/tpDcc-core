@@ -72,12 +72,16 @@ class ToolsManager(plugins.PluginsManager, object):
         if not config_dict:
             config_dict = dict()
 
+        local = os.getenv('APPDATA') or os.getenv('HOME')
+
         config_dict.update({
             'join': os.path.join,
             'user': os.path.expanduser('~'),
             'filename': plugin_path,
             'fullname': plugin_name,
-            'root': path_utils.clean_path(plugin_path)
+            'root': path_utils.clean_path(plugin_path),
+            'local': local,
+            'home': local
         })
 
         if pkg_name not in self._plugins:
@@ -239,26 +243,51 @@ class ToolsManager(plugins.PluginsManager, object):
 
         return True
 
-    def get_tool_data_from_id(self, plugin_id, package_name=None):
+    def get_tool_settings_file_path(self, tool_id):
+        """
+        Returns the path where tool settings file is located
+        :param tool_id:
+        :return: str
+        """
+
+        settings_path = path_utils.get_user_data_dir(appname=tool_id)
+        settings_file = path_utils.clean_path(os.path.expandvars(os.path.join(settings_path, 'settings.cfg')))
+
+        return settings_file
+
+    def get_tool_settings_file(self, tool_id):
+        """
+        Returns the settings file of the given tool
+        :param tool_id: str
+        :return: settings.QtSettings
+        """
+
+        from tpDcc.libs.qt.core import settings
+
+        settings_file = self.get_tool_settings_file_path(tool_id)
+
+        return settings.QtSettings(filename=settings_file)
+
+    def get_tool_data_from_id(self, tool_id, package_name=None):
         """
         Returns registered plugin data from its id
-        :param plugin_id: str
+        :param tool_id: str
         :param package_name: str
         :return: dict
         """
 
-        if not plugin_id:
+        if not tool_id:
             return None
 
         if not package_name:
-            package_name = plugin_id.replace('.', '-').split('-')[0]
+            package_name = tool_id.replace('.', '-').split('-')[0]
 
         if package_name and package_name not in self._plugins:
             LOGGER.error('Impossible to retrieve data from id: {} package "{}" not registered!'.format(
-                plugin_id, package_name))
+                tool_id, package_name))
             return None
 
-        return self._plugins[package_name][plugin_id] if plugin_id in self._plugins[package_name] else None
+        return self._plugins[package_name][tool_id] if tool_id in self._plugins[package_name] else None
 
     def cleanup(self):
         """
@@ -394,7 +423,7 @@ class ToolsManager(plugins.PluginsManager, object):
         """
 
         if not package_name:
-            package_name = plugin.PACKAGE
+            package_name = plugin.PACKAGE if hasattr(plugins, 'PACKAGE') else None
         if not package_name:
             LOGGER.error('Impossible to retrieve data from plugin with undefined package!')
             return None
@@ -419,8 +448,6 @@ class ToolsManager(plugins.PluginsManager, object):
         :param kwargs: dict, keyword arguments to pas to the tool execute function
         :return: DccTool or None, executed tool instance
         """
-
-        from tpDcc.libs.qt.core import settings
 
         if not package_name:
             package_name = tool_id.replace('.', '-').split('-')[0]
@@ -481,9 +508,7 @@ class ToolsManager(plugins.PluginsManager, object):
         # if dcc_loader:
         #     tool_config = dcc_config
 
-        settings_path = path_utils.get_user_data_dir(appname=tool_id)
-        settings_file = path_utils.clean_path(os.path.expandvars(os.path.join(settings_path, 'settings.cfg')))
-        tool_settings = settings.QtSettings(filename=settings_file)
+        tool_settings = self.get_tool_settings_file(tool_id)
         if not tool_settings.has_setting('theme'):
             tool_settings.set('theme', 'default')
         tool_settings.setFallbacksEnabled(False)
