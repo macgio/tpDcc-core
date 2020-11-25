@@ -9,8 +9,10 @@ from __future__ import print_function, division, absolute_import
 
 import logging
 
+from Qt.QtWidgets import QDialogButtonBox, QFileDialog
+
 from tpDcc.core import dcc
-from tpDcc.libs.python import decorators
+from tpDcc.libs.python import python, decorators
 
 LOGGER = logging.getLogger('tpDcc-core')
 
@@ -142,6 +144,94 @@ def get_main_menubar():
     """
 
     return None
+
+
+def confirm_dialog(title, message, button=None, cancel_button=None, default_button=None, dismiss_string=None):
+    """
+    Shows DCC confirm dialog
+    :param title:
+    :param message:
+    :param button:
+    :param cancel_button:
+    :param default_button:
+    :param dismiss_string:
+    :return:
+    """
+
+    from tpDcc.libs.qt.widgets import messagebox
+
+    new_buttons = None
+    if button:
+        if python.is_string(button):
+            if button == 'Yes':
+                new_buttons = QDialogButtonBox.Yes
+            elif button == 'No':
+                new_buttons = QDialogButtonBox.No
+        elif isinstance(button, (tuple, list)):
+            for i, btn in enumerate(button):
+                if i == 0:
+                    if btn == 'Yes':
+                        new_buttons = QDialogButtonBox.Yes
+                    elif btn == 'No':
+                        new_buttons = QDialogButtonBox.No
+                else:
+                    if btn == 'Yes':
+                        new_buttons = new_buttons | QDialogButtonBox.Yes
+                    elif btn == 'No':
+                        new_buttons = new_buttons | QDialogButtonBox.No
+    if new_buttons:
+        buttons = new_buttons
+    else:
+        buttons = button or QDialogButtonBox.Yes | QDialogButtonBox.No
+
+    if cancel_button:
+        if python.is_string(cancel_button):
+            if cancel_button == 'No':
+                buttons = buttons | QDialogButtonBox.No
+            elif cancel_button == 'Cancel':
+                buttons = buttons | QDialogButtonBox.Cancel
+        else:
+            buttons = buttons | QDialogButtonBox.Cancel
+
+    return messagebox.MessageBox.question(None, title=title, text=message, buttons=buttons)
+
+
+def select_file_dialog(title, start_directory=None, pattern=None):
+    """
+    Shows select file dialog
+    :param title: str
+    :param start_directory: str
+    :param pattern: str
+    :return: str
+    """
+
+    if not pattern:
+        pattern = 'All Files (*.*)'
+
+    return QFileDialog.getOpenFileName(None, title, start_directory, pattern)[0]
+
+
+def select_folder_dialog(title, start_directory=None):
+    """
+    Shows select folder dialog
+    :param title: str
+    :param start_directory: str
+    :return: str
+    """
+
+    return QFileDialog.getExistingDirectory(None, title, start_directory)[0]
+
+
+def save_file_dialog(title, start_directory=None, pattern=None):
+    """
+    Shows save file dialog
+    :param title: str
+    :param start_directory: str
+    :param pattern: str
+    :return: str
+    """
+
+    return QFileDialog.getSaveFileName(None, title, start_directory, pattern)[0]
 
 
 # def new_scene(force=True, do_save=True):
@@ -345,58 +435,7 @@ def selected_nodes(full_path=True, **kwargs):
 #     """
 #
 #     return list()
-#
-#
-# def confirm_dialog(title, message, button=None, cancel_button=None, default_button=None, dismiss_string=None):
-#     """
-#     Shows DCC confirm dialog
-#     :param title:
-#     :param message:
-#     :param button:
-#     :param cancel_button:
-#     :param default_button:
-#     :param dismiss_string:
-#     :return:
-#     """
-#
-#     from tpDcc.libs.qt.widgets import messagebox
-#
-#     new_buttons = None
-#     if button:
-#         if python.is_string(button):
-#             if button == 'Yes':
-#                 new_buttons = QDialogButtonBox.Yes
-#             elif button == 'No':
-#                 new_buttons = QDialogButtonBox.No
-#         elif isinstance(button, (tuple, list)):
-#             for i, btn in enumerate(button):
-#                 if i == 0:
-#                     if btn == 'Yes':
-#                         new_buttons = QDialogButtonBox.Yes
-#                     elif btn == 'No':
-#                         new_buttons = QDialogButtonBox.No
-#                 else:
-#                     if btn == 'Yes':
-#                         new_buttons = new_buttons | QDialogButtonBox.Yes
-#                     elif btn == 'No':
-#                         new_buttons = new_buttons | QDialogButtonBox.No
-#     if new_buttons:
-#         buttons = new_buttons
-#     else:
-#         buttons = button or QDialogButtonBox.Yes | QDialogButtonBox.No
-#
-#     if cancel_button:
-#         if python.is_string(cancel_button):
-#             if cancel_button == 'No':
-#                 buttons = buttons | QDialogButtonBox.No
-#             elif cancel_button == 'Cancel':
-#                 buttons = buttons | QDialogButtonBox.Cancel
-#         else:
-#             buttons = buttons | QDialogButtonBox.Cancel
-#
-#     return messagebox.MessageBox.question(None, title=title, text=message, buttons=buttons)
-#
-#
+
 # def warning(message):
 #     """
 #     Prints a warning message
