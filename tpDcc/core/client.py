@@ -21,6 +21,7 @@ from Qt.QtCore import Signal, QObject
 
 import tpDcc.loader
 import tpDcc.config
+from tpDcc import dcc
 import tpDcc.libs.python
 import tpDcc.libs.resources
 import tpDcc.libs.qt.loader
@@ -125,6 +126,15 @@ class DccClient(object):
             return json.loads(reply_json)
         else:
             if not self._connected:
+                cmd = cmd_dict.pop('cmd', None)
+                if cmd and hasattr(dcc, cmd):
+                    res = None
+                    try:
+                        res = getattr(dcc, cmd)(**json_cmd)
+                    except TypeError:
+                        res = getattr(dcc, cmd)()
+                    if res:
+                        return {'success': True, 'result': res}
                 return None
 
             message = list()
