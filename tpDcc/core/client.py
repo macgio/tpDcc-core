@@ -14,6 +14,8 @@ import json
 import socket
 import pkgutil
 import logging
+import weakref
+import importlib
 import traceback
 from collections import OrderedDict
 
@@ -22,6 +24,7 @@ from Qt.QtCore import Signal, QObject
 import tpDcc.loader
 import tpDcc.config
 from tpDcc import dcc
+from tpDcc.managers import configs
 import tpDcc.libs.python
 import tpDcc.libs.resources
 import tpDcc.libs.qt.loader
@@ -44,12 +47,19 @@ class DccClient(object):
 
     signals = DccClientSignals()
 
+    class Status(object):
+        ERROR = 'error'
+        WARNING = 'warning'
+        SUCCESS = 'success'
+        UNKNOWN = 'unknown'
+
     def __init__(self, timeout=10):
         self._timeout = timeout
         self._port = self.__class__.PORT
         self._discard_count = 0
         self._server = None
         self._connected = False
+        self._status = dict()
 
     def __getattribute__(self, name):
         try:
@@ -58,6 +68,7 @@ class DccClient(object):
             def new_fn(*args, **kwargs):
                 cmd = {
                     'cmd': name,
+                    'args': args
                 }
                 cmd.update(kwargs)
                 reply_dict = self.send(cmd)
@@ -80,8 +91,110 @@ class DccClient(object):
     # BASE
     # =================================================================================================================
 
+    @classmethod
+    def create_and_connect_to_server(cls, tool_id, *args, **kwargs):
+
+        def _update_client():
+            config_dict = configs.get_tool_config(tool_id) or dict()
+            supported_dccs = config_dict.get(
+                'supported_dccs', dict()) if config_dict else kwargs.get('supported_dccs', dict())
+
+            valid_connect = client.connect()
+            if not valid_connect:
+                _register_client()
+                return False
+
+            if dcc.is_standalone():
+                success, dcc_exe = client.update_paths()
+                if not success:
+                    return False
+
+                success = client.update_dcc_paths(dcc_exe)
+                if not success:
+                    return False
+
+                success = client.init_dcc()
+                if not success:
+                    return False
+
+            dcc_name, dcc_version, dcc_pid = client.get_dcc_info()
+            if not dcc_name or not dcc_version:
+                return False
+
+            if dcc_name not in supported_dccs:
+                client.set_status(
+                    'Connected DCC {} ({}) is not supported!'.format(dcc_name, dcc_version), client.Status.WARNING)
+                return False
+
+            supported_versions = supported_dccs[dcc_name]
+            if dcc_version not in supported_versions:
+                client.set_status(
+                    'Connected DCC {} is support but version {} is not!'.format(
+                        dcc_name, dcc_version), client.Status.WARNING)
+                return False
+
+            msg = 'Connected to: {} {} ({})'.format(dcc_name, dcc_version, dcc_pid)
+            client.set_status(msg, client.Status.SUCCESS)
+            LOGGER.info(msg)
+
+            _register_client()
+
+        def _register_client():
+            """
+            Internal function that registers given client in global Dcc clients variable
+            """
+
+            if not client:
+                return
+            client_found = False
+            current_clients = dcc._CLIENTS
+            for current_client in list(current_clients.values()):
+                if client == current_client():
+                    client_found = True
+                    break
+            if client_found:
+                return
+            dcc._CLIENTS[tool_id] = weakref.ref(client)
+
+        # If a client with given ID is already registered, we return it
+        client = dcc.client(tool_id, only_clients=True)
+        if client:
+            return client
+
+        client = cls()
+
+        parent = kwargs.get('parent', None)
+        server_class_name = kwargs.get('server_name', cls.__name__.replace(
+            'Client', 'Server').replace('client', 'server'))
+        server_module_name = kwargs.get('server_module_name', server_class_name.lower())
+
+        if not dcc.is_standalone():
+            dcc_mod_name = '{}.dccs.{}.{}'.format(tool_id.replace('-', '.'), dcc.get_name(), server_module_name)
+            try:
+                mod = importlib.import_module(dcc_mod_name)
+                if hasattr(mod, server_class_name):
+                    server = getattr(mod, server_class_name)(parent, client=client, update_paths=False)
+                    client.set_server(server)
+                    _update_client()
+            except Exception as exc:
+                LOGGER.warning(
+                    'Impossible to launch Renamer server! Error while importing: {} >> {}'.format(dcc_mod_name, exc))
+                try:
+                    server.close_connection()
+                except Exception:
+                    pass
+                return None
+        else:
+            _update_client()
+
+        return client
+
+    def set_server(self, server):
+        self._server = server
+
     def connect(self, port=-1):
         if self._server:
+            self._status = {'msg': 'Client connected successfully!', 'level': self.Status.SUCCESS}
             self._connected = True
             return True
 
@@ -90,13 +203,15 @@ class DccClient(object):
         try:
             self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._client_socket.connect(('localhost', self._port))
-            # self._client_socket.setblocking(0)
+            # self._client_socket.setblocking(False)
         except ConnectionRefusedError as exc:
             LOGGER.warning(exc)
+            self._status = {'msg': 'Client connection was refused.', 'level': self.Status.ERROR}
             self._connected = False
             return False
         except Exception:
             LOGGER.exception(traceback.format_exc())
+            self._status = {'msg': 'Error while connecting client', 'level': self.Status.ERROR}
             self._connected = False
             return False
 
@@ -110,6 +225,7 @@ class DccClient(object):
             self.signals.dccDisconnected.emit()
         except Exception:
             traceback.print_exc()
+            self._status = {'msg': 'Error while disconnecting client', 'level': self.Status.ERROR}
             return False
 
         return True
@@ -122,18 +238,18 @@ class DccClient(object):
         if self._server:
             reply_json = self._server._process_data(cmd_dict)
             if not reply_json:
+                self._status = None
                 return {'success': False}
             return json.loads(reply_json)
         else:
             if not self._connected:
                 cmd = cmd_dict.pop('cmd', None)
                 if cmd and hasattr(dcc, cmd):
-                    res = None
                     try:
                         res = getattr(dcc, cmd)(**json_cmd)
                     except TypeError:
                         res = getattr(dcc, cmd)()
-                    if res:
+                    if res is not None:
                         return {'success': True, 'result': res}
                 return None
 
@@ -151,11 +267,13 @@ class DccClient(object):
                 LOGGER.exception(traceback.format_exc())
                 return None
 
-            return self.recv()
+            res = self.recv()
+            self._status = res.pop('status', dict())
+
+            return res
 
     def recv(self):
         total_data = list()
-        data = ''
         reply_length = 0
         bytes_remaining = DccClient.HEADER_SIZE
 
@@ -190,6 +308,27 @@ class DccClient(object):
 
         self._discard_count += 1
 
+        # If timeout is checked, before raising timeout we make sure that all remaining data is processed
+        try:
+            data = self._client_socket.recv(bytes_remaining)
+        except Exception as exc:
+            time.sleep(0.01)
+            print(exc)
+        if data:
+            total_data.append(data)
+            bytes_remaining -= len(data)
+            if bytes_remaining <= 0:
+                for i in range(len(total_data)):
+                    total_data[i] = total_data[i].decode()
+
+                if reply_length == 0:
+                    header = ''.join(total_data)
+                    reply_length = int(header)
+                else:
+                    self._discard_count -= 1
+                    reply_json = ''.join(total_data)
+                    return json.loads(reply_json)
+
         raise RuntimeError('Timeout waiting for response')
 
     def is_valid_reply(self, reply_dict):
@@ -200,6 +339,9 @@ class DccClient(object):
         if not reply_dict['success']:
             LOGGER.error('{} failed: {}'.format(reply_dict['cmd'], reply_dict['msg']))
             return False
+
+        self._status = reply_dict.pop(
+            'status', None) or {'msg': self.get_status_message(), 'level': self.get_status_level()}
 
         return True
 
@@ -228,6 +370,7 @@ class DccClient(object):
         reply_dict = self.send(cmd)
 
         if not self.is_valid_reply(reply_dict):
+            self._status = {'msg': 'Error while connecting to Dcc: update paths ...', 'level': self.Status.ERROR}
             return False
 
         exe = reply_dict.get('exe', None)
@@ -247,10 +390,12 @@ class DccClient(object):
             dcc_name = 'houdini'
         elif 'nuke' in dcc_executable:
             dcc_name = 'nuke'
-        elif 'unreal' in dcc_executable:
+        elif 'unreal' in dcc_executable or os.path.basename(dcc_executable).startswith('UE'):
             dcc_name = 'unreal'
         if not dcc_name:
-            LOGGER.warning('Executable DCC {} is not supported!'.format(dcc_executable))
+            msg = 'Executable DCC {} is not supported!'.format(dcc_executable)
+            LOGGER.warning(msg)
+            self._status = {'msg': msg, 'level': self.Status.WARNING}
             return False
 
         module_name = 'tpDcc.dccs.{}.loader'.format(dcc_name)
@@ -258,13 +403,19 @@ class DccClient(object):
             mod = pkgutil.get_loader(module_name)
         except Exception:
             try:
+                self._status = {
+                    'msg': 'Error while connecting to Dcc: update dcc paths ...', 'severity': self.Status.ERROR}
                 LOGGER.error('FAILED IMPORT: {} -> {}'.format(str(module_name), str(traceback.format_exc())))
-                return
+                return False
             except Exception:
+                self._status = {
+                    'msg': 'Error while connecting to Dcc: update dcc paths ...', 'severity': self.Status.ERROR}
                 LOGGER.error('FAILED IMPORT: {}'.format(module_name))
-                return
+                return False
         if not mod:
-            LOGGER.warning('Impossible to import DCC specific module: {} ({})'.format(module_name, dcc_name))
+            msg = 'Impossible to import DCC specific module: {} ({})'.format(module_name, dcc_name)
+            LOGGER.warning(msg)
+            self._status = {'msg': msg, 'severity': self.Status.WARNING}
             return False
 
         cmd = {
@@ -278,6 +429,8 @@ class DccClient(object):
         reply_dict = self.send(cmd)
 
         if not self.is_valid_reply(reply_dict):
+            self._status = {
+                'msg': 'Error while connecting to Dcc: update dcc paths ...', 'level': self.Status.ERROR}
             return False
 
         return reply_dict['success']
@@ -290,6 +443,7 @@ class DccClient(object):
         reply_dict = self.send(cmd)
 
         if not self.is_valid_reply(reply_dict):
+            self._status = {'msg': 'Error while connecting to Dcc: init dcc ...', 'level': self.Status.ERROR}
             return False
 
         return reply_dict['success']
@@ -302,9 +456,10 @@ class DccClient(object):
         reply_dict = self.send(cmd)
 
         if not self.is_valid_reply(reply_dict):
+            self._status = {'msg': 'Error while connecting to Dcc: get dcc info ...', 'level': self.Status.ERROR}
             return None, None
 
-        return reply_dict['name'], reply_dict['version']
+        return reply_dict['name'], reply_dict['version'], reply_dict['pid']
 
     def select_node(self, node, **kwargs):
         cmd = {
@@ -392,6 +547,17 @@ class DccClient(object):
             return list()
 
         return reply_dict['success']
+
+    def get_status_message(self):
+        return self._status.get('msg', '')
+
+    def get_status_level(self):
+        return self._status.get('level', self.Status.UNKNOWN)
+
+    def set_status(self, status_message, status_level):
+        self._status = {
+            'msg': str(status_message), 'level': status_level
+        }
 
     def _get_paths_to_update(self):
         """
