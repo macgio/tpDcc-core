@@ -24,6 +24,12 @@ class _MetaWindow(type):
                 return maya_window.MayaWindow
             else:
                 return type.__call__(maya_window.MayaWindow, *args, **kwargs)
+        elif dcc.is_unreal():
+            from tpDcc.dccs.unreal.ui import window as unreal_window
+            if as_class:
+                return unreal_window.UnrealWindow
+            else:
+                return type.__call__(unreal_window.UnrealWindow, *args, **kwargs)
         else:
             if as_class:
                 return window.MainWindow
