@@ -1,6 +1,17 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Module that contains DCC core server implementation
+"""
+
+from __future__ import print_function, division, absolute_import
+
+import os
 import sys
 import time
 import json
+import logging
 import inspect
 import traceback
 import importlib
@@ -16,6 +27,8 @@ from Qt.QtNetwork import QTcpServer, QHostAddress, QTcpSocket
 
 from tpDcc import dcc
 
+LOGGER = logging.getLogger('tpDcc-core')
+
 
 class DccServer(QObject, object):
 
@@ -23,7 +36,7 @@ class DccServer(QObject, object):
     HEADER_SIZE = 10
 
     def __init__(self, parent=None, client=None, update_paths=True):
-        parent = parent or dcc.get_main_window()
+        # parent = parent or dcc.get_main_window()
         super(DccServer, self).__init__(parent)
 
         self._socket = None
@@ -32,6 +45,7 @@ class DccServer(QObject, object):
         self._modules_to_import = list()
         self._client = client
         self._server_functions = dict()
+        self._dcc = dcc
 
         server_functions = inspect.getmembers(self, predicate=inspect.ismethod) or list()
         for server_function_list in server_functions:
@@ -43,42 +57,56 @@ class DccServer(QObject, object):
         self._init()
 
     # =================================================================================================================
+    # PROPERTIES
+    # =================================================================================================================
+
+    @property
+    def dcc(self):
+        return self._dcc
+
+    # =================================================================================================================
     # BASE
     # =================================================================================================================
+
+    def close_connection(self):
+        if not self._server:
+            return
+
+        self._server.close()
 
     def select_node(self, data, reply):
         node = data.get('node', None)
         add_to_selection = data.get('add_to_selection', False)
         if node:
-            dcc.select_node(node, replace_selection=not add_to_selection)
+            self._dcc.select_node(node)
         reply['success'] = True
 
     def selected_nodes(self, data, reply):
         full_path = data.get('full_path', True)
-        selected_nodes = dcc.selected_nodes(full_path=full_path)
+        selected_nodes = self._dcc.selected_nodes(full_path=full_path)
         reply['success'] = True
         reply['result'] = selected_nodes
 
     def clear_selection(self, data, reply):
-        dcc.clear_selection()
+        self._dcc.clear_selection()
         reply['success'] = True
 
     def get_control_colors(self, data, reply):
-        control_colors = dcc.get_control_colors() or list()
+        control_colors = self._dcc.get_control_colors() or list()
         reply['success'] = True
         reply['result'] = control_colors
 
     def get_fonts(self, data, reply):
-        all_fonts = dcc.get_all_fonts() or list()
+        all_fonts = self._dcc.get_all_fonts() or list()
         reply['success'] = True
         reply['result'] = all_fonts
 
     def enable_undo(self, data, reply):
-        dcc.enable_undo()
+        self._dcc.enable_undo()
         reply['success'] = True
 
     def disable_undo(self, data, reply):
-        dcc.disable_undo()
+        self._dcc.disable_undo()
         reply['success'] = True
 
     # =================================================================================================================
@@ -134,7 +162,14 @@ class DccServer(QObject, object):
                     json_data = ''
 
     def _write(self, reply_dict):
-        json_reply = json.dumps(reply_dict)
+
+        try:
+            json_reply = json.dumps(reply_dict)
+        except Exception:
+            msg = 'Error while serializing data: "{}"'.format(traceback.format_exc())
+            LOGGER.error(msg)
+            json_dict = {'result': None, 'success': False, 'msg': msg, 'cmd': reply_dict.get('cmd', 'unknown')}
+            json_reply = json.dumps(json_dict)
 
         if self._socket and self._socket.state() == QTcpSocket.ConnectedState:
             header = '{0}'.format(len(json_reply.encode())).zfill(DccServer.HEADER_SIZE)
@@ -159,6 +194,7 @@ class DccServer(QObject, object):
             'result': None
         }
 
+        do_write = True
         cmd = data_dict['cmd']
         if cmd == 'ping':
             reply['success'] = True
@@ -171,13 +207,20 @@ class DccServer(QObject, object):
         elif cmd == 'get_dcc_info':
             self._get_dcc_info(data_dict, reply)
         else:
-            self._process_command(cmd, data_dict, reply)
+            try:
+                self._process_command(cmd, data_dict, reply)
+            except Exception:
+                reply['success'] = False
+                reply['msg'] = traceback.format_exc()
             if not reply['success']:
                 reply['cmd'] = cmd
                 if 'msg' not in reply.keys():
                     reply['msg'] = 'Unknown Error'
 
-        return self._write(reply)
+        if do_write:
+            return self._write(reply)
+        else:
+            return reply
 
     def _update_paths(self, data, reply):
 
@@ -203,17 +246,17 @@ class DccServer(QObject, object):
                 print('Updating SYS.PATH: {}'.format(path))
                 sys.path.append(path)
 
-        for path_mod in paths_data.keys():
-            try:
-                mod = importlib.import_module(path_mod)
-            except Exception:
-                try:
-                    print('FAILED IMPORT: {} -> {}'.format(str(path_mod), str(traceback.format_exc())))
-                    continue
-                except Exception:
-                    print('FAILED IMPORT: {}'.format(path_mod))
-                    continue
-            self._modules_to_import.append(mod)
+        # for path_mod in paths_data.keys():
+        #     try:
+        #         mod = importlib.import_module(path_mod)
+        #     except Exception:
+        #         try:
+        #             print('FAILED IMPORT: {} -> {}'.format(str(path_mod), str(traceback.format_exc())))
+        #             continue
+        #         except Exception:
+        #             print('FAILED IMPORT: {}'.format(path_mod))
+        #             continue
+        #     self._modules_to_import.append(mod)
 
         reply['success'] = True
         reply['exe'] = sys.executable
@@ -255,24 +298,27 @@ class DccServer(QObject, object):
             reply['success'] = False
             return
 
-        modules_to_import = list()
-        clean_modules_to_import = list(set(self._modules_to_import))
+        # modules_to_import = list()
+        # clean_modules_to_import = list(set(self._modules_to_import))
+        #
+        # # Order modules to import (tpDcc.core, tpDcc.dccs.X, etc)
+        # for module in clean_modules_to_import:
+        #     if module.__name__ == 'tpDcc.loader' and module not in modules_to_import:
+        #         modules_to_import.append(module)
+        #         break
+        # for module in clean_modules_to_import:
+        #     if module.__name__.startswith('tpDcc.dccs.') and module not in modules_to_import:
+        #         modules_to_import.append(module)
+        # for module in clean_modules_to_import:
+        #     if module not in self._modules_to_import:
+        #         modules_to_import.append(module)
+        #
+        # for module in modules_to_import:
+        #     if hasattr(module, 'init'):
+        #         module.init()
 
-        # Order modules to import (tpDcc.core, tpDcc.dccs.X, etc)
-        for module in clean_modules_to_import:
-            if module.__name__ == 'tpDcc.loader' and module not in modules_to_import:
-                modules_to_import.append(module)
-                break
-        for module in clean_modules_to_import:
-            if module.__name__.startswith('tpDcc.dccs.') and module not in modules_to_import:
-                modules_to_import.append(module)
-        for module in clean_modules_to_import:
-            if module not in self._modules_to_import:
-                modules_to_import.append(module)
-
-        for module in modules_to_import:
-            if hasattr(module, 'init'):
-                module.init()
+        from tpDcc import dcc
+        self._dcc = dcc
 
         reply['success'] = True
 
@@ -290,16 +336,36 @@ class DccServer(QObject, object):
             exec('__builtin__.%s = builtin_value' % builtin)
 
         # NOTE: tp is imported dynamically
-        dcc_name = dcc.get_name()
-        dcc_version = dcc.get_version_name()
+        dcc_name = self._dcc.get_name()
+        dcc_version = self._dcc.get_version_name()
 
         reply['success'] = True
         reply['name'] = dcc_name
         reply['version'] = dcc_version
+        reply['pid'] = os.getpid()
 
     def _process_command(self, command_name, data_dict, reply_dict):
         if command_name in self._server_functions:
             self._server_functions[command_name](data_dict, reply_dict)
+        elif self._dcc and hasattr(self._dcc, command_name):
+            reply_dict['success'] = True
+            dcc_fn = getattr(self._dcc, command_name)
+            args, varargs, varkw, defaults = inspect.getargspec(dcc_fn)
+            if not varkw:
+                reply_dict['result'] = getattr(self._dcc, command_name)()
+            else:
+                data_dict.pop('cmd', None)
+                args = data_dict.pop('args', list())
+                try:
+                    reply_dict['result'] = getattr(self._dcc, command_name)(*args, **data_dict)
+                except TypeError:
+                    try:
+                        reply_dict['result'] = getattr(self._dcc, command_name)(**data_dict)
+                    except TypeError:
+                        try:
+                            reply_dict['result'] = getattr(self._dcc, command_name)(*args)
+                        except TypeError:
+                            reply_dict['result'] = getattr(self._dcc, command_name)()
         else:
             reply_dict['msg'] = 'Invalid command ({})'.format(command_name)
 

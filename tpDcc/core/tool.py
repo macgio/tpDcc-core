@@ -11,37 +11,58 @@ import os
 import sys
 import copy
 import time
-import weakref
+import inspect
 import logging
 import traceback
 from functools import partial
 
 from tpDcc import dcc
 from tpDcc.dcc import window
-from tpDcc.core import plugin
-from tpDcc.managers import resources
+from tpDcc.managers import resources, configs
 from tpDcc.libs.python import decorators
 
 LOGGER = logging.getLogger('tpDcc-core')
 
 
-class DccTool(plugin.Plugin, object):
+class DccTool(object):
     """
     Base class used by all editor tools
     """
 
-    FILE_NAME = ''
-    FULL_NAME = ''
+    ID = None
+    PACKAGE = None
+    VERSION = '0.0.0'
 
-    def __init__(self, manager, config=None, settings=None, dev=False, *args, **kwargs):
-        super(DccTool, self).__init__(manager=manager)
+    TOOLSET_CLASS = None
+
+    CLIENT_CLASS = None
+    SERVER_NAME = None
+    SERVER_MODULE_NAME = None
+
+    def __init__(self, settings=None, dev=False, *args, **kwargs):
+        super(DccTool, self).__init__()
 
         self._tool = list()
-        self._config = config
+        self._config = None
         self._bootstrap = list()
         self._attacher = None
+        self._client = None
+        self._client_status = None
+        self._is_frameless = True
+        # self._is_frameless = self.config_dict().get('is_checked', False)
         self._settings = settings
+        self._stats = ToolStats(self)
         self._dev = dev
+
+        self._setup_client(*args, **kwargs)
+
+        # Config is setup after the client is connected, because we need to know if we need to load app
+        # DCC specifici configuration or not
+        self._setup_config()
+
+    @property
+    def attacher(self):
+        return self._attacher
 
     @property
     def config(self):
@@ -56,24 +77,41 @@ class DccTool(plugin.Plugin, object):
         return self._attacher
 
     @property
+    def stats(self):
+        return self._stats
+
+    @property
+    def is_frameless(self):
+        return self._is_frameless
+
+    @property
     def dev(self):
         return self._dev
 
-    @decorators.abstractmethod
-    def creator(self):
-        """
-        Creator function of the tool
-        """
+    @property
+    def name(self):
+        return self.config_dict().get('name')
 
-        pass
+    @property
+    def default_size(self):
+        return self.config_dict().get('size')
 
     @decorators.abstractmethod
     def launch(self, *args, **kwargs):
         """
-        Function that launches the tool
+        Launches the tool
         """
 
         pass
+
+    @staticmethod
+    def creator():
+        """
+        Returns tool creator
+        :return: str
+        """
+
+        return ''
 
     @staticmethod
     def icon():
@@ -95,15 +133,13 @@ class DccTool(plugin.Plugin, object):
 
         return {
             'name': 'DccTool',
-            'id': 'tpDcc-tools-tool',
+            'id': cls.ID,
             'supported_dccs': dict(),
             'creator': 'Tomas Poveda',
             'icon': 'tpdcc',
             'tooltip': '',
             'help_url': 'www.tomipoveda.com',
             'tags': ['tpDcc', 'dcc', 'tool'],
-            'logger_dir': os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs', 'tools'),
-            'logger_level': 'INFO',
             'resources_path': os.path.join(file_name, 'resources'),
             'logging_file': os.path.join(file_name, '__logging__.ini'),
             'is_checkable': False,
@@ -159,20 +195,6 @@ class DccTool(plugin.Plugin, object):
 
         return '::{}'.format(self.ID)
 
-    def frameless_window_toggle(self):
-        """
-        Returns current framelessWindowToggle plugin
-        :return:
-        """
-
-        from tpDcc.managers import tools
-
-        frameless_toggle = tools.ToolsManager().get_tool_by_id('tpDcc-tools-frameless_toggle')
-        if not frameless_toggle:
-            return False
-
-        return frameless_toggle.state
-
     def launch_frameless(self, *args, **kwargs):
         """
         Laucnhes the tool and applies frameless functionality to it
@@ -182,8 +204,7 @@ class DccTool(plugin.Plugin, object):
         """
 
         launch_frameless = kwargs.get('launch_frameless', None)
-        default_frameless = self.frameless_window_toggle()
-        frameless_active = launch_frameless if launch_frameless is not None else default_frameless
+        frameless_active = launch_frameless if launch_frameless is not None else self._is_frameless
 
         tool = self.run_tool(frameless_active, kwargs)
 
@@ -200,11 +221,8 @@ class DccTool(plugin.Plugin, object):
         Function that launches current tool
         :param frameless_active: bool, Whether the tool will be launch in frameless mode or not
         :param tool_kwargs: dict, dictionary of arguments to launch tool with
-        :param attacher_class:
         :return:
         """
-
-        from tpDcc.libs.qt.managers import toolsets
 
         tool_config_dict = self.config_dict()
         tool_name = tool_config_dict.get('name', None)
@@ -214,35 +232,37 @@ class DccTool(plugin.Plugin, object):
             LOGGER.warning('Impossible to run tool "{}" with id: "{}"'.format(tool_name, tool_id))
             return None
 
-        toolset_class = toolsets.ToolsetsManager().toolset(tool_id)
+        toolset_class = self.TOOLSET_CLASS
         if not toolset_class:
-            LOGGER.warning('Impossible to run tool! No toolset found with id: "{}"'.format(tool_id))
+            LOGGER.warning('Impossible to run tool! Tool "{}" does not define a toolset class.'.format(self.ID))
             return None
-        toolset_data_copy = copy.deepcopy(self._config.data)
-        toolset_data_copy.update(toolset_class.CONFIG.data)
-        toolset_class.CONFIG.data = toolset_data_copy
+        # toolset_data_copy = copy.deepcopy(self._config.data)
+        # toolset_data_copy.update(toolset_class.CONFIG.data)
+        # toolset_class.CONFIG.data = toolset_data_copy
 
         if tool_kwargs is None:
             tool_kwargs = dict()
 
         tool_kwargs['collapsable'] = False
         tool_kwargs['show_item_icon'] = False
-        toolset_inst = toolset_class(**tool_kwargs)
-        toolset_inst.initialize()
 
         if not attacher_class:
             attacher_class = window.Window
 
+        toolset_inst = toolset_class(**tool_kwargs)
+        toolset_inst.initialize(client=self._client)
+
+        # noinspection PyArgumentList
         self._attacher = attacher_class(
-            id=tool_id, title=tool_name, config=toolset_class.CONFIG, settings=self.settings,
-            show_on_initialize=True, frameless=frameless_active, dockable=True, toolset=toolset_inst)
+            id=tool_id, title=self.name, config=self.config, settings=self.settings,
+            show_on_initialize=False, frameless=self.is_frameless, dockable=True, toolset=toolset_inst)
 
         toolset_inst.set_attacher(self._attacher)
-
         self._attacher.setWindowIcon(toolset_inst.get_icon())
         self._attacher.setWindowTitle('{} - {}'.format(self._attacher.windowTitle(), self.VERSION))
         if tool_size:
             self._attacher.resize(tool_size[0], tool_size[1])
+
         self._attacher.show()
 
         return self._attacher
@@ -277,6 +297,29 @@ class DccTool(plugin.Plugin, object):
                 LOGGER.error('Tool Widget already deleted: {}'.format(self._bootstrap), exc_info=True)
             except Exception:
                 LOGGER.error('Failed to remove tool widget: {}'.format(self._bootstrap), exc_info=True)
+
+    # =================================================================================================================
+    # INTERNAL
+    # =================================================================================================================
+
+    def _setup_client(self, *args, **kwargs):
+        """
+        Internal function that is called to setup the client of the tool
+        """
+
+        if not self.CLIENT_CLASS:
+            return False
+
+        self._client = self.CLIENT_CLASS.create_and_connect_to_server(self.ID, *args, **kwargs)
+
+        return True
+
+    def _setup_config(self):
+        """
+        Internal function that sets the configuration of the tool
+        """
+
+        self._config = configs.get_tool_config(self.ID, self.PACKAGE)
 
     def _launch(self, *args, **kwargs):
         """
@@ -322,6 +365,10 @@ class DccTool(plugin.Plugin, object):
 
         return tool_data
 
+    # =================================================================================================================
+    # CALLBACKS
+    # =================================================================================================================
+
     def _on_tool_closed(self, tool):
         """
         Internal callback function that is called when a tool is closed
@@ -330,3 +377,70 @@ class DccTool(plugin.Plugin, object):
         """
 
         pass
+
+
+class ToolStats(object):
+    def __init__(self, tool):
+        self._tool = tool
+        self._id = self._tool.ID
+        self._start_time = 0.0
+        self._end_time = 0.0
+        self._execution_time = 0.0
+
+        self._info = dict()
+
+        self._init()
+
+    @property
+    def start_time(self):
+        return self._start_time
+
+    @start_time.setter
+    def start_time(self, value):
+        self._start_time = value
+
+    @property
+    def end_time(self):
+        return self._end_time
+
+    @end_time.setter
+    def end_time(self, value):
+        self._end_time = value
+
+    @property
+    def execution_time(self):
+        return self._execution_time
+
+    def _init(self):
+        """
+        Internal function that initializes info for the plugin and its environment
+        """
+
+        self._info.update({
+            'name': self._tool.__class__.__name__,
+            'creator': self._tool.creator(),
+            'module': self._tool.__class__.__module__,
+            'filepath': inspect.getfile(self._tool.__class__),
+            'id': self._id,
+            'application': dcc.client().get_name()
+        })
+
+    def start(self):
+        """
+        Starts the execution of the plugin
+        """
+
+        self._start_time = time.time()
+
+    def finish(self, trace=None):
+        """
+        Function that is called when plugin finishes its execution
+        :param trace: str or None
+        """
+
+        self._end_time = time.time()
+        self._execution_time = self._end_time - self._start_time
+        self._info['executionTime'] = self._execution_time
+        self._info['lastUsed'] = self._end_time
+        if trace:
+            self._info['traceback'] = trace

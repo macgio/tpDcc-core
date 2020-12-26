@@ -219,7 +219,7 @@ def select_folder_dialog(title, start_directory=None):
     :return: str
     """
 
-    return QFileDialog.getExistingDirectory(None, title, start_directory)[0]
+    return QFileDialog.getExistingDirectory(None, title, start_directory)
 
 
 def save_file_dialog(title, start_directory=None, pattern=None):
@@ -475,6 +475,21 @@ def selected_nodes(full_path=True, **kwargs):
 #     return []
 
 # =================================================================================================================
+# OBJECTS / NODES
+# =================================================================================================================
+
+def node_types():
+    """
+    Returns dictionary that provides a mapping between tpDcc object types and  DCC specific node types
+    Can be the situation where a tpDcc object maps maps to more than one MFn object
+    None values are ignored. This is because either do not exists or there is not equivalent type in Maya
+    :return: dict
+    """
+
+    return dict()
+
+
+# =================================================================================================================
 # DECORATORS
 # =================================================================================================================
 
@@ -491,7 +506,7 @@ def repeat_last_decorator(command_name=None):
     Returns repeat last decorator for current DCC
     """
 
-    return decorators.empty_decorator(command_name)
+    return decorators.empty_decorator
 
 
 def restore_selection_decorator():

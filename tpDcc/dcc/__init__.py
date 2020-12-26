@@ -7,7 +7,7 @@ Module that contains abstract definition of basic DCC functions
 
 from __future__ import print_function, division, absolute_import
 
-from tpDcc.core import dcc, consts
+from tpDcc.core import dcc
 from tpDcc.libs.python import decorators
 
 main = __import__('__main__')
@@ -15,7 +15,7 @@ main = __import__('__main__')
 _CLIENTS = dict()
 
 
-def client(key=None):
+def client(key=None, only_clients=False):
     """
     Returns first current active DCC client
     :return: DccClient
@@ -23,17 +23,22 @@ def client(key=None):
 
     from tpDcc import dcc
 
-    if not _CLIENTS:
+    client = None
+    if _CLIENTS:
+        if key:
+            client = _CLIENTS.get(key, None)
+            if client:
+                return client()
+        else:
+            client = _CLIENTS[list(_CLIENTS.keys())[0]]
+
+    if not client:
+        if only_clients:
+            return None
         return dcc
 
-    # Clients are stored as a weak reference
-    client = None
-    if key:
-        client = _CLIENTS.get(key, None)()
-    if not client:
-        client = _CLIENTS[list(_CLIENTS.keys())[0]]()
-
-    return client
+    # Clients are stored as weakrefs
+    return client()
 
 
 def clients():
@@ -933,11 +938,12 @@ def find_node_by_name(node_name):
 
 @dcc.reroute
 @decorators.abstractmethod
-def find_node_by_id(unique_id):
+def find_node_by_id(unique_id, full_path=True):
     """
     Returns node by its given id.
     This function makes sure that the returned node is an existing node
     :param unique_id: str
+    :param full_path: bool
     :return: str
     """
 
