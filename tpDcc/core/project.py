@@ -129,7 +129,7 @@ class ProjectData(options.OptionObject):
     def create_project(self):
         project_full_path = self.full_path
         if path.is_dir(project_full_path):
-            tpDcc.logger.warning('Project Path {} already exists! Choose another one ...'.format(project_full_path))
+            LOGGER.warning('Project Path {} already exists! Choose another one ...'.format(project_full_path))
             return
 
         folder.create_folder(name=self.name, directory=self._project_path)
@@ -173,4 +173,4 @@ class ProjectData(options.OptionObject):
         self._settings.set('name', self.name)
         self._settings.set('path', self._project_path)
         self._settings.set('full_path', self.full_path)
-        self._settings.set('image', image.image_to_base64(resources.get('icons', 'default', 'tpdcc.png')))
+        self._settings.set('image', str(image.image_to_base64(resources.get('icons', 'default', 'tpdcc.png'))))

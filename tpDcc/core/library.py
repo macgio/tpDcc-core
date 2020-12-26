@@ -9,10 +9,12 @@ from __future__ import print_function, division, absolute_import
 
 import os
 
-from tpDcc.core import plugin
 
+class DccLibrary(object):
 
-class DccLibrary(plugin.Plugin, object):
+    ID = None
+    VERSION = '0.0.0'
+
     def __init__(self, manager, config=None, dev=False, *args, **kwargs):
         super(DccLibrary, self).__init__(manager=manager)
 
@@ -26,6 +28,18 @@ class DccLibrary(plugin.Plugin, object):
     @property
     def dev(self):
         return self._dev
+
+    @classmethod
+    def load(cls):
+        """
+        Function that is called when library is discovered by the Library Manager
+
+        NOTE: This function is called during import time, so we should try to reduce as much as possible the amount
+        of code that we call here
+        :return:
+        """
+
+        pass
 
     @classmethod
     def config_dict(cls, file_name=None):
@@ -47,3 +61,4 @@ class DccLibrary(plugin.Plugin, object):
             'resources_path': os.path.join(file_name, 'resources'),
             'logging_file': os.path.join(file_name, '__logging__.ini'),
         }
+

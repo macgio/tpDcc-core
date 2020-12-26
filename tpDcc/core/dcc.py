@@ -71,7 +71,11 @@ def current_dcc():
             CURRENT_DCC = dcc_name
             break
     if not CURRENT_DCC:
-        CURRENT_DCC = Dccs.Standalone
+        try:
+            import unreal
+            CURRENT_DCC = Dccs.Unreal
+        except ImportError:
+            CURRENT_DCC = Dccs.Standalone
 
     return CURRENT_DCC
 
@@ -96,7 +100,7 @@ def get_dcc_loader_module(package='tpDcc.dccs'):
         try:
             import unreal
             try:
-                dcc_mod = importlib.import_module('{}.unreal.loader')
+                dcc_mod = importlib.import_module('{}.unreal.loader'.format(package))
             except ImportError:
                 pass
         except Exception:
