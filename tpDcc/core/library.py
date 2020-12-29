@@ -42,23 +42,17 @@ class DccLibrary(object):
         pass
 
     @classmethod
-    def config_dict(cls, file_name=None):
+    def config_dict(cls):
         """
         Returns internal tool configuration dictionary
         :return: dict
         """
-
-        file_name = file_name or ''
 
         return {
             'name': 'DccLib',
             'id': 'tpDcc-libs-library',
             'supported_dccs': dict(),
             'creator': 'Tomas Poveda',
-            'tooltip': '',
-            'logger_dir': os.path.join(os.path.expanduser('~'), 'tpDcc', 'logs', 'tools'),
-            'logger_level': 'INFO',
-            'resources_path': os.path.join(file_name, 'resources'),
-            'logging_file': os.path.join(file_name, '__logging__.ini'),
+            'tooltip': ''
         }
 
