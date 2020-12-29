@@ -245,7 +245,7 @@ class OptionObject(object):
                 new_value = self._format_custom_option_value(option_type, value)
 
         if not option_type == 'script':
-            if type(value) == str or type(value) in [unicode, str]:
+            if python.is_string(value):
                 eval_value = None
                 try:
                     if value:
@@ -256,7 +256,7 @@ class OptionObject(object):
                     if type(eval_value) in [list, tuple, dict]:
                         new_value = eval_value
                         value = eval_value
-            if type(value) in [str, unicode]:
+            if python.is_string(value):
                 if value.find(',') > -1:
                     new_value = value.split(',')
 
