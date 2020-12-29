@@ -3013,14 +3013,10 @@ def move_pivot_in_world_space(node, x, y, z):
 
 @dcc.reroute
 @decorators.abstractmethod
-def move_pivot(node, x, y, z):
+def move_pivot_to_zero(node):
     """
-    Moves the pivot of the given node by the given values
+    Moves pivot of given node to zero (0, 0, 0 in the world)
     :param node: str
-    :param x: float
-    :param y: float
-    :param z: float
-    :return: float
     """
 
     pass
@@ -3434,6 +3430,18 @@ def combine_meshes(meshes_to_combine=None, **kwargs):
     """
     Combines given meshes into one unique mesh. If no meshes given, all selected meshes will be combined
     :param meshes_to_combine: list(str) or None
+    :return: str
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def separate_meshes(meshes_to_separate=None, **kwargs):
+    """
+    Separates given meshes. If no meshes given, all selected meshes will be combined
+    :param meshes_to_separate: list(str) or None
     :return: str
     """
 

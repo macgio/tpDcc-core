@@ -9,7 +9,6 @@ from __future__ import print_function, division, absolute_import
 
 import os
 import sys
-import copy
 import time
 import inspect
 import logging
@@ -129,8 +128,6 @@ class DccTool(object):
         :return: dict
         """
 
-        file_name = file_name or ''
-
         return {
             'name': 'DccTool',
             'id': cls.ID,
@@ -140,8 +137,6 @@ class DccTool(object):
             'tooltip': '',
             'help_url': 'www.tomipoveda.com',
             'tags': ['tpDcc', 'dcc', 'tool'],
-            'resources_path': os.path.join(file_name, 'resources'),
-            'logging_file': os.path.join(file_name, '__logging__.ini'),
             'is_checkable': False,
             'is_checked': False,
             'frameless': {
