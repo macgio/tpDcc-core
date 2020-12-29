@@ -12,6 +12,7 @@ import sys
 import time
 import json
 import socket
+import inspect
 import pkgutil
 import logging
 import weakref
@@ -28,7 +29,7 @@ from tpDcc.managers import configs
 import tpDcc.libs.python
 import tpDcc.libs.resources
 import tpDcc.libs.qt.loader
-from tpDcc.libs.python import path as path_utils
+from tpDcc.libs.python import python, path as path_utils
 
 if sys.version_info[0] == 2:
     from socket import error as ConnectionRefusedError
@@ -246,9 +247,29 @@ class DccClient(object):
                 cmd = cmd_dict.pop('cmd', None)
                 if cmd and hasattr(dcc, cmd):
                     try:
-                        res = getattr(dcc, cmd)(**json_cmd)
+                        res = getattr(dcc, cmd)(**cmd_dict)
                     except TypeError:
-                        res = getattr(dcc, cmd)()
+                        if python.is_python2():
+                            function_kwargs = inspect.getargspec(getattr(dcc, cmd))
+                            plugin_kwargs = function_kwargs.args
+                            if not function_kwargs:
+                                res = getattr(dcc, cmd)()
+                            else:
+                                valid_kwargs = dict()
+                                for kwarg_name, kwarg_value in cmd_dict.items():
+                                    if kwarg_name in plugin_kwargs:
+                                        valid_kwargs[kwarg_name] = kwarg_value
+                                res = getattr(dcc, cmd)(**valid_kwargs)
+                        else:
+                            function_signature = inspect.signature(getattr(dcc, cmd))
+                            if not function_signature.parameters:
+                                res = getattr(dcc, cmd)()
+                            else:
+                                valid_kwargs = dict()
+                                for kwarg_name, kwarg_value in function_signature.parameters.items():
+                                    if kwarg_name in cmd_dict:
+                                        valid_kwargs[kwarg_name] = cmd_dict[kwarg_name]
+                                res = getattr(dcc, cmd)(**valid_kwargs)
                     if res is not None:
                         return {'success': True, 'result': res}
                 return None
@@ -457,7 +478,7 @@ class DccClient(object):
 
         if not self.is_valid_reply(reply_dict):
             self._status = {'msg': 'Error while connecting to Dcc: get dcc info ...', 'level': self.Status.ERROR}
-            return None, None
+            return None, None, None
 
         return reply_dict['name'], reply_dict['version'], reply_dict['pid']
 
