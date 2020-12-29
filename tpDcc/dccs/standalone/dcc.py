@@ -85,6 +85,79 @@ def deferred_function(fn, *args, **kwargs):
     return fn(*args, **kwargs)
 
 
+def is_component_mode():
+    """
+    Returns whether current DCC selection mode is component mode or not
+    :return: bool
+    """
+
+    return False
+
+
+def enable_component_selection():
+    """
+    Enables DCC component selection mode
+    """
+
+    return False
+
+
+def is_plugin_loaded(plugin_name):
+    """
+    Return whether given plugin is loaded or not
+    :param plugin_name: str
+    :return: bool
+    """
+
+    return False
+
+
+def load_plugin(plugin_path, quiet=True):
+    """
+    Loads given plugin
+    :param plugin_path: str
+    :param quiet: bool
+    """
+
+    return False
+
+
+def unload_plugin(plugin_path):
+    """
+    Unloads the given plugin
+    :param plugin_path: str
+    """
+
+    return False
+
+
+def list_old_plugins():
+    """
+    Returns a list of old plugins in the current scene
+    :return: list<str>
+    """
+
+    return list()
+
+
+def remove_old_plugin(plugin_name):
+    """
+    Removes given old plugin from current scene
+    :param plugin_name: str
+    """
+
+    return False
+
+
+def set_workspace(workspace_path):
+    """
+    Sets current workspace to the given path
+    :param workspace_path: str
+    """
+
+    return False
+
+
 def warning(message):
     """
     Prints a warning message
@@ -436,26 +509,6 @@ def selected_nodes(full_path=True, **kwargs):
 #
 #     return list()
 
-# def warning(message):
-#     """
-#     Prints a warning message
-#     :param message: str
-#     :return:
-#     """
-#
-#     print('WARNING: {}'.format(message))
-#
-#
-# def error(message):
-#     """
-#     Prints a error message
-#     :param message: str
-#     :return:
-#     """
-#
-#     print('ERROR: {}'.format(message))
-#
-#
 # def get_control_colors():
 #     """
 #     Returns control colors available in DCC
@@ -488,6 +541,81 @@ def node_types():
 
     return dict()
 
+
+def dcc_to_tpdcc_types():
+    """
+    # Returns a dictionary that provides a mapping between Dcc object types and tpDcc object types
+    :return:
+    """
+
+    pass
+
+
+def dcc_to_tpdcc_str_types():
+    """
+    Returns a dictionary that provides a mapping between Dcc string object types and tpDcc object types
+    :return:
+    """
+
+    pass
+
+
+def node_tpdcc_type(self, node, as_string=False):
+    """
+    Returns the DCC object type as a string given a specific tpDcc object type
+    :param node: str
+    :param as_string: bool
+    :return: str
+    """
+
+    pass
+
+
+# =================================================================================================================
+# CONTROLS
+# =================================================================================================================
+
+def set_parent_controller(control, parent_controller):
+    """
+    Sets the parent controller of the given control
+    :param control: str
+    :param parent_controller: str
+    """
+
+    pass
+
+
+def distance_between_nodes(source_node=None, target_node=None):
+    """
+    Returns the distance between 2 given nodes
+    :param str source_node: first node to start measuring distance from.
+        If not given, first selected node will be used.
+    :param str target_node: second node to end measuring distance to.
+        If not given, second selected node will be used.
+    :return: distance between 2 nodes.
+    :rtype: float
+    """
+
+    pass
+
+
+def get_control_colors():
+    """
+    Returns control colors available in DCC
+    :return: list(float, float, float)
+    """
+
+    return list()
+
+
+def set_control_color(control_node, color=None):
+    """
+    Sets the color of the given control node
+    :param control_node: str
+    :param color: int or list(float, float, float)
+    """
+
+    pass
 
 # =================================================================================================================
 # DECORATORS
