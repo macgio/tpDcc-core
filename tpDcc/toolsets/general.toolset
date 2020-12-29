@@ -7,3 +7,4 @@
     toolsets:
       - tpDcc-tools-renamer
       - tpDcc-tools-nameit
+      - tpDcc-tools-scripteditor
