@@ -32,7 +32,7 @@ def client(key=None, only_clients=False):
         else:
             client = _CLIENTS[list(_CLIENTS.keys())[0]]
 
-    if not client:
+    if not client or not client():
         if only_clients:
             return None
         return dcc
@@ -2427,11 +2427,27 @@ def scene_is_modified():
     pass
 
 
+@dcc.reroute
 @decorators.abstractmethod
 def save_current_scene(force=True, **kwargs):
     """
     Saves current scene
     :param force: bool
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def export_current_selection(export_path, export_type, force=True, **kwargs):
+    """
+    Exports current selection to a file
+    :param export_path: str
+    :param export_type: str
+    :param force: bool
+    :param kwargs:
+    :return:
     """
 
     pass
@@ -3426,6 +3442,19 @@ def get_pole_vector_position(transform_init, transform_mid, transform_end, offse
 
 @dcc.reroute
 @decorators.abstractmethod
+def meshes_are_similar(mesh1, mesh2):
+    """
+    Checks whether two meshes to see if they have the same vertices, edge and face count
+    :param mesh1: str
+    :param mesh2: str
+    :return: bool
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
 def combine_meshes(meshes_to_combine=None, **kwargs):
     """
     Combines given meshes into one unique mesh. If no meshes given, all selected meshes will be combined
@@ -3660,6 +3689,31 @@ def get_curve_shapes(node_name):
 
 @dcc.reroute
 @decorators.abstractmethod
+def get_curve_knots(node_name):
+    """
+    Returns given curve knots
+    :param node_name: str
+    :return: list(str)
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def get_curve_knots_positions(curve_node_name, world_space=False):
+    """
+    Returns given curve knot positions
+    :param curve_node_name: str
+    :param world_space: bool
+    :return: list(tuple(float, float, float))
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
 def get_curve_degree(curve_node_name):
     """
     Returns given curve degree
@@ -3689,6 +3743,19 @@ def get_curve_form(curve_node_name):
     Returns given curve form
     :param curve_node_name: str
     :return: int
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def get_curve_cvs(curve_node_name, world_space=False):
+    """
+    Returns given curve CVs
+    :param curve_node_name: str
+    :param world_space: bool
+    :return: list
     """
 
     pass
@@ -3762,14 +3829,14 @@ def create_circle_curve(name, **kwargs):
 
 @dcc.reroute
 @decorators.abstractmethod
-def create_curve(name, degree, points, knots, periodic):
+def create_curve(name, degree, cvs, knots, form, **kwargs):
     """
     Creates a new Nurbs curve
     :param name: str, name of the new curve
     :param degree: int
-    :param points: list
+    :param cvs: list(tuple(float, float, float))
     :param knots: list
-    :param periodic: bool
+    :param form: int
     :return: str
     """
 
@@ -3801,6 +3868,23 @@ def create_wire(surface, curves, name='wire', **kwargs):
     :param name:str
     :param kwargs:
     :return: str, str
+    """
+
+    pass
+
+
+# =================================================================================================================
+# DEFORMERS
+# =================================================================================================================
+
+@dcc.reroute
+@decorators.abstractmethod
+def find_deformer_by_type(geo_obj, deformer_type, **kwargs):
+    """
+    Given a object find a deformer with deformer_type in its history
+    :param geo_obj: str, name of a mesh
+    :param deformer_type: str, correspnds to the Maya deformer type (skinCluster, blendShape, etc)
+    :return: list(str), names of deformers of type found in the history
     """
 
     pass
@@ -4098,6 +4182,166 @@ def set_joint_radius(node, radius_value):
 
 
 # =================================================================================================================
+# SKIN
+# =================================================================================================================
+
+@dcc.reroute
+@decorators.abstractmethod
+def create_skin(mesh, influences, **kwargs):
+    """
+    Creates a new skin deformer node with given influences and apply it to given mesh
+    :param mesh: str
+    :param influences: list(str)
+    :return: str
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def get_skin_weights(skin_node, vertices_ids=None):
+    """
+    Get the skin weights of the given skin deformer node
+    :param skin_node: str, name of a skin deformer node
+    :param vertices_ids:
+    :return: dict(int, list(float)), returns a dictionary where the key is the influence id and the
+    value is the list of weights of the influence
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def get_skin_blend_weights(skin_deformer):
+    """
+    Returns the blendWeight values on the given skin node
+    :param skin_deformer: str, name of a skin deformer node
+    :return: list(float), blend weight values corresponding to point order
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def set_skin_blend_weights(skin_deformer, weights):
+    """
+    Sets the blendWeights on the skinCluster given a list of weights
+    :param skin_deformer: str, name of a skinCluster deformer
+    :param weights: list<float>, list of weight values corresponding to point order
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def get_skin_influences(skin_deformer, short_name=True, return_dict=False):
+    """
+    Returns the influences connected to the skin cluster
+    Returns a dictionary with the keys being the name of the influences being the value at the
+    key index where the influence connects to the skinCluster
+    :param skin_deformer: str, name of a skinCluster
+    :param short_name: bool, Whether to return full name of the influence or not
+    :param return_dict: bool, Whether to return a dictionary or not
+    :return: variant(dict, list)
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def apply_skin_influences_from_data(skin_deformer, influences, influence_dict):
+    """
+    Updates skin cluster with given influences data
+    :param skin_deformer: str
+    :param influences: list(str), list of influence names
+    :param influence_dict: dict(str, float), list that contains a map between influences and its weights
+    :return:
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def get_skin_influence_at_index(index, skin_deformer):
+    """
+    Returns which influence connect to the skin node at the given index
+    :param index: int, index of an influence
+    :param skin_deformer: str, name of the skin node to check the index
+    :return: str, name of the influence at the given index
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def get_skin_envelope(geo_obj):
+    """
+    Returns envelope value of the skin node in the given geometry object
+    :param geo_obj: str, name of the geometry
+    :return: float
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def set_skin_envelope(geo_obj, envelope_value):
+    """
+    Sets the envelope value of teh skin node in the given geometry object
+    :param geo_obj: str, name of the geometry
+    :param envelope_value: float. envelope value
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def set_skin_normalize_weights_mode(skin_node, index_mode):
+    """
+    Sets the skin normalize mode used by the given skin deformer node
+    :param skin_node: str
+    :param index_mode: int
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def set_skin_force_normalize_weights(skin_node, flag):
+    """
+    Sets whether or not the skin node weights are forced to be normalized
+    :param skin_node: str
+    :param flag: bool
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def skin_mesh_from_mesh(source_mesh, target_mesh, **kwargs):
+    """
+    Skins a mesh based on the skinning of another mesh
+    Source mesh must be skinned and the target mesh will be skinned with the joints in the source mesh
+    The skinning from the source mesh will be projected onto the target mesh
+    :param source_mesh: str, name of a mesh
+    :param target_mesh: str, name of a mesh
+    """
+
+    pass
+
+
+# =================================================================================================================
 # SELECTION GROUPS
 # =================================================================================================================
 
@@ -4147,6 +4391,17 @@ def add_node_to_selection_group(node, selection_group_name, force=True):
     :param selection_group_name: str
     :param force: bool
     :return: str
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def clear_skin_weights(skin_node):
+    """
+    Sets all the weights on the given skinCluster to zero
+    :param skin_node: str, name of a skinCluster deformer
     """
 
     pass
