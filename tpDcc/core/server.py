@@ -47,6 +47,9 @@ class DccServer(QObject, object):
         self._server_functions = dict()
         self._dcc = dcc
 
+        self._retrieved_data = ''
+        self._bytes_remaining = -1
+
         server_functions = inspect.getmembers(self, predicate=inspect.ismethod) or list()
         for server_function_list in server_functions:
             server_function_name = server_function_list[0]
@@ -132,34 +135,39 @@ class DccServer(QObject, object):
         return False
 
     def _read(self):
-        bytes_remaining = -1
-        json_data = ''
+        json_data = self._retrieved_data or ''
 
         while self._socket.bytesAvailable():
-            # header (10 bytes)
-            if bytes_remaining <= 0:
-                byte_array = self._socket.read(DccServer.HEADER_SIZE)
-                bytes_remaining, valid = byte_array.toInt()
-                if not valid:
-                    bytes_remaining = -1
-                    self._write_error('Invalid header')
 
+            # When no bytes are remaining, we read header from socket, so we can store the total
+            # amount of data (in bytes) we expect to retrieve
+            if self._bytes_remaining <= 0:
+                byte_array = self._socket.read(DccServer.HEADER_SIZE)   # header (10 bytes)
+                self._bytes_remaining, valid = byte_array.toInt()
+                if not valid:
+                    self._bytes_remaining = -1
+                    self._write_error('Invalid header')
                     # purge unknown data
+                    self._retrieved_data = ''
                     self._socket.readAll()
                     return
 
             # body (payload)
-            if bytes_remaining > 0:
-                byte_array = self._socket.read(bytes_remaining)
-                bytes_remaining -= len(byte_array)
+            # we read data until all expected bytes are read
+            if self._bytes_remaining > 0:
+                byte_array = self._socket.read(self._bytes_remaining)
+                self._bytes_remaining -= len(byte_array)
                 json_data += byte_array.data().decode()
 
-                if bytes_remaining == 0:
-                    bytes_remaining = -1
+                if self._bytes_remaining == 0:
+                    self._bytes_remaining = -1
                     data = json.loads(json_data, object_pairs_hook=OrderedDict)
                     self._process_data(data)
 
                     json_data = ''
+
+        self._retrieved_data = json_data
+
 
     def _write(self, reply_dict):
 
@@ -188,6 +196,9 @@ class DccServer(QObject, object):
         self._write(reply)
 
     def _process_data(self, data_dict):
+
+        self._retrieved_data = ''
+
         reply = {
             'success': False,
             'msg': '',
@@ -358,6 +369,8 @@ class DccServer(QObject, object):
                 args = data_dict.pop('args', list())
                 try:
                     reply_dict['result'] = getattr(self._dcc, command_name)(*args, **data_dict)
+                except Exception as exc:
+                    print(exc)
                 except TypeError:
                     try:
                         reply_dict['result'] = getattr(self._dcc, command_name)(**data_dict)
