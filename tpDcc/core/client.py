@@ -54,7 +54,7 @@ class DccClient(object):
         SUCCESS = 'success'
         UNKNOWN = 'unknown'
 
-    def __init__(self, timeout=10):
+    def __init__(self, timeout=2000000000):
         self._timeout = timeout
         self._port = self.__class__.PORT
         self._discard_count = 0
@@ -88,74 +88,34 @@ class DccClient(object):
     def server(self):
         return self._server
 
+    @property
+    def connected(self):
+        return self._connected
+
     # =================================================================================================================
     # BASE
     # =================================================================================================================
 
     @classmethod
-    def create_and_connect_to_server(cls, tool_id, *args, **kwargs):
+    def _register_client(cls, tool_id, client):
+        """
+        Internal function that registers given client in global Dcc clients variable
+        """
 
-        def _update_client():
-            config_dict = configs.get_tool_config(tool_id) or dict()
-            supported_dccs = config_dict.get(
-                'supported_dccs', dict()) if config_dict else kwargs.get('supported_dccs', dict())
+        if not client:
+            return
+        client_found = False
+        current_clients = dcc._CLIENTS
+        for current_client in list(current_clients.values()):
+            if client == current_client():
+                client_found = True
+                break
+        if client_found:
+            return
+        dcc._CLIENTS[tool_id] = weakref.ref(client)
 
-            valid_connect = client.connect()
-            if not valid_connect:
-                _register_client()
-                return False
-
-            if dcc.is_standalone():
-                success, dcc_exe = client.update_paths()
-                if not success:
-                    return False
-
-                success = client.update_dcc_paths(dcc_exe)
-                if not success:
-                    return False
-
-                success = client.init_dcc()
-                if not success:
-                    return False
-
-            dcc_name, dcc_version, dcc_pid = client.get_dcc_info()
-            if not dcc_name or not dcc_version:
-                return False
-
-            if dcc_name not in supported_dccs:
-                client.set_status(
-                    'Connected DCC {} ({}) is not supported!'.format(dcc_name, dcc_version), client.Status.WARNING)
-                return False
-
-            supported_versions = supported_dccs[dcc_name]
-            if dcc_version not in supported_versions:
-                client.set_status(
-                    'Connected DCC {} is support but version {} is not!'.format(
-                        dcc_name, dcc_version), client.Status.WARNING)
-                return False
-
-            msg = 'Connected to: {} {} ({})'.format(dcc_name, dcc_version, dcc_pid)
-            client.set_status(msg, client.Status.SUCCESS)
-            LOGGER.info(msg)
-
-            _register_client()
-
-        def _register_client():
-            """
-            Internal function that registers given client in global Dcc clients variable
-            """
-
-            if not client:
-                return
-            client_found = False
-            current_clients = dcc._CLIENTS
-            for current_client in list(current_clients.values()):
-                if client == current_client():
-                    client_found = True
-                    break
-            if client_found:
-                return
-            dcc._CLIENTS[tool_id] = weakref.ref(client)
+    @classmethod
+    def create(cls, tool_id, *args, **kwargs):
 
         # If a client with given ID is already registered, we return it
         client = dcc.client(tool_id, only_clients=True)
@@ -164,10 +124,23 @@ class DccClient(object):
 
         client = cls()
 
+        return client
+
+    @classmethod
+    def create_and_connect_to_server(cls, tool_id, *args, **kwargs):
+
+        # def _connect_client():
+        #     valid_connect = client.connect()
+        #     if not valid_connect:
+        #         cls._register_client(tool_id, client)
+        #         return False
+
+        client = cls.create(tool_id, *args, **kwargs)
+
         parent = kwargs.get('parent', None)
         server_class_name = kwargs.get('server_name', cls.__name__.replace(
             'Client', 'Server').replace('client', 'server'))
-        server_module_name = kwargs.get('server_module_name', server_class_name.lower())
+        server_module_name = kwargs.get('server_module_name', 'server')
 
         if not dcc.is_standalone():
             dcc_mod_name = '{}.dccs.{}.{}'.format(tool_id.replace('-', '.'), dcc.get_name(), server_module_name)
@@ -176,19 +149,66 @@ class DccClient(object):
                 if hasattr(mod, server_class_name):
                     server = getattr(mod, server_class_name)(parent, client=client, update_paths=False)
                     client.set_server(server)
-                    _update_client()
+                    client.update_client(tool_id=tool_id, **kwargs)
             except Exception as exc:
                 LOGGER.warning(
-                    'Impossible to launch Renamer server! Error while importing: {} >> {}'.format(dcc_mod_name, exc))
+                    'Impossible to launch tool server! Error while importing: {} >> {}'.format(dcc_mod_name, exc))
                 try:
                     server.close_connection()
                 except Exception:
                     pass
                 return None
         else:
-            _update_client()
+            client.connect()
+            client.update_client(tool_id=tool_id, **kwargs)
 
         return client
+
+    def update_client(self, **kwargs):
+        tool_id = kwargs.get('tool_id', None)
+        config_dict = configs.get_tool_config(tool_id) or dict() if tool_id else dict()
+        supported_dccs = config_dict.get(
+            'supported_dccs', dict()) if config_dict else kwargs.get('supported_dccs', dict())
+
+        if not self.connected:
+            self.set_status('Not connected to any DCC', self.Status.WARNING)
+            return False
+
+        if dcc.is_standalone():
+            success, dcc_exe = self.update_paths()
+            if not success:
+                return False
+
+            success = self.update_dcc_paths(dcc_exe)
+            if not success:
+                return False
+
+            success = self.init_dcc()
+            if not success:
+                return False
+
+        dcc_name, dcc_version, dcc_pid = self.get_dcc_info()
+        if not dcc_name or not dcc_version:
+            return False
+
+        if dcc_name not in supported_dccs:
+            self.set_status(
+                'Connected DCC {} ({}) is not supported!'.format(dcc_name, dcc_version), self.Status.WARNING)
+            return False
+
+        supported_versions = supported_dccs[dcc_name]
+        if dcc_version not in supported_versions:
+            self.set_status(
+                'Connected DCC {} is support but version {} is not!'.format(
+                    dcc_name, dcc_version), self.Status.WARNING)
+            return False
+
+        msg = 'Connected to: {} {} ({})'.format(dcc_name, dcc_version, dcc_pid)
+        self.set_status(msg, self.Status.SUCCESS)
+        LOGGER.info(msg)
+
+        if tool_id:
+            DccClient._register_client(tool_id, self)
 
     def set_server(self, server):
         self._server = server
@@ -206,7 +226,7 @@ class DccClient(object):
             self._client_socket.connect(('localhost', self._port))
             # self._client_socket.setblocking(False)
         except ConnectionRefusedError as exc:
-            LOGGER.warning(exc)
+            # LOGGER.warning(exc)
             self._status = {'msg': 'Client connection was refused.', 'level': self.Status.ERROR}
             self._connected = False
             return False
@@ -392,7 +412,7 @@ class DccClient(object):
 
         if not self.is_valid_reply(reply_dict):
             self._status = {'msg': 'Error while connecting to Dcc: update paths ...', 'level': self.Status.ERROR}
-            return False
+            return False, None
 
         exe = reply_dict.get('exe', None)
 
