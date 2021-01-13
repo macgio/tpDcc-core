@@ -18,7 +18,7 @@ from functools import partial
 from tpDcc import dcc
 from tpDcc.dcc import window
 from tpDcc.managers import resources, configs
-from tpDcc.libs.python import decorators
+from tpDcc.libs.python import decorators, version, modules
 
 LOGGER = logging.getLogger('tpDcc-core')
 
@@ -30,7 +30,7 @@ class DccTool(object):
 
     ID = None
     PACKAGE = None
-    VERSION = '0.0.0'
+    VERSION = None
 
     TOOLSET_CLASS = None
 
@@ -56,7 +56,7 @@ class DccTool(object):
         self._setup_client(*args, **kwargs)
 
         # Config is setup after the client is connected, because we need to know if we need to load app
-        # DCC specifici configuration or not
+        # DCC specific configuration or not
         self._setup_config()
 
     @property
@@ -102,6 +102,27 @@ class DccTool(object):
         """
 
         pass
+
+    @classmethod
+    def version(cls):
+
+        if cls.VERSION is not None:
+            return cls.VERSION
+
+        cls.VERSION = '0.0.0'
+
+        if hasattr(cls, 'ROOT') and os.path.isdir(cls.ROOT):
+            version_module_file = os.path.join(cls.ROOT, '_version.py')
+            if os.path.isfile(version_module_file):
+                try:
+                    version_module = modules.import_module(version_module_file)
+                    if version_module:
+                        cls.VERSION = version.SemanticVersion.from_pep440_string(
+                            version_module.get_versions()['version'])
+                except Exception as exc:
+                    LOGGER.debug('Impossible to retrieve version for "{}" | {}'.format(cls.ID, exc))
+
+        return cls.VERSION
 
     @staticmethod
     def creator():
