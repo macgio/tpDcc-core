@@ -10,8 +10,10 @@ from __future__ import print_function, division, absolute_import
 import logging
 import importlib
 from functools import wraps
+from collections import OrderedDict
 
 from tpDcc.core import consts
+from tpDcc.libs.python import osplatform
 
 LOGGER = logging.getLogger('tpDcc-core')
 
@@ -33,13 +35,37 @@ class Dccs(object):
     Nuke = 'nuke'
     Unreal = 'unreal'
 
-    packages = {
-        'cmds': Maya,
-        'pymxs': Max,
-        'pyfbsdk': MotionBuilder,
-        'hou': Houdini,
-        'nuke': Nuke,
-        'unreal': Unreal
+    ALL = [
+        Maya, Max, MotionBuilder, Houdini, Nuke, Unreal
+    ]
+
+    nice_names = OrderedDict([
+        (Maya, 'Maya'),
+        (Max, '3ds Max'),
+        (MotionBuilder, 'MotionBuilder'),
+        (Houdini, 'Houdini'),
+        (Nuke, 'Nuke'),
+        (Unreal, 'Unreal')
+    ])
+
+    packages = OrderedDict([
+        ('cmds', Maya),
+        ('pymxs', Max),
+        ('pyfbsdk', MotionBuilder),
+        ('hou', Houdini),
+        ('nuke', Nuke),
+        ('unreal', Unreal)
+    ])
+
+    # TODO: Add support for both MacOS and Linux
+    # TODO: Add missing executables
+    executables = {
+        Maya: {osplatform.Platforms.Windows: 'maya.exe'},
+        Max: {osplatform.Platforms.Windows: '3dsmax.exe'},
+        MotionBuilder: {},
+        Houdini: {},
+        Nuke: {},
+        Unreal: {osplatform.Platforms.Windows: 'unreal.exe'}
     }
 
 
@@ -59,6 +85,29 @@ class DccCallbacks(object):
     NodeSelect = ('NodeSelect', {'type': 'filter'})
     NodeAdded = ('NodeAdded', {'type': 'filter'})
     NodeDeleted = ('NodeDeleted', {'type': 'filter'})
+
+
+def dcc_port(base_port, dcc_name=None):
+    dcc = dcc_name or current_dcc()
+    if not dcc:
+        return base_port
+
+    base_dcc_port = base_port
+    for dcc_name in Dccs.ALL:
+        base_dcc_port += 1
+        if dcc_name == dcc:
+            return base_dcc_port
+
+    return base_port
+
+
+def dcc_ports(base_port):
+    all_ports = OrderedDict()
+    all_ports['base'] = base_port
+    for dcc_name in enumerate(Dccs.ALL):
+        all_ports[dcc_name] = base_port + 1
+
+    return all_ports
 
 
 def current_dcc():

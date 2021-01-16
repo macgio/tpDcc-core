@@ -26,21 +26,21 @@ from Qt.QtCore import QObject, QByteArray
 from Qt.QtNetwork import QTcpServer, QHostAddress, QTcpSocket
 
 from tpDcc import dcc
+from tpDcc.core import dcc as core_dcc
 
 LOGGER = logging.getLogger('tpDcc-core')
 
 
 class DccServer(QObject, object):
 
-    PORT = 17344
+    PORT = 17344           # Base port value, final one will depend on DCC
     HEADER_SIZE = 10
 
     def __init__(self, parent=None, client=None, update_paths=True):
-        # parent = parent or dcc.get_main_window()
         super(DccServer, self).__init__(parent)
 
         self._socket = None
-        self._port = self.__class__.PORT
+        self._port = core_dcc.dcc_port(self.__class__.PORT)
         self._do_update_paths = update_paths
         self._modules_to_import = list()
         self._client = client
@@ -247,6 +247,7 @@ class DccServer(QObject, object):
 
         paths = paths_data.values()
 
+        # TODO: Remove this ASAP
         # NOTE: For now, we add the dependencies manually
         # In the final package, all dependencies libraries will be stored in a specific folder
         maya_deps_folder = r'D:\tpRigToolkit\venvs\maya_deps'

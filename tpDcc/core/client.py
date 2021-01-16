@@ -25,11 +25,12 @@ from Qt.QtCore import Signal, QObject
 import tpDcc.loader
 import tpDcc.config
 from tpDcc import dcc
+from tpDcc.core import dcc as core_dcc
 from tpDcc.managers import configs
 import tpDcc.libs.python
 import tpDcc.libs.resources
 import tpDcc.libs.qt.loader
-from tpDcc.libs.python import python, path as path_utils
+from tpDcc.libs.python import python, osplatform, process, path as path_utils
 
 if sys.version_info[0] == 2:
     from socket import error as ConnectionRefusedError
@@ -54,13 +55,17 @@ class DccClient(object):
         SUCCESS = 'success'
         UNKNOWN = 'unknown'
 
-    def __init__(self, timeout=2000000000):
+    def __init__(self, timeout=20, tool_id=None):
+        self._tool_id = tool_id or None
         self._timeout = timeout
-        self._port = self.__class__.PORT
+        self._ports = core_dcc.dcc_ports(self.__class__.PORT)
+        self._port = None
         self._discard_count = 0
         self._server = None
         self._connected = False
         self._status = dict()
+        self._client_sockets = dict()
+        self._running_dccs = list()
 
     def __getattribute__(self, name):
         try:
@@ -122,7 +127,7 @@ class DccClient(object):
         if client:
             return client
 
-        client = cls()
+        client = cls(tool_id=tool_id)
 
         return client
 
@@ -214,31 +219,73 @@ class DccClient(object):
         self._server = server
 
     def connect(self, port=-1):
+
+        def _connect(_port):
+            try:
+                self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self._client_socket.connect(('localhost', _port))
+                # self._client_socket.setblocking(False)
+            except ConnectionRefusedError as exc:
+                # LOGGER.warning(exc)
+                self._status = {'msg': 'Client connection was refused.', 'level': self.Status.ERROR}
+                self._connected = False
+                return False
+            except Exception:
+                LOGGER.exception(traceback.format_exc())
+                self._status = {'msg': 'Error while connecting client', 'level': self.Status.ERROR}
+                self._connected = False
+                return False
+
+            return True
+
         if self._server:
             self._status = {'msg': 'Client connected successfully!', 'level': self.Status.SUCCESS}
             self._connected = True
             return True
 
+        # If we pass a port, we just connect to it
         if port > 0:
             self._port = port
-        try:
-            self._client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self._client_socket.connect(('localhost', self._port))
-            # self._client_socket.setblocking(False)
-        except ConnectionRefusedError as exc:
-            # LOGGER.warning(exc)
-            self._status = {'msg': 'Client connection was refused.', 'level': self.Status.ERROR}
-            self._connected = False
-            return False
-        except Exception:
-            LOGGER.exception(traceback.format_exc())
-            self._status = {'msg': 'Error while connecting client', 'level': self.Status.ERROR}
-            self._connected = False
-            return False
+            self._connected = _connect(port)
+            return self._connected
 
-        self._connected = True
+        self._port = self.PORT
+        _connect(self._port)
 
-        return True
+        supported_dccs = None
+        tool_id = self._tool_id
+        if tool_id:
+            config_dict = configs.get_tool_config(tool_id) or dict() if tool_id else dict()
+            supported_dccs = config_dict.get(
+                'supported_dccs', dict()) if config_dict else kwargs.get('supported_dccs', dict())
+
+        # If no port if given, we check which DCCs are running the user machine and we try to connect
+        # to those ports
+        self._running_dccs = list()
+        for dcc_name in core_dcc.Dccs.ALL:
+
+            if supported_dccs and dcc_name not in supported_dccs:
+                continue
+
+            process_name = core_dcc.Dccs.executables.get(dcc_name, dict()).get(osplatform.get_platform(), None)
+            if not process_name:
+                continue
+            process_running = process.check_if_process_is_running(process_name)
+            if not process_running:
+                continue
+            self._running_dccs.append(dcc_name)
+        if not self._running_dccs:
+            self._port = self.PORT
+            self._connected = _connect(self._port)
+        else:
+            for dcc_name in self._running_dccs:
+                self._port = core_dcc.dcc_port(self.PORT, dcc_name=dcc_name)
+                valid_connect = _connect(self._port)
+                if valid_connect:
+                    self._connected = True
+                    return True
+
+        return self._connected
 
     def disconnect(self):
         try:
@@ -424,15 +471,15 @@ class DccClient(object):
 
         dcc_name = None
         if 'maya' in dcc_executable:
-            dcc_name = 'maya'
+            dcc_name = core_dcc.Dccs.Maya
         elif '3dsmax' in dcc_executable:
-            dcc_name = 'max'
+            dcc_name = core_dcc.Dccs.Max
         elif 'houdini' in dcc_executable:
-            dcc_name = 'houdini'
+            dcc_name = core_dcc.Dccs.Houdini
         elif 'nuke' in dcc_executable:
-            dcc_name = 'nuke'
+            dcc_name = core_dcc.Dccs.Nuke
         elif 'unreal' in dcc_executable or os.path.basename(dcc_executable).startswith('UE'):
-            dcc_name = 'unreal'
+            dcc_name = core_dcc.Dccs.Unreal
         if not dcc_name:
             msg = 'Executable DCC {} is not supported!'.format(dcc_executable)
             LOGGER.warning(msg)
