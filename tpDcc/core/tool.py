@@ -266,6 +266,8 @@ class DccTool(object):
             attacher_class = window.Window
 
         toolset_inst = toolset_class(**tool_kwargs)
+        toolset_inst.ID = tool_id
+        toolset_inst.CONFIG = tool_config_dict
         toolset_inst.initialize(client=self._client)
 
         # noinspection PyArgumentList
