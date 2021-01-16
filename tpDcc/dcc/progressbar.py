@@ -15,14 +15,26 @@ from tpDcc.libs.python import decorators
 class _MetaProgressBar(type):
 
     def __call__(cls, *args, **kwargs):
+        as_class = kwargs.pop('as_class', False)
         if dcc.is_maya():
             from tpDcc.dccs.maya.ui import progress
-            return type.__call__(progress.MayaProgressBar, *args, **kwargs)
+            if as_class:
+                return progress.MayaProgressBar
+            else:
+                return type.__call__(progress.MayaProgressBar, *args, **kwargs)
         else:
-            return type.__call__(BaseProgressBar, *args, **kwargs)
+            if as_class:
+                return BaseProgressBar
+            else:
+                return type.__call__(BaseProgressBar, *args, **kwargs)
 
 
 class BaseProgressBar(abstract_progressbar.AbstractProgressBar):
+
+    ERROR_STATUS = 'error'
+    NORMAL_STATUS = 'primary'
+    SUCCESS_STATUS = 'success'
+    WARNING_STATUS = 'warning'
 
     inc_value = 0
 
