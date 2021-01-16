@@ -2407,6 +2407,34 @@ def reference_file(file_path, force=True, **kwargs):
 
 @dcc.reroute
 @decorators.abstractmethod
+def import_obj_file(file_path, force=True, **kwargs):
+    """
+    Imports OBJ file into current DCC scene
+    :param file_path: str
+    :param force: bool
+    :param kwargs: keyword arguments
+    :return:
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
+def import_fbx_file(file_path, force=True, **kwargs):
+    """
+    Imports FBX file into current DCC scene
+    :param file_path: str
+    :param force: bool
+    :param kwargs: keyword arguments
+    :return:
+    """
+
+    pass
+
+
+@dcc.reroute
+@decorators.abstractmethod
 def scene_name():
     """
     Returns the name of the current scene
